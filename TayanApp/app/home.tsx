@@ -1,0 +1,349 @@
+import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { router } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { Gradients } from '@/constants/gradients';
+import { useThemeColor } from '@/hooks/use-theme-color';
+import { api } from '@/lib/api';
+import { t } from '@/lib/i18n';
+import { getGeoOrNull } from '@/lib/location';
+import { setLastRequestId } from '@/lib/storage';
+import { useAuth } from '@/providers/auth-provider';
+
+const DEFAULT_LAT = 42.8746;
+const DEFAULT_LNG = 74.5698;
+
+export default function HomeScreen() {
+	const { me, token, lang } = useAuth();
+	const insets = useSafeAreaInsets();
+	const primary = useThemeColor({}, 'primary');
+	const surface = useThemeColor({}, 'surface');
+	const border = useThemeColor({}, 'border');
+	const mutedBg = useThemeColor({}, 'background');
+	const text = useThemeColor({}, 'text');
+
+	const isUser = me?.role === 'user';
+
+	async function sendSos() {
+		if (!token) {
+			Alert.alert(t(lang, 'home.need_sign_in'), t(lang, 'home.sign_in_first'), [
+				{ text: t(lang, 'common.cancel'), style: 'cancel' },
+				{ text: t(lang, 'common.open_profile'), onPress: () => router.push('/profile') },
+			]);
+			return;
+		}
+
+		Alert.alert(t(lang, 'home.sos_title'), t(lang, 'home.sos_confirm'), [
+				{ text: t(lang, 'common.cancel'), style: 'cancel' },
+				{
+					text: t(lang, 'common.send'),
+					style: 'destructive',
+					onPress: async () => {
+						try {
+							const geo = await getGeoOrNull();
+							const lat = geo?.lat ?? DEFAULT_LAT;
+							const lng = geo?.lng ?? DEFAULT_LNG;
+
+							const created = await api<{ id: number; status: string }>('/requests', {
+								method: 'POST',
+								token,
+								lang,
+								body: {
+									kind: 'sos',
+									lat,
+									lng,
+									address: '',
+									severity: 'critical',
+								},
+							});
+
+							const id = created?.id;
+							if (id) {
+								await setLastRequestId(id);
+								router.push({ pathname: '/request', params: { id: String(id) } });
+							} else {
+								Alert.alert(t(lang, 'common.done'), t(lang, 'home.sos_sent'));
+							}
+						} catch (e: any) {
+							Alert.alert(t(lang, 'home.sos_error_title'), e?.message ? String(e.message) : t(lang, 'home.sos_error_fallback'));
+						}
+					},
+				},
+			]
+		);
+	}
+
+	return (
+		<ThemedView style={styles.container}>
+			<View style={[styles.header, { backgroundColor: primary, paddingTop: 24 + insets.top }]}>
+				<View style={styles.headerTop}>
+					<View style={{ flex: 1 }}>
+						<ThemedText style={[styles.headerHello, { color: 'rgba(255,255,255,0.6)' }]}>{t(lang, 'home.hello')}</ThemedText>
+						<ThemedText style={[styles.headerName, { color: '#fff' }]}>
+							{me?.name || t(lang, 'home.user_fallback')}
+						</ThemedText>
+					</View>
+					<Pressable
+						onPress={() => router.push('/profile')}
+						style={[styles.avatar, { backgroundColor: 'rgba(255,255,255,0.2)' }]}
+					>
+						<ThemedText style={styles.avatarText}>👤</ThemedText>
+					</Pressable>
+				</View>
+
+				<Pressable onPress={sendSos} style={styles.sosWrap}>
+					<LinearGradient colors={[...Gradients.sos]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.sosBtn}>
+						<ThemedText style={[styles.sosText, { color: '#fff' }]}>{t(lang, 'home.sos_button')}</ThemedText>
+					</LinearGradient>
+				</Pressable>
+			</View>
+
+			<ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
+				{isUser ? (
+					<ThemedText style={[styles.sectionTitle, { color: primary }]}>{t(lang, 'home.quick_access')}</ThemedText>
+				) : null}
+
+				{isUser ? (
+					<View style={styles.cardGrid}>
+						<Pressable style={styles.cardItem} onPress={() => router.push({ pathname: '/symptom', params: { severity: 'light' } })}>
+							<LinearGradient
+								colors={[...Gradients.lightDamage]}
+								start={{ x: 0, y: 0 }}
+								end={{ x: 1, y: 1 }}
+								style={styles.categoryCard}
+							>
+								<View style={[styles.categoryIcon, { backgroundColor: 'rgba(255,152,0,0.2)' }]}>
+									<ThemedText style={styles.categoryIconText}>🩹</ThemedText>
+								</View>
+								<ThemedText numberOfLines={2} style={[styles.categoryTitle, { color: primary }]}>
+									{t(lang, 'home.light_damage')}
+								</ThemedText>
+							</LinearGradient>
+						</Pressable>
+
+						<Pressable style={styles.cardItem} onPress={() => router.push({ pathname: '/symptom', params: { severity: 'unstable' } })}>
+							<LinearGradient
+								colors={[...Gradients.unstableState]}
+								start={{ x: 0, y: 0 }}
+								end={{ x: 1, y: 1 }}
+								style={styles.categoryCard}
+							>
+								<View style={[styles.categoryIcon, { backgroundColor: 'rgba(255,235,59,0.3)' }]}>
+									<ThemedText style={styles.categoryIconText}>⚠️</ThemedText>
+								</View>
+								<ThemedText numberOfLines={2} style={[styles.categoryTitle, { color: primary }]}>
+									{t(lang, 'home.unstable_state')}
+								</ThemedText>
+							</LinearGradient>
+						</Pressable>
+					</View>
+				) : null}
+
+				<ThemedText style={[styles.sectionTitle, { color: primary }]}>{t(lang, 'home.main_features')}</ThemedText>
+				<View style={styles.functionList}>
+					<FunctionItem
+						surface={surface}
+						mutedBg={mutedBg}
+						textColor={text}
+						primary={primary}
+						icon="📍"
+						title={t(lang, 'home.my_request_map')}
+						onPress={() => router.push('/map')}
+					/>
+
+					{me?.role === 'volunteer' ? (
+						<FunctionItem
+							surface={surface}
+							mutedBg={mutedBg}
+							textColor={text}
+							primary={primary}
+							icon="📌"
+							title={t(lang, 'home.my_accepted')}
+							onPress={() => router.push('/volunteer-my')}
+						/>
+					) : null}
+
+					<FunctionItem
+						surface={surface}
+						mutedBg={mutedBg}
+						textColor={text}
+						primary={primary}
+						icon="📋"
+						title={t(lang, 'home.categories')}
+						onPress={() => router.push('/categories')}
+					/>
+
+					<FunctionItem
+						surface={surface}
+						mutedBg={mutedBg}
+						textColor={text}
+						primary={primary}
+						icon="📹"
+						title={t(lang, 'home.videos')}
+						onPress={() => router.push('/video')}
+					/>
+
+					<FunctionItem
+						surface={surface}
+						mutedBg={mutedBg}
+						textColor={text}
+						primary={primary}
+						icon="🗺️"
+						title={t(lang, 'home.hospitals_map')}
+						onPress={() => router.push('/hospitals-map')}
+					/>
+
+					<FunctionItem
+						surface={surface}
+						mutedBg={mutedBg}
+						textColor={text}
+						primary={primary}
+						icon="💬"
+						title={t(lang, 'home.ai_assistant')}
+						onPress={() => router.push('/chat')}
+					/>
+
+					<FunctionItem
+						surface={surface}
+						mutedBg={mutedBg}
+						textColor={text}
+						primary={primary}
+						icon="⭐"
+						title={t(lang, 'home.volunteer_reviews')}
+						onPress={() => router.push('/reviews')}
+					/>
+
+					<FunctionItem
+						surface={surface}
+						mutedBg={mutedBg}
+						textColor={text}
+						primary={primary}
+						icon="📄"
+						title={t(lang, 'home.my_requests')}
+						onPress={() => router.push('/my-requests')}
+					/>
+				</View>
+			</ScrollView>
+		</ThemedView>
+	);
+}
+
+function FunctionItem(props: {
+	surface: string;
+	mutedBg: string;
+	textColor: string;
+	primary: string;
+	icon: string;
+	title: string;
+	onPress: () => void;
+}) {
+	return (
+		<Pressable onPress={props.onPress} style={[styles.functionItem, { backgroundColor: props.surface }]}>
+			<View style={[styles.functionIconBox, { backgroundColor: props.mutedBg }]}
+			>
+				<ThemedText style={styles.functionIconText}>{props.icon}</ThemedText>
+			</View>
+			<ThemedText style={[styles.functionTitle, { color: props.primary }]}>{props.title}</ThemedText>
+			<ThemedText style={[styles.functionChevron, { color: props.textColor }]}>›</ThemedText>
+		</Pressable>
+	);
+}
+
+const styles = StyleSheet.create({
+	container: { flex: 1 },
+	header: {
+		paddingHorizontal: 24,
+		paddingBottom: 24,
+		borderBottomLeftRadius: 32,
+		borderBottomRightRadius: 32,
+	},
+	headerTop: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 16,
+		marginBottom: 24,
+	},
+	headerHello: { fontSize: 14 },
+	headerName: { fontSize: 20, fontWeight: '700' },
+	avatar: {
+		width: 48,
+		height: 48,
+		borderRadius: 24,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	avatarText: { fontSize: 18 },
+
+	sosWrap: { width: '100%' },
+	sosBtn: {
+		width: '100%',
+		paddingVertical: 20,
+		paddingHorizontal: 18,
+		borderRadius: 16,
+		alignItems: 'center',
+		justifyContent: 'center',
+		shadowColor: '#B91717',
+		shadowOpacity: 0.3,
+		shadowRadius: 20,
+		shadowOffset: { width: 0, height: 8 },
+		elevation: 6,
+	},
+	sosText: { fontSize: 18, fontWeight: '700' },
+
+	scroll: { flex: 1 },
+	content: { padding: 24, paddingBottom: 24 },
+
+	sectionTitle: { fontSize: 18, fontWeight: '700', marginBottom: 16 },
+	cardGrid: { flexDirection: 'row', gap: 16, marginBottom: 24 },
+	cardItem: { flex: 1 },
+	categoryCard: {
+		flex: 1,
+		padding: 24,
+		borderRadius: 24,
+		alignItems: 'center',
+		gap: 16,
+		minHeight: 160,
+		shadowColor: '#000',
+		shadowOpacity: 0.1,
+		shadowRadius: 12,
+		shadowOffset: { width: 0, height: 4 },
+		elevation: 3,
+	},
+	categoryIcon: {
+		width: 64,
+		height: 64,
+		borderRadius: 16,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	categoryIconText: { fontSize: 32, lineHeight: 36, textAlign: 'center' },
+	categoryTitle: { textAlign: 'center', fontWeight: '700' },
+
+	functionList: { gap: 12 },
+	functionItem: {
+		padding: 16,
+		borderRadius: 16,
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 16,
+		shadowColor: '#000',
+		shadowOpacity: 0.08,
+		shadowRadius: 8,
+		shadowOffset: { width: 0, height: 2 },
+		elevation: 2,
+	},
+	functionIconBox: {
+		width: 48,
+		height: 48,
+		borderRadius: 12,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	functionIconText: { fontSize: 20 },
+	functionTitle: { flex: 1, fontWeight: '700' },
+	functionChevron: { fontSize: 18, opacity: 0.7 },
+
+});
