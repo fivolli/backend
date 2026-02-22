@@ -406,16 +406,16 @@ export default function ProfileScreen() {
 							automaticallyAdjustKeyboardInsets
 						>
 							<View style={styles.inputGroup}>
-								<Text style={[styles.inputLabel, { color: primary }]}>{t(lang, 'profile.phone_label')}</Text>
+								<Text style={[styles.inputLabel, { color: primary }]}>{t(lang, 'profile.email_label')}</Text>
 								<TextInput
-									style={[styles.inputField, focused === 'phone' ? [styles.inputFieldFocused, { borderColor: primary }] : null]}
-									value={phone}
-									onChangeText={setPhone}
-									placeholder="+996 XXX XXX XXX"
+									style={[styles.inputField, focused === 'email' ? [styles.inputFieldFocused, { borderColor: primary }] : null]}
+									value={email}
+									onChangeText={setEmail}
+									placeholder="example@mail.com"
 									placeholderTextColor="#999"
-									keyboardType="phone-pad"
+									keyboardType="email-address"
 									autoCapitalize="none"
-									onFocus={() => setFocused('phone')}
+									onFocus={() => setFocused('email')}
 									onBlur={() => setFocused(null)}
 								/>
 							</View>
@@ -647,8 +647,8 @@ const styles = StyleSheet.create({
 	authHeaderWhite: { backgroundColor: 'white' },
 	authLogoSmall: { width: 130, height: 150 },
 	authLogoSmallCompact: { width: 96, height: 112 },
-	authLogoLarge: { width: 385, height: 385, borderRadius: 80 },
-	authLogoLargeCompact: { width: 220, height: 220, borderRadius: 44 },
+	authLogoLarge: { width: 260, height: 260, borderRadius: 52 },
+	authLogoLargeCompact: { width: 170, height: 170, borderRadius: 34 },
 	authWelcome: { fontSize: 28, fontWeight: '700', marginTop: 8 },
 	loginTitle: { color: 'white', fontSize: 20, fontWeight: '700', marginTop: 12 },
 

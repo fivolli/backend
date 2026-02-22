@@ -96,7 +96,7 @@ export default function LoginScreen() {
     }
   }
 
-  const imageSize = Math.min(385, Math.max(240, width - 2 * headerHPad));
+  const imageSize = Math.min(260, Math.max(150, width - 2 * headerHPad));
   const imageRadius = Math.round(imageSize * 0.2);
 
   return (

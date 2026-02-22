@@ -85,7 +85,13 @@ export default function VideoDetailScreen() {
 
   const embedUrl = useMemo(() => {
     if (!video?.youtube_id) return '';
-    return `https://www.youtube.com/embed/${video.youtube_id}?playsinline=1&rel=0`;
+    const q = [
+      'playsinline=1',
+      'rel=0',
+      'modestbranding=1',
+      'autoplay=0',
+    ].join('&');
+    return `https://www.youtube.com/embed/${video.youtube_id}?${q}`;
   }, [video?.youtube_id]);
 
   return (
@@ -116,10 +122,19 @@ export default function VideoDetailScreen() {
           <View style={[styles.playerWrap, { backgroundColor: '#000' }]}>
             {embedUrl && !webError ? (
               <WebView
-                source={{ uri: embedUrl }}
+                source={{
+                  uri: embedUrl,
+                  headers: {
+                    Referer: 'https://www.youtube.com/',
+                  },
+                }}
                 style={styles.playerImage}
                 allowsFullscreenVideo
-                mediaPlaybackRequiresUserAction
+                javaScriptEnabled
+                domStorageEnabled
+                allowsInlineMediaPlayback
+                mediaPlaybackRequiresUserAction={false}
+                userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
                 onError={() => setWebError(true)}
               />
             ) : (

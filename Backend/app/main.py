@@ -1008,10 +1008,14 @@ def register(data: RegisterRequest, request: Request, db: Session = Depends(get_
 @app.post("/auth/login", response_model=TokenResponse)
 def login(data: LoginRequest, request: Request, db: Session = Depends(get_db)):
     _enforce_rate_limit("auth_login", _client_ip(request), AUTH_RATE_LIMIT_RPM)
-    email = (data.email or "").strip().lower()
-    u = db.query(User).filter(func.lower(User.email) == email).first()
+    raw = (data.email or "").strip()
+    if "@" in raw:
+        u = db.query(User).filter(func.lower(User.email) == raw.lower()).first()
+    else:
+        # Backward-compatible fallback for old clients/users that still type phone.
+        u = db.query(User).filter(User.phone == raw).first()
     if not u or not verify_password(str(data.password or ""), u.password_hash):
-        raise HTTPException(400, tr("auth.invalid_credentials"))
+        raise HTTPException(400, "Invalid email or password")
 
     return {"access_token": create_token(u.id), "token_type": "bearer"}
 

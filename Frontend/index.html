@@ -1711,7 +1711,7 @@
             localStorage.setItem('selectedLanguage', next);
         }
 
-        const API_BASE = "http://127.0.0.1:8000";
+        const API_BASE = "https://backend-ae6h.onrender.com/";
         document.addEventListener("submit", (e) => {
             console.warn("GLOBAL SUBMIT BLOCKED", e.target?.id || e.target);
             e.preventDefault();
@@ -1828,7 +1828,7 @@
 
 
         async function api(path, method="GET", body=null, auth=false) {
-            const url = `http://127.0.0.1:8000${path}`;
+            const url = `https://backend-ae6h.onrender.com/${path}`;
             const headers = {};
 
             if (body !== null) headers["Content-Type"] = "application/json";
@@ -1854,7 +1854,7 @@
             }
 
         async function apiWithTimeout(path, method="GET", body=null, auth=false, timeoutMs=20000) {
-            const url = `http://127.0.0.1:8000${path}`;
+            const url = `https://backend-ae6h.onrender.com/${path}`;
             const headers = {};
 
             if (body !== null) headers["Content-Type"] = "application/json";
