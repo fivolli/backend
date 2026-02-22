@@ -25,8 +25,8 @@ const LOGO = require('@/assets/images/tayan_logo.jpg');
 const COPY = {
   ru: {
     title: 'Вход',
-    phone: 'Номер телефона',
-    phonePh: '+996 XXX XXX XXX',
+    email: 'Email',
+    emailPh: 'example@mail.com',
     password: 'Пароль',
     passwordPh: 'Введите пароль',
     login: 'Войти',
@@ -35,8 +35,8 @@ const COPY = {
   },
   en: {
     title: 'Log in',
-    phone: 'Phone number',
-    phonePh: '+996 XXX XXX XXX',
+    email: 'Email',
+    emailPh: 'example@mail.com',
     password: 'Password',
     passwordPh: 'Enter password',
     login: 'Log in',
@@ -45,8 +45,8 @@ const COPY = {
   },
   kg: {
     title: 'Кирүү',
-    phone: 'Телефон номери',
-    phonePh: '+996 XXX XXX XXX',
+    email: 'Email',
+    emailPh: 'example@mail.com',
     password: 'Сыр сөз',
     passwordPh: 'Сыр сөздү жазыңыз',
     login: 'Кирүү',
@@ -75,18 +75,18 @@ export default function LoginScreen() {
   const contentPadV = isCompact ? 24 : 48;
   const contentPadH = isCompact ? 16 : 32;
 
-  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
-  const [focused, setFocused] = useState<'phone' | 'password' | null>(null);
+  const [focused, setFocused] = useState<'email' | 'password' | null>(null);
 
-  const canSubmit = useMemo(() => !!phone.trim() && !!password && !busy, [phone, password, busy]);
+  const canSubmit = useMemo(() => !!email.trim() && !!password && !busy, [email, password, busy]);
 
   async function onSubmit() {
     if (!canSubmit) return;
     setBusy(true);
     try {
-      await signIn(phone, password);
+      await signIn(email, password);
       Alert.alert(t(lang, 'common.done'), t(lang, 'profile.login_success'));
       router.replace('/home');
     } catch (e: any) {
@@ -125,22 +125,22 @@ export default function LoginScreen() {
           contentContainerStyle={{ paddingVertical: contentPadV, paddingHorizontal: contentPadH, flexGrow: 1 }}
         >
           <View style={styles.inputGroup}>
-            <ThemedText style={[styles.inputLabel, { color: primary }]}>{copy.phone}</ThemedText>
+            <ThemedText style={[styles.inputLabel, { color: primary }]}>{copy.email}</ThemedText>
             <TextInput
-              value={phone}
-              onChangeText={setPhone}
-              placeholder={copy.phonePh}
+              value={email}
+              onChangeText={setEmail}
+              placeholder={copy.emailPh}
               placeholderTextColor="#9BA1A6"
-              keyboardType="phone-pad"
+              keyboardType="email-address"
               autoCapitalize="none"
               style={[
                 styles.inputField,
                 {
-                  borderColor: focused === 'phone' ? primary : border,
+                  borderColor: focused === 'email' ? primary : border,
                   color: text,
                 },
               ]}
-              onFocus={() => setFocused('phone')}
+              onFocus={() => setFocused('email')}
               onBlur={() => setFocused(null)}
               returnKeyType="next"
             />
@@ -254,3 +254,4 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
 });
+

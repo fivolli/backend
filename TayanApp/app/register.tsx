@@ -107,10 +107,11 @@ export default function RegisterScreen() {
   const canSubmit = useMemo(() => {
     if (busy) return false;
     if (!name.trim()) return false;
+    if (!email.trim()) return false;
     if (!phone.trim()) return false;
     if (!password) return false;
     return true;
-  }, [busy, name, phone, password]);
+  }, [busy, name, email, phone, password]);
 
   async function onSubmit() {
     if (!canSubmit) return;

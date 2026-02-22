@@ -23,10 +23,10 @@ type AuthContextValue = {
   lang: 'ru' | 'en' | 'kg';
   setLang: (lang: 'ru' | 'en' | 'kg') => void;
   refreshMe: () => Promise<void>;
-  signIn: (phone: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
   register: (data: {
     name: string;
-    email?: string;
+    email: string;
     phone: string;
     password: string;
     role: UserRole;
@@ -130,10 +130,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [token, lang, me?.role]);
 
   const signIn = useCallback(
-    async (phone: string, password: string) => {
+    async (email: string, password: string) => {
       const data = await api<{ access_token: string; token_type: string }>('/auth/login', {
         method: 'POST',
-        body: { phone: phone.trim(), password },
+        body: { email: email.trim().toLowerCase(), password },
         lang,
       });
       const t = data?.access_token || null;
@@ -146,12 +146,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const register = useCallback(
-    async (data: { name: string; email?: string; phone: string; password: string; role: UserRole }) => {
+    async (data: { name: string; email: string; phone: string; password: string; role: UserRole }) => {
       const resp = await api<{ access_token: string; token_type: string }>('/auth/register', {
         method: 'POST',
         body: {
           name: data.name.trim(),
-          email: (data.email || '').trim() || null,
+          email: data.email.trim().toLowerCase(),
           phone: data.phone.trim(),
           password: data.password,
           role: data.role,

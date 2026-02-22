@@ -72,6 +72,13 @@ import json
 import uuid
 from collections import defaultdict, deque
 
+try:
+    import sentry_sdk
+    from sentry_sdk.integrations.fastapi import FastApiIntegration
+except Exception:
+    sentry_sdk = None
+    FastApiIntegration = None
+
 
 def _bool_env(name: str, default: bool = False) -> bool:
     v = os.getenv(name)
@@ -125,6 +132,32 @@ ALLOWED_AVATAR_MIME_TO_EXT = {
 _RATE_LIMIT_LOCK = Lock()
 _RATE_LIMIT_BUCKETS: dict[str, deque[float]] = defaultdict(deque)
 
+
+def _init_sentry() -> None:
+    if sentry_sdk is None or FastApiIntegration is None:
+        return
+
+    dsn = (os.getenv("SENTRY_DSN") or "").strip()
+    if not dsn:
+        return
+
+    app_env = (os.getenv("APP_ENV") or "dev").strip().lower()
+    release = (os.getenv("SENTRY_RELEASE") or "").strip() or None
+    traces_rate = float(os.getenv("SENTRY_TRACES_SAMPLE_RATE", "0.05"))
+    profiles_rate = float(os.getenv("SENTRY_PROFILES_SAMPLE_RATE", "0.0"))
+
+    sentry_sdk.init(
+        dsn=dsn,
+        environment=app_env,
+        release=release,
+        integrations=[FastApiIntegration()],
+        traces_sample_rate=max(0.0, min(1.0, traces_rate)),
+        profiles_sample_rate=max(0.0, min(1.0, profiles_rate)),
+        send_default_pii=False,
+    )
+
+
+_init_sentry()
 
 app = FastAPI()
 
@@ -255,6 +288,31 @@ def _send_expo_push(
         except Exception:
             # Best-effort: do not fail core API calls because push failed.
             pass
+
+
+def _send_resend_email(to_email: str, subject: str, html: str) -> None:
+    api_key = (os.getenv("RESEND_API_KEY") or "").strip()
+    email_from = (os.getenv("EMAIL_FROM") or "").strip()
+    if not api_key or not email_from:
+        return
+
+    payload = {
+        "from": email_from,
+        "to": [to_email],
+        "subject": subject,
+        "html": html,
+    }
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
+    try:
+        resp = httpx.post("https://api.resend.com/emails", json=payload, headers=headers, timeout=12.0)
+        if resp.status_code >= 400 and _bool_env("AI_DEBUG", False):
+            print(f"[MAIL_DBG] Resend failed status={resp.status_code} body={resp.text[:500]}")
+    except Exception as e:
+        if _bool_env("AI_DEBUG", False):
+            print(f"[MAIL_DBG] Resend exception: {e}")
 
 
 def _public_url(request: Request, url_or_path: str | None) -> str | None:
@@ -903,12 +961,18 @@ def register(data: RegisterRequest, request: Request, db: Session = Depends(get_
     if len(phone) < 6:
         raise HTTPException(400, "phone is invalid")
 
+    email = (data.email or "").strip().lower()
+    if not email or "@" not in email:
+        raise HTTPException(400, "email is invalid")
+
     password = str(data.password or "")
     if len(password) < 8:
         raise HTTPException(400, "password must be at least 8 characters")
 
     if db.query(User).filter(User.phone == phone).first():
         raise HTTPException(400, tr("auth.phone_taken"))
+    if db.query(User).filter(func.lower(User.email) == email).first():
+        raise HTTPException(400, "email is already in use")
 
     role = data.role.strip().lower()
     if role not in ("user", "volunteer"):
@@ -916,7 +980,7 @@ def register(data: RegisterRequest, request: Request, db: Session = Depends(get_
 
     u = User(
         name=(data.name or "").strip() or "User",
-        email=(data.email or "").strip() or None,
+        email=email,
         phone=phone,
         password_hash=hash_password(password),
         role=role,
@@ -924,6 +988,16 @@ def register(data: RegisterRequest, request: Request, db: Session = Depends(get_
     db.add(u)
     db.commit()
     db.refresh(u)
+
+    _send_resend_email(
+        to_email=email,
+        subject="Welcome to Tayan",
+        html=(
+            "<h2>Welcome to Tayan</h2>"
+            "<p>Your account has been created successfully.</p>"
+            "<p>If you did not create this account, please change your password immediately.</p>"
+        ),
+    )
 
     return {
         "access_token": create_token(u.id),
@@ -934,8 +1008,8 @@ def register(data: RegisterRequest, request: Request, db: Session = Depends(get_
 @app.post("/auth/login", response_model=TokenResponse)
 def login(data: LoginRequest, request: Request, db: Session = Depends(get_db)):
     _enforce_rate_limit("auth_login", _client_ip(request), AUTH_RATE_LIMIT_RPM)
-    phone = (data.phone or "").strip()
-    u = db.query(User).filter(User.phone == phone).first()
+    email = (data.email or "").strip().lower()
+    u = db.query(User).filter(func.lower(User.email) == email).first()
     if not u or not verify_password(str(data.password or ""), u.password_hash):
         raise HTTPException(400, tr("auth.invalid_credentials"))
 

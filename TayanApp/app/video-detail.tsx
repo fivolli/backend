@@ -1,7 +1,8 @@
-import { ActivityIndicator, Alert, ImageBackground, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useEffect, useMemo, useState } from 'react';
+import { WebView } from 'react-native-webview';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -23,16 +24,17 @@ export default function VideoDetailScreen() {
 
   const [loading, setLoading] = useState(true);
   const [video, setVideo] = useState<NormalizedVideoItem | null>(null);
+  const [webError, setWebError] = useState(false);
 
   const initialFromParams = useMemo(() => {
     if (!id) return null;
     if (!params.videoUrl && !params.title && !params.thumbnailUrl) return null;
     return normalizeVideoItem(
       {
-      id,
-      title: params.title || t(lang, 'video.item_fallback'),
-      video_url: params.videoUrl || '',
-      thumbnail_url: params.thumbnailUrl || '',
+        id,
+        title: params.title || t(lang, 'video.item_fallback'),
+        video_url: params.videoUrl || '',
+        thumbnail_url: params.thumbnailUrl || '',
       },
       lang
     );
@@ -72,7 +74,7 @@ export default function VideoDetailScreen() {
     };
   }, [id, initialFromParams, lang]);
 
-  async function openVideo(url: string) {
+  async function openVideoExternal(url: string) {
     if (!url) return;
     try {
       await Linking.openURL(url);
@@ -80,6 +82,11 @@ export default function VideoDetailScreen() {
       Alert.alert(t(lang, 'common.error'), t(lang, 'video_detail.open_failed'));
     }
   }
+
+  const embedUrl = useMemo(() => {
+    if (!video?.youtube_id) return '';
+    return `https://www.youtube.com/embed/${video.youtube_id}?playsinline=1&rel=0`;
+  }, [video?.youtube_id]);
 
   return (
     <ThemedView style={styles.container}>
@@ -106,35 +113,36 @@ export default function VideoDetailScreen() {
         </ScrollView>
       ) : (
         <>
-          <Pressable onPress={() => openVideo(video.video_url)} disabled={!video.video_url}>
-            <View style={[styles.playerWrap, { backgroundColor: '#000' }]}>
-              {video.thumbnail_url ? (
-                <ImageBackground source={{ uri: video.thumbnail_url }} style={styles.playerImage} resizeMode="cover">
-                  <View style={styles.playCircle}>
-                    <Text style={styles.playIcon}>▶</Text>
-                  </View>
-                </ImageBackground>
-              ) : (
-                <View style={[styles.playerImage, { alignItems: 'center', justifyContent: 'center' }]}>
-                  <View style={styles.playCircle}>
-                    <Text style={styles.playIcon}>▶</Text>
-                  </View>
-                </View>
-              )}
-            </View>
-          </Pressable>
+          <View style={[styles.playerWrap, { backgroundColor: '#000' }]}>
+            {embedUrl && !webError ? (
+              <WebView
+                source={{ uri: embedUrl }}
+                style={styles.playerImage}
+                allowsFullscreenVideo
+                mediaPlaybackRequiresUserAction
+                onError={() => setWebError(true)}
+              />
+            ) : (
+              <View style={[styles.playerImage, styles.fallbackWrap]}>
+                <ThemedText style={styles.fallbackText}>{t(lang, 'video_detail.open_failed')}</ThemedText>
+                {video.video_url ? (
+                  <Pressable onPress={() => openVideoExternal(video.video_url)} style={[styles.btn, { backgroundColor: primary }]}>
+                    <ThemedText style={styles.btnText}>{t(lang, 'video_detail.open_link')}</ThemedText>
+                  </Pressable>
+                ) : null}
+              </View>
+            )}
+          </View>
 
           <ScrollView contentContainerStyle={[styles.content, { backgroundColor: bg }]}>
             <ThemedText style={[styles.title, { color: primary }]}>{video.title}</ThemedText>
 
             {video.video_url ? (
               <>
-                <Pressable onPress={() => openVideo(video.video_url)} style={[styles.btn, { backgroundColor: primary }]}>
+                <Pressable onPress={() => openVideoExternal(video.video_url)} style={[styles.btn, { backgroundColor: primary }]}>
                   <ThemedText style={styles.btnText}>{t(lang, 'video_detail.open_link')}</ThemedText>
                 </Pressable>
-                <ThemedText style={styles.urlText}>
-                  {video.video_url}
-                </ThemedText>
+                <ThemedText style={styles.urlText}>{video.video_url}</ThemedText>
               </>
             ) : null}
           </ScrollView>
@@ -170,18 +178,17 @@ const styles = StyleSheet.create({
   },
   playerImage: {
     flex: 1,
+  },
+  fallbackWrap: {
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: 16,
+    gap: 10,
   },
-  playCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    alignItems: 'center',
-    justifyContent: 'center',
+  fallbackText: {
+    color: '#fff',
+    textAlign: 'center',
   },
-  playIcon: { fontSize: 20, color: '#000' },
 
   content: { padding: 24 },
   center: { paddingVertical: 20, alignItems: 'center' },

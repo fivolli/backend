@@ -32,6 +32,16 @@ AI (optional):
 - `OPENAI_API_KEY` - required to enable `POST /ai/triage`
 - `OPENAI_MODEL` - optional (default: `gpt-5-nano`)
 
+Email (optional, Resend):
+- `RESEND_API_KEY` - API key from resend.com
+- `EMAIL_FROM` - verified sender, e.g. `Tayan <noreply@your-domain.com>`
+
+Monitoring (recommended):
+- `SENTRY_DSN` - Sentry DSN for backend error tracking
+- `SENTRY_RELEASE` - optional release tag (for deploy tracking)
+- `SENTRY_TRACES_SAMPLE_RATE` - e.g. `0.05`
+- `SENTRY_PROFILES_SAMPLE_RATE` - usually `0.0` for MVP
+
 ## 2) Install
 Use Python 3.12.
 

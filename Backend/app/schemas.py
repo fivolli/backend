@@ -6,14 +6,14 @@ from datetime import datetime
 
 class RegisterRequest(BaseModel):
     name: str
-    email: Optional[str] = None
+    email: str
     phone: str
     password: str
     role: str = "user"
 
 
 class LoginRequest(BaseModel):
-    phone: str
+    email: str
     password: str
 
 

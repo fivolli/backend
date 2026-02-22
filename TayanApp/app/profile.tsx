@@ -69,17 +69,17 @@ export default function ProfileScreen() {
 	}, [me, editing]);
 
 	const canSubmit = useMemo(() => {
-		if (!phone.trim() || !password) return false;
+		if (!email.trim() || !password) return false;
 		if (mode === 'register' && !name.trim()) return false;
 		return true;
-	}, [mode, phone, password, name]);
+	}, [mode, email, password, name]);
 
 	async function onSubmit() {
 		if (!canSubmit || busy) return;
 		setBusy(true);
 		try {
 			if (mode === 'login') {
-				await signIn(phone, password);
+				await signIn(email, password);
 				Alert.alert(t(lang, 'common.done'), t(lang, 'profile.login_success'));
 				router.back();
 			} else {
