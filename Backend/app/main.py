@@ -1009,12 +1009,25 @@ def register(data: RegisterRequest, request: Request, db: Session = Depends(get_
 def login(data: LoginRequest, request: Request, db: Session = Depends(get_db)):
     _enforce_rate_limit("auth_login", _client_ip(request), AUTH_RATE_LIMIT_RPM)
     raw = (data.email or "").strip()
+    candidates: list[User] = []
     if "@" in raw:
-        u = db.query(User).filter(func.lower(User.email) == raw.lower()).first()
+        # Handle legacy duplicates safely: verify password against all matches.
+        candidates = db.query(User).filter(func.lower(User.email) == raw.lower()).all()
     else:
         # Backward-compatible fallback for old clients/users that still type phone.
-        u = db.query(User).filter(User.phone == raw).first()
-    if not u or not verify_password(str(data.password or ""), u.password_hash):
+        candidates = db.query(User).filter(User.phone == raw).all()
+
+    password = str(data.password or "")
+    u = None
+    for c in candidates:
+        try:
+            if verify_password(password, c.password_hash):
+                u = c
+                break
+        except Exception:
+            continue
+
+    if not u:
         raise HTTPException(400, "Invalid email or password")
 
     return {"access_token": create_token(u.id), "token_type": "bearer"}
