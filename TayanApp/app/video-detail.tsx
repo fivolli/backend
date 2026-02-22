@@ -1,8 +1,9 @@
-import { ActivityIndicator, Alert, Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useEffect, useMemo, useState } from 'react';
 import { WebView } from 'react-native-webview';
+import * as WebBrowser from 'expo-web-browser';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -77,7 +78,10 @@ export default function VideoDetailScreen() {
   async function openVideoExternal(url: string) {
     if (!url) return;
     try {
-      await Linking.openURL(url);
+      await WebBrowser.openBrowserAsync(url, {
+        presentationStyle: WebBrowser.WebBrowserPresentationStyle.FORM_SHEET,
+        controlsColor: primary,
+      });
     } catch {
       Alert.alert(t(lang, 'common.error'), t(lang, 'video_detail.open_failed'));
     }
