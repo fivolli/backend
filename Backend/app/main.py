@@ -1384,13 +1384,30 @@ def open_requests(
 
     require_role(u, "volunteer")
 
-    items = (
-        db.query(HelpRequest)
+    owner = aliased(User)
+    rows = (
+        db.query(HelpRequest, owner.name)
+        .outerjoin(owner, HelpRequest.user_id == owner.id)
         .filter(HelpRequest.status == "new")
         .order_by(HelpRequest.id.desc())
         .all()
     )
-    return items
+    return [
+        {
+            "id": r.id,
+            "kind": r.kind,
+            "status": r.status,
+            "created_at": r.created_at,
+            "user_name": owner_name,
+            "severity": r.severity,
+            "symptoms": r.symptoms,
+            "comments": r.comments,
+            "lat": r.lat,
+            "lng": r.lng,
+            "address": r.address,
+        }
+        for r, owner_name in rows
+    ]
 
 
 @app.get("/requests/{request_id}", response_model=HelpRequestDetail)

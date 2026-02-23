@@ -139,6 +139,7 @@ class OpenRequestItem(BaseModel):
     kind: str
     status: str
     created_at: datetime
+    user_name: Optional[str] = None
     severity: Optional[str] = None
     symptoms: Optional[str] = None
     comments: Optional[str] = None

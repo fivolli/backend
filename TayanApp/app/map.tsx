@@ -42,6 +42,7 @@ type OpenRequestItem = {
 	kind: string;
 	status: string;
 	created_at: string;
+	user_name?: string | null;
 	severity?: string | null;
 	lat?: number | null;
 	lng?: number | null;
@@ -146,6 +147,16 @@ function formatDistance(lang: 'ru' | 'en' | 'kg', meters: number) {
 	if (meters < 1000) return t(lang, 'common.distance_m', { meters: Math.round(meters) });
 	const km = Math.round((meters / 1000) * 10) / 10;
 	return t(lang, 'common.distance_km', { km });
+}
+
+function formatMinutesAgo(lang: AppLang, iso?: string | null) {
+	if (!iso) return null;
+	const d = new Date(iso);
+	if (Number.isNaN(d.getTime())) return null;
+	const minutes = Math.max(0, Math.floor((Date.now() - d.getTime()) / 60000));
+	if (lang === 'en') return `${minutes} min ago`;
+	if (lang === 'kg') return `${minutes} мүн мурда`;
+	return `${minutes} мин назад`;
 }
 
 export default function MapScreen() {
@@ -866,14 +877,18 @@ export default function MapScreen() {
 		const m = mapRef.current;
 		if (!m) return;
 		try {
+			const coords = [
+				...openPoints.map((p) => ({ latitude: p.latitude, longitude: p.longitude })),
+				...(myGeo ? [{ latitude: myGeo.lat, longitude: myGeo.lng }] : []),
+			];
 			m.fitToCoordinates(
-				openPoints.map((p) => ({ latitude: p.latitude, longitude: p.longitude })),
+				coords,
 				{ edgePadding: { top: 80, right: 60, bottom: 120, left: 60 }, animated: true }
 			);
 		} catch {
 			// ignore
 		}
-	}, [me?.role, requestId, openPoints.length]);
+	}, [me?.role, requestId, openPoints.length, myGeo?.lat, myGeo?.lng]);
 
 	return (
 		<ThemedView style={styles.container}>
@@ -909,6 +924,13 @@ export default function MapScreen() {
 									longitudeDelta: 0.12,
 								}}
 							>
+								{myGeo ? (
+									<Marker
+										coordinate={{ latitude: myGeo.lat, longitude: myGeo.lng }}
+										title={t(lang, 'common.you')}
+										pinColor="#2E7D32"
+									/>
+								) : null}
 								{openPoints.map((p) => (
 									<Marker
 										key={String(p.id)}
@@ -931,6 +953,7 @@ export default function MapScreen() {
 										myGeo && typeof x.lat === 'number' && typeof x.lng === 'number'
 											? formatDistance(lang, haversineMeters(myGeo, { lat: x.lat, lng: x.lng }))
 											: null;
+									const age = formatMinutesAgo(lang, x.created_at);
 									return (
 									<View key={String(x.id)} style={[styles.openItem, { backgroundColor: surface, borderColor: border }]}>
 										<View style={[styles.openIconBox, { backgroundColor: bg }]}>
@@ -938,6 +961,8 @@ export default function MapScreen() {
 										</View>
 										<View style={{ flex: 1 }}>
 											<ThemedText style={[styles.openTitle, { color: primary }]}>{requestKindTitle(lang, x.kind, x.severity)}</ThemedText>
+											{x.user_name ? <ThemedText style={styles.openSub}>👤 {x.user_name}</ThemedText> : null}
+											{age ? <ThemedText style={styles.openSub}>🕒 {age}</ThemedText> : null}
 											{d ? <ThemedText style={styles.openSub}>📏 {d}</ThemedText> : null}
 											{x.address ? <ThemedText style={styles.openSub}>📍 {x.address}</ThemedText> : null}
 											{x.symptoms ? <ThemedText style={styles.openSub} numberOfLines={2}>🩹 {x.symptoms}</ThemedText> : null}
