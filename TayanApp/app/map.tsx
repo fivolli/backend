@@ -113,9 +113,9 @@ function requestKindTitle(lang: AppLang, kind: string, severity?: string | null)
 	return t(lang, 'request.kind.symptom');
 }
 
-function statusText(lang: AppLang, status: string) {
+function statusText(lang: AppLang, status: string, role?: 'user' | 'volunteer') {
 	if (status === 'new') return t(lang, 'map.status_line.new');
-	if (status === 'accepted') return t(lang, 'map.status_line.accepted');
+	if (status === 'accepted') return role === 'volunteer' ? t(lang, 'map.status_line.accepted_self') : t(lang, 'map.status_line.accepted');
 	if (status === 'in_progress') return t(lang, 'map.status_line.in_progress');
 	if (status === 'completed') return t(lang, 'map.status_line.completed');
 	if (status === 'canceled') return t(lang, 'map.status_line.canceled');
@@ -454,6 +454,37 @@ export default function MapScreen() {
 			Alert.alert(t(lang, 'common.error'), e?.message ? String(e.message) : t(lang, 'map.requests_load_failed'));
 		} finally {
 			if (!silent) setOpenLoading(false);
+		}
+	}
+
+	function focusOpenRequestOnMap(item: OpenRequestItem) {
+		const lat = item.lat;
+		const lng = item.lng;
+		if (typeof lat !== 'number' || typeof lng !== 'number') return;
+		const m = mapRef.current;
+		if (!m) return;
+		try {
+			if (myGeo) {
+				m.fitToCoordinates(
+					[
+						{ latitude: lat, longitude: lng },
+						{ latitude: myGeo.lat, longitude: myGeo.lng },
+					],
+					{ edgePadding: { top: 90, right: 60, bottom: 160, left: 60 }, animated: true }
+				);
+				return;
+			}
+			m.animateToRegion(
+				{
+					latitude: lat,
+					longitude: lng,
+					latitudeDelta: 0.015,
+					longitudeDelta: 0.015,
+				},
+				350
+			);
+		} catch {
+			// ignore map animation errors
 		}
 	}
 
@@ -959,7 +990,10 @@ export default function MapScreen() {
 										<View style={[styles.openIconBox, { backgroundColor: bg }]}>
 											<ThemedText style={styles.openIconText}>{kindIcon(x.kind)}</ThemedText>
 										</View>
-										<View style={{ flex: 1 }}>
+										<Pressable
+											onPress={() => focusOpenRequestOnMap(x)}
+											style={({ pressed }) => [{ flex: 1, opacity: pressed ? 0.95 : 1 }]}
+										>
 											<ThemedText style={[styles.openTitle, { color: primary }]}>{requestKindTitle(lang, x.kind, x.severity)}</ThemedText>
 											{x.user_name ? <ThemedText style={styles.openSub}>👤 {x.user_name}</ThemedText> : null}
 											{age ? <ThemedText style={styles.openSub}>🕒 {age}</ThemedText> : null}
@@ -967,7 +1001,7 @@ export default function MapScreen() {
 											{x.address ? <ThemedText style={styles.openSub}>📍 {x.address}</ThemedText> : null}
 											{x.symptoms ? <ThemedText style={styles.openSub} numberOfLines={2}>🩹 {x.symptoms}</ThemedText> : null}
 									{x.comments ? <ThemedText style={styles.openSub} numberOfLines={2}>💬 {x.comments}</ThemedText> : null}
-										</View>
+										</Pressable>
 										<Pressable
 											onPress={() => acceptRequest(x.id)}
 											disabled={acceptingId === x.id}
@@ -1141,7 +1175,7 @@ export default function MapScreen() {
 					<>
 						<View style={[styles.alertBox, { backgroundColor: bg, borderColor: border }]}>
 							<ThemedText style={[styles.alertText, { color: primary }]}>
-								{statusText(lang, data.status)}
+								{statusText(lang, data.status, me?.role)}
 							</ThemedText>
 						</View>
 
