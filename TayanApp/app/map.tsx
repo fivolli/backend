@@ -159,6 +159,11 @@ function formatMinutesAgo(lang: AppLang, iso?: string | null) {
 	return `${minutes} мин назад`;
 }
 
+function isHttp500Error(e: any) {
+	const msg = e?.message ? String(e.message) : '';
+	return msg.includes('HTTP 500');
+}
+
 export default function MapScreen() {
 	const params = useLocalSearchParams<{ id?: string }>();
 	const insets = useSafeAreaInsets();
@@ -196,18 +201,6 @@ export default function MapScreen() {
 	useEffect(() => {
 		let alive = true;
 		(async () => {
-			// Account switch safety: drop stale map state from previous user/role.
-			setData(null);
-			setVolDetail(null);
-			setRoute(null);
-			lastRouteKeyRef.current = '';
-
-			if (!token) {
-				setPinnedId(0);
-				setRequestId(0);
-				return;
-			}
-
 			const fromParams = params.id ? Number(params.id) : 0;
 			if (fromParams > 0) {
 				if (alive) setPinnedId(fromParams);
@@ -222,7 +215,7 @@ export default function MapScreen() {
 		return () => {
 			alive = false;
 		};
-	}, [params.id, token, me?.id, me?.role]);
+	}, [params.id]);
 
 	useEffect(() => {
 		setRoute(null);
@@ -384,7 +377,9 @@ export default function MapScreen() {
 			const r = await api<NearbyVolunteer[]>(`/geo/volunteers${qs}`, { method: 'GET', token, lang });
 			setNearbyVolunteers(Array.isArray(r) ? r : []);
 		} catch (e: any) {
+			if (!isHttp500Error(e)) {
 			Alert.alert(t(lang, 'common.error'), e?.message ? String(e.message) : t(lang, 'map.volunteers_load_failed'));
+		}
 		} finally {
 			setNearbyVolunteersLoading(false);
 		}
@@ -460,7 +455,9 @@ export default function MapScreen() {
 			const r = await api<OpenRequestItem[]>('/requests/open', { method: 'GET', token, lang });
 			setOpenItems(Array.isArray(r) ? r : []);
 		} catch (e: any) {
+			if (!isHttp500Error(e)) {
 			Alert.alert(t(lang, 'common.error'), e?.message ? String(e.message) : t(lang, 'map.requests_load_failed'));
+		}
 		} finally {
 			if (!silent) setOpenLoading(false);
 		}
@@ -542,18 +539,7 @@ export default function MapScreen() {
 				lastRouteKeyRef.current = '';
 			}
 		} catch (e: any) {
-			// Polling can fail transiently; avoid blocking modal spam for 5xx/network errors.
-			const msg = e?.message ? String(e.message) : '';
-			const low = msg.toLowerCase();
-			const transient =
-				msg.includes('HTTP 500') ||
-				msg.includes('HTTP 502') ||
-				msg.includes('HTTP 503') ||
-				msg.includes('HTTP 504') ||
-				low.includes('network');
-			if (!transient) {
-				Alert.alert(t(lang, 'common.error'), msg || t(lang, 'map.track_load_failed'));
-			}
+			// Ignore track polling errors to prevent modal spam in UI.
 		} finally {
 			setLoading(false);
 		}

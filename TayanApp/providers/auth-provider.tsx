@@ -1,9 +1,11 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { AppState, Platform } from 'react-native';
 
 import { DEFAULT_LANG } from '@/lib/config';
 import { api } from '@/lib/api';
 import { getGeoOrNull } from '@/lib/location';
-import { clearLastRequestId, clearToken, getAppLang, getToken, setAppLang, setToken } from '@/lib/storage';
+import { registerForPushNotificationsAsync } from '@/lib/push-notifications';
+import { clearLastRequestId, clearToken, getAppLang, getNotificationPrefs, getToken, setAppLang, setToken } from '@/lib/storage';
 
 export type UserRole = 'user' | 'volunteer';
 
@@ -62,6 +64,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setMe(data);
   }, [token, lang]);
 
+  const syncPushRegistration = useCallback(
+    async (authToken: string) => {
+      if (!authToken) return;
+      try {
+        const prefs = await getNotificationPrefs();
+        await api('/auth/me/notification-prefs', {
+          method: 'PUT',
+          token: authToken,
+          lang,
+          body: prefs,
+        });
+
+        if (!(prefs.sos || prefs.volunteers || prefs.updates)) return;
+
+        const pushToken = await registerForPushNotificationsAsync();
+        if (!pushToken) return;
+
+        await api('/auth/me/push-token', {
+          method: 'PUT',
+          token: authToken,
+          lang,
+          body: { token: pushToken, platform: String(Platform.OS) },
+        });
+      } catch {
+        // keep auth flow uninterrupted if push registration fails
+      }
+    },
+    [lang]
+  );
+
   useEffect(() => {
     let alive = true;
     (async () => {
@@ -90,6 +122,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!token) return;
       try {
         await refreshMe();
+        await syncPushRegistration(token);
       } catch {
         await clearToken();
         await clearLastRequestId();
@@ -97,7 +130,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setMe(null);
       }
     })();
-  }, [token, loading, refreshMe]);
+  }, [token, loading, refreshMe, syncPushRegistration]);
+
+  useEffect(() => {
+    if (!token) return;
+
+    const onActive = (state: string) => {
+      if (state === 'active') {
+        void syncPushRegistration(token);
+      }
+    };
+
+    const sub = AppState.addEventListener('change', onActive);
+    const t = setInterval(() => {
+      void syncPushRegistration(token);
+    }, 5 * 60 * 1000);
+
+    return () => {
+      sub.remove();
+      clearInterval(t);
+    };
+  }, [token, syncPushRegistration]);
 
   useEffect(() => {
     // Keep volunteers "online" server-side (updates User.volunteer_online_at) on all screens.
@@ -141,8 +194,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await setToken(t);
       setTokenState(t);
       await refreshMe();
+      await syncPushRegistration(t);
     },
-    [lang, refreshMe]
+    [lang, refreshMe, syncPushRegistration]
   );
 
   const register = useCallback(
@@ -163,8 +217,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await setToken(t);
       setTokenState(t);
       await refreshMe();
+      await syncPushRegistration(t);
     },
-    [lang, refreshMe]
+    [lang, refreshMe, syncPushRegistration]
   );
 
   const signOut = useCallback(async () => {

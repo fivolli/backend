@@ -2161,7 +2161,16 @@ def get_nearby_volunteers(
     for v in volunteers:
         distance = hav_km(lat, lng, v.volunteer_lat, v.volunteer_lng)
         if distance <= radius_km:
-            online_seconds = (datetime.utcnow() - v.volunteer_online_at).total_seconds()
+            try:
+                now = datetime.now(timezone.utc)
+                online_at = v.volunteer_online_at
+                if online_at is None:
+                    continue
+                if online_at.tzinfo is None:
+                    online_at = online_at.replace(tzinfo=timezone.utc)
+                online_seconds = (now - online_at).total_seconds()
+            except Exception:
+                online_seconds = 0
             nearby.append(NearbyVolunteer(
                 id=v.id,
                 name=v.name,
