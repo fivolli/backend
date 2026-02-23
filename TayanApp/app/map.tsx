@@ -116,7 +116,7 @@ function requestKindTitle(lang: AppLang, kind: string, severity?: string | null)
 function statusText(lang: AppLang, status: string, role?: 'user' | 'volunteer') {
 	if (status === 'new') return t(lang, 'map.status_line.new');
 	if (status === 'accepted') return role === 'volunteer' ? t(lang, 'map.status_line.accepted_self') : t(lang, 'map.status_line.accepted');
-	if (status === 'in_progress') return t(lang, 'map.status_line.in_progress');
+	if (status === 'in_progress') return role === 'volunteer' ? t(lang, 'map.status_line.in_progress_self') : t(lang, 'map.status_line.in_progress');
 	if (status === 'completed') return t(lang, 'map.status_line.completed');
 	if (status === 'canceled') return t(lang, 'map.status_line.canceled');
 	return status;
@@ -196,6 +196,18 @@ export default function MapScreen() {
 	useEffect(() => {
 		let alive = true;
 		(async () => {
+			// Account switch safety: drop stale map state from previous user/role.
+			setData(null);
+			setVolDetail(null);
+			setRoute(null);
+			lastRouteKeyRef.current = '';
+
+			if (!token) {
+				setPinnedId(0);
+				setRequestId(0);
+				return;
+			}
+
 			const fromParams = params.id ? Number(params.id) : 0;
 			if (fromParams > 0) {
 				if (alive) setPinnedId(fromParams);
@@ -210,7 +222,7 @@ export default function MapScreen() {
 		return () => {
 			alive = false;
 		};
-	}, [params.id]);
+	}, [params.id, token, me?.id, me?.role]);
 
 	useEffect(() => {
 		setRoute(null);
