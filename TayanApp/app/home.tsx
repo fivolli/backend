@@ -63,7 +63,7 @@ export default function HomeScreen() {
 							const id = created?.id;
 							if (id) {
 								await setLastRequestId(id);
-								router.push({ pathname: '/request', params: { id: String(id) } });
+								router.push({ pathname: '/map', params: { id: String(id) } });
 							} else {
 								Alert.alert(t(lang, 'common.done'), t(lang, 'home.sos_sent'));
 							}

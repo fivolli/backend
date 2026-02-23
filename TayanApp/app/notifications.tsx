@@ -28,17 +28,13 @@ export default function NotificationsScreen() {
 		(async () => {
 			const p = await getNotificationPrefs();
 			if (alive) setPrefs(p);
-
-			// Best-effort: keep server-side prefs in sync for push routing.
 			if (alive && token) {
 				try {
 					await api('/auth/me/notification-prefs', { method: 'PUT', token, lang, body: p });
 				} catch {
-					// ignore
 				}
 			}
 
-			// If any notifications are enabled, make sure we have push permission + token on server.
 			if (alive && (p.sos || p.volunteers || p.updates)) {
 				void ensureRegistered();
 			}
@@ -77,7 +73,6 @@ export default function NotificationsScreen() {
 		}
 		setSendingTest(true);
 		try {
-			// Make sure we have permissions + token saved on server.
 			await ensureRegistered();
 			await api('/auth/me/push/test', {
 				method: 'POST',
@@ -103,7 +98,6 @@ export default function NotificationsScreen() {
 			try {
 				await api('/auth/me/notification-prefs', { method: 'PUT', token, lang, body: next });
 			} catch {
-				// ignore
 			}
 		}
 

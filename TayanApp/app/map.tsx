@@ -42,6 +42,7 @@ type OpenRequestItem = {
 	kind: string;
 	status: string;
 	created_at: string;
+	severity?: string | null;
 	lat?: number | null;
 	lng?: number | null;
 	address?: string | null;
@@ -83,6 +84,7 @@ type VolunteerRequestDetail = {
 	kind: string;
 	status: string;
 	created_at: string;
+	severity?: string | null;
 	accepted_by?: number | null;
 	accepted_at?: string | null;
 	in_progress_at?: string | null;
@@ -101,6 +103,13 @@ type GeoPoint = { lat: number; lng: number };
 
 function kindIcon(kind: string) {
 	return kind === 'sos' ? '🚨' : '🩹';
+}
+
+function requestKindTitle(lang: AppLang, kind: string, severity?: string | null) {
+	if (kind === 'sos') return t(lang, 'request.kind.sos');
+	if (severity === 'light') return t(lang, 'symptom.state_light_plain');
+	if (severity === 'unstable') return t(lang, 'symptom.state_unstable_plain');
+	return t(lang, 'request.kind.symptom');
 }
 
 function statusText(lang: AppLang, status: string) {
@@ -423,16 +432,17 @@ export default function MapScreen() {
 		setRequestId(0);
 	}
 
-	async function loadOpenRequests() {
+	async function loadOpenRequests(opts?: { silent?: boolean }) {
 		if (!token) return;
-		setOpenLoading(true);
+		const silent = !!opts?.silent;
+		if (!silent) setOpenLoading(true);
 		try {
 			const r = await api<OpenRequestItem[]>('/requests/open', { method: 'GET', token, lang });
 			setOpenItems(Array.isArray(r) ? r : []);
 		} catch (e: any) {
 			Alert.alert(t(lang, 'common.error'), e?.message ? String(e.message) : t(lang, 'map.requests_load_failed'));
 		} finally {
-			setOpenLoading(false);
+			if (!silent) setOpenLoading(false);
 		}
 	}
 
@@ -655,7 +665,7 @@ export default function MapScreen() {
 		loadOpenRequests().catch(() => {});
 		const t = setInterval(() => {
 			if (!alive) return;
-			loadOpenRequests().catch(() => {});
+			loadOpenRequests({ silent: true }).catch(() => {});
 		}, 6000);
 		return () => {
 			alive = false;
@@ -813,9 +823,9 @@ export default function MapScreen() {
 				const lat = x.lat;
 				const lng = x.lng;
 				if (typeof lat !== 'number' || typeof lng !== 'number') return null;
-				return { id: x.id, kind: x.kind, latitude: lat, longitude: lng };
+				return { id: x.id, kind: x.kind, severity: x.severity, latitude: lat, longitude: lng };
 			})
-			.filter(Boolean) as { id: number; kind: string; latitude: number; longitude: number }[];
+			.filter(Boolean) as { id: number; kind: string; severity?: string | null; latitude: number; longitude: number }[];
 	}, [sortedOpenItems]);
 
 	const newReqPoint = useMemo(() => {
@@ -903,7 +913,7 @@ export default function MapScreen() {
 									<Marker
 										key={String(p.id)}
 										coordinate={{ latitude: p.latitude, longitude: p.longitude }}
-										title={`#${p.id} ${t(lang, p.kind === 'sos' ? 'request.kind.sos' : 'request.kind.symptom')}`}
+										title={requestKindTitle(lang, p.kind, p.severity)}
 										pinColor={p.kind === 'sos' ? danger : primary}
 									/>
 								))}
@@ -927,10 +937,11 @@ export default function MapScreen() {
 											<ThemedText style={styles.openIconText}>{kindIcon(x.kind)}</ThemedText>
 										</View>
 										<View style={{ flex: 1 }}>
-											<ThemedText style={[styles.openTitle, { color: primary }]}>#{x.id} • {t(lang, x.kind === 'sos' ? 'request.kind.sos' : 'request.kind.symptom')}</ThemedText>
+											<ThemedText style={[styles.openTitle, { color: primary }]}>{requestKindTitle(lang, x.kind, x.severity)}</ThemedText>
 											{d ? <ThemedText style={styles.openSub}>📏 {d}</ThemedText> : null}
 											{x.address ? <ThemedText style={styles.openSub}>📍 {x.address}</ThemedText> : null}
 											{x.symptoms ? <ThemedText style={styles.openSub} numberOfLines={2}>🩹 {x.symptoms}</ThemedText> : null}
+									{x.comments ? <ThemedText style={styles.openSub} numberOfLines={2}>💬 {x.comments}</ThemedText> : null}
 										</View>
 										<Pressable
 											onPress={() => acceptRequest(x.id)}
@@ -1058,7 +1069,7 @@ export default function MapScreen() {
 								>
 									<Marker
 										coordinate={newReqPoint}
-										title={`#${volDetail.id} ${t(lang, volDetail.kind === 'sos' ? 'request.kind.sos' : 'request.kind.symptom')}`}
+										title={requestKindTitle(lang, volDetail.kind, volDetail.severity)}
 										pinColor={volDetail.kind === 'sos' ? danger : primary}
 									/>
 									{myGeo ? (
@@ -1076,7 +1087,7 @@ export default function MapScreen() {
 						)}
 
 						<View style={[styles.card, { backgroundColor: surface, borderColor: border }]}>
-							<ThemedText style={[styles.rowTitle, { color: primary }]}>#{volDetail.id} • {t(lang, volDetail.kind === 'sos' ? 'request.kind.sos' : 'request.kind.symptom')}</ThemedText>
+							<ThemedText style={[styles.rowTitle, { color: primary }]}>{requestKindTitle(lang, volDetail.kind, volDetail.severity)}</ThemedText>
 							{newReqDistance ? <ThemedText style={[styles.rowValue, { color: text }]}>📏 {newReqDistance}</ThemedText> : null}
 							{!volDetail.address && newReqPoint ? (
 								<ThemedText style={[styles.rowValue, { color: text }]}>📍 {newReqPoint.latitude.toFixed(6)}, {newReqPoint.longitude.toFixed(6)}</ThemedText>
@@ -1323,12 +1334,14 @@ export default function MapScreen() {
 							</View>
 
 						<View style={{ gap: 10 }}>
-							<Pressable
-								onPress={openRouteByGps}
-								style={({ pressed }) => [styles.routeBtn, { borderColor: border, opacity: pressed ? 0.9 : 1 }]}
-							>
-								<ThemedText style={{ color: primary, fontWeight: '800' }}>🧭 {t(lang, 'common.route_gps')}</ThemedText>
-							</Pressable>
+							{(me?.role === 'volunteer' || Boolean(data.accepted_by)) ? (
+								<Pressable
+									onPress={openRouteByGps}
+									style={({ pressed }) => [styles.routeBtn, { borderColor: border, opacity: pressed ? 0.9 : 1 }]}
+								>
+									<ThemedText style={{ color: primary, fontWeight: '800' }}>🧭 {t(lang, 'common.route_gps')}</ThemedText>
+								</Pressable>
+							) : null}
 
 							{showVolunteerActions && data.status === 'accepted' ? (
 								<View style={styles.actionsRow}>

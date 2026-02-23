@@ -62,7 +62,7 @@ export default function SymptomScreen() {
               });
               if (created?.id) {
                 await setLastRequestId(created.id);
-                router.push({ pathname: '/request', params: { id: String(created.id) } });
+                router.push({ pathname: '/map', params: { id: String(created.id) } });
               }
             } catch (e: any) {
               Alert.alert(t(lang, 'home.sos_error_title'), e?.message ? String(e.message) : t(lang, 'home.sos_error_fallback'));
@@ -115,7 +115,7 @@ export default function SymptomScreen() {
 
       if (created?.id) {
         await setLastRequestId(created.id);
-        router.push({ pathname: '/request', params: { id: String(created.id) } });
+        router.push({ pathname: '/map', params: { id: String(created.id) } });
       } else {
         Alert.alert(t(lang, 'common.done'), t(lang, 'symptom.request_sent'));
       }

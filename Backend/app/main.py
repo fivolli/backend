@@ -72,13 +72,6 @@ import json
 import uuid
 from collections import defaultdict, deque
 
-try:
-    import sentry_sdk
-    from sentry_sdk.integrations.fastapi import FastApiIntegration
-except Exception:
-    sentry_sdk = None
-    FastApiIntegration = None
-
 
 def _bool_env(name: str, default: bool = False) -> bool:
     v = os.getenv(name)
@@ -132,32 +125,6 @@ ALLOWED_AVATAR_MIME_TO_EXT = {
 _RATE_LIMIT_LOCK = Lock()
 _RATE_LIMIT_BUCKETS: dict[str, deque[float]] = defaultdict(deque)
 
-
-def _init_sentry() -> None:
-    if sentry_sdk is None or FastApiIntegration is None:
-        return
-
-    dsn = (os.getenv("SENTRY_DSN") or "").strip()
-    if not dsn:
-        return
-
-    app_env = (os.getenv("APP_ENV") or "dev").strip().lower()
-    release = (os.getenv("SENTRY_RELEASE") or "").strip() or None
-    traces_rate = float(os.getenv("SENTRY_TRACES_SAMPLE_RATE", "0.05"))
-    profiles_rate = float(os.getenv("SENTRY_PROFILES_SAMPLE_RATE", "0.0"))
-
-    sentry_sdk.init(
-        dsn=dsn,
-        environment=app_env,
-        release=release,
-        integrations=[FastApiIntegration()],
-        traces_sample_rate=max(0.0, min(1.0, traces_rate)),
-        profiles_sample_rate=max(0.0, min(1.0, profiles_rate)),
-        send_default_pii=False,
-    )
-
-
-_init_sentry()
 
 app = FastAPI()
 
@@ -1911,6 +1878,7 @@ def volunteer_request_detail(
         "kind": r.kind,
         "status": r.status,
         "created_at": r.created_at,
+        "severity": r.severity,
         "symptoms": r.symptoms,
         "comments": r.comments,
         "accepted_by": r.accepted_by,

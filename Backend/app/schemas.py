@@ -139,6 +139,7 @@ class OpenRequestItem(BaseModel):
     kind: str
     status: str
     created_at: datetime
+    severity: Optional[str] = None
     symptoms: Optional[str] = None
     comments: Optional[str] = None
     lat: Optional[float] = None
@@ -185,6 +186,7 @@ class VolunteerRequestDetail(BaseModel):
     kind: str
     status: str
     created_at: datetime
+    severity: Optional[str] = None
     symptoms: Optional[str] = None
     comments: Optional[str] = None
     accepted_by: Optional[int] = None
