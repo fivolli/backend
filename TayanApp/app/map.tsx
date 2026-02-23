@@ -413,7 +413,6 @@ export default function MapScreen() {
 			try {
 				await clearLastRequestId();
 			} catch {
-				// ignore
 			}
 			setShowNearbyVolunteers(true);
 			setData(null);
@@ -431,13 +430,11 @@ export default function MapScreen() {
 		try {
 			await setReviewLater(requestId, true);
 		} catch {
-			// ignore
 		}
 		setReviewOpen(false);
 		try {
 			await clearLastRequestId();
 		} catch {
-			// ignore
 		}
 		setData(null);
 		setRequestId(0);
@@ -533,7 +530,18 @@ export default function MapScreen() {
 				lastRouteKeyRef.current = '';
 			}
 		} catch (e: any) {
-			Alert.alert(t(lang, 'common.error'), e?.message ? String(e.message) : t(lang, 'map.track_load_failed'));
+			// Polling can fail transiently; avoid blocking modal spam for 5xx/network errors.
+			const msg = e?.message ? String(e.message) : '';
+			const low = msg.toLowerCase();
+			const transient =
+				msg.includes('HTTP 500') ||
+				msg.includes('HTTP 502') ||
+				msg.includes('HTTP 503') ||
+				msg.includes('HTTP 504') ||
+				low.includes('network');
+			if (!transient) {
+				Alert.alert(t(lang, 'common.error'), msg || t(lang, 'map.track_load_failed'));
+			}
 		} finally {
 			setLoading(false);
 		}
@@ -1167,7 +1175,7 @@ export default function MapScreen() {
 							</Pressable>
 						</View>
 					</>
-				) : loading && !data ? (
+				) : (loading && !data) || (!!requestId && !data) ? (
 					<View style={styles.center}>
 						<ActivityIndicator />
 					</View>
@@ -1248,8 +1256,17 @@ export default function MapScreen() {
 									{route?.coords?.length ? (
 										<Polyline coordinates={route.coords} strokeWidth={4} strokeColor={primary} />
 									) : null}
-									<Marker coordinate={userPoint!} title={me?.role === 'volunteer' ? t(lang, 'common.user') : t(lang, 'common.you')} />
-									{volunteerPoint ? <Marker coordinate={volunteerPoint} title={me?.role === 'volunteer' ? t(lang, 'common.you') : t(lang, 'common.volunteer')} pinColor={danger} /> : null}
+									<Marker
+										coordinate={userPoint!}
+										title={me?.role === 'volunteer' ? (userName || t(lang, 'common.user')) : t(lang, 'common.you')}
+									/>
+									{volunteerPoint ? (
+										<Marker
+											coordinate={volunteerPoint}
+											title={me?.role === 'volunteer' ? t(lang, 'common.you') : (volunteerName || t(lang, 'common.volunteer'))}
+											pinColor={danger}
+										/>
+									) : null}
 								</MapView>
 							</View>
 						) : (

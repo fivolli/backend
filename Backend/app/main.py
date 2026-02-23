@@ -201,6 +201,48 @@ def _get_push_token_map(db: Session, user_ids: list[int]) -> dict[int, str]:
     return out
 
 
+def _help_request_detail_payload(db: Session, r: HelpRequest) -> dict:
+    volunteer_name = None
+    volunteer_phone = None
+    accepted_by = getattr(r, "accepted_by", None)
+    if accepted_by:
+        try:
+            v = db.query(User).filter(User.id == accepted_by).first()
+            if v:
+                volunteer_name = v.name
+                volunteer_phone = v.phone
+        except Exception:
+            # Keep payload usable even if volunteer lookup fails.
+            volunteer_name = None
+            volunteer_phone = None
+
+    return {
+        "id": r.id,
+        "kind": r.kind,
+        "status": r.status,
+        "created_at": r.created_at,
+        "severity": getattr(r, "severity", None),
+        "symptoms": r.symptoms,
+        "comments": r.comments,
+        "accepted_by": accepted_by,
+        "accepted_at": r.accepted_at,
+        "volunteer_name": volunteer_name,
+        "volunteer_phone": volunteer_phone,
+        "volunteer_lat": r.volunteer_lat,
+        "volunteer_lng": r.volunteer_lng,
+        "lat": r.lat,
+        "lng": r.lng,
+        "address": r.address,
+        "in_progress_at": r.in_progress_at,
+        "completed_at": r.completed_at,
+        "canceled_at": r.canceled_at,
+        "reaction_minutes": _safe_reaction_minutes(r.created_at, r.accepted_at),
+        "rating": r.rating,
+        "review_text": r.review_text,
+        "reviewed_at": r.reviewed_at,
+    }
+
+
 def _send_expo_push(
     tokens: list[str],
     title: str,
@@ -1442,44 +1484,7 @@ def get_request(
     if not r or r.user_id != u.id:
         raise HTTPException(404, tr("request.not_found"))
 
-    volunteer_name = None
-    volunteer_phone = None
-
-    if r.accepted_by:
-        v = db.query(User).filter(User.id == r.accepted_by).first()
-        if v:
-            volunteer_name = v.name
-            volunteer_phone = v.phone
-    
-    reaction_minutes = _safe_reaction_minutes(r.created_at, r.accepted_at)
-
-    
-
-    return {
-        "id": r.id,
-        "kind": r.kind,
-        "status": r.status,
-        "created_at": r.created_at,
-        "symptoms": r.symptoms,
-        "comments": r.comments,
-        "accepted_by": r.accepted_by,
-        "accepted_at": r.accepted_at,
-        "lat": r.lat,
-        "lng": r.lng,
-        "severity": r.severity,
-        "volunteer_name": volunteer_name,
-        "volunteer_phone": volunteer_phone,
-        "volunteer_lat": r.volunteer_lat,
-        "volunteer_lng": r.volunteer_lng,
-        "address": r.address,
-        "reaction_minutes": reaction_minutes,
-        "in_progress_at": r.in_progress_at,
-        "completed_at": r.completed_at,
-        "canceled_at": r.canceled_at,
-        "rating": r.rating,
-        "review_text": r.review_text,
-        "reviewed_at": r.reviewed_at
-    }
+    return _help_request_detail_payload(db, r)
 
 
 
@@ -1840,40 +1845,7 @@ def track_request(
     if not (r.user_id == u.id or r.accepted_by == u.id):
         raise HTTPException(403, tr("auth.forbidden"))
 
-    volunteer_name = None
-    volunteer_phone = None
-    if r.accepted_by:
-        v = db.query(User).filter(User.id == r.accepted_by).first()
-        if v:
-            volunteer_name = v.name
-            volunteer_phone = v.phone
-
-    reaction_minutes = _safe_reaction_minutes(r.created_at, r.accepted_at)
-
-    return {
-        "id": r.id,
-        "kind": r.kind,
-        "status": r.status,
-        "created_at": r.created_at,
-        "symptoms": r.symptoms,
-        "comments": r.comments,
-        "accepted_by": r.accepted_by,
-        "accepted_at": r.accepted_at,
-        "volunteer_name": volunteer_name,
-        "volunteer_phone": volunteer_phone,
-        "volunteer_lat": r.volunteer_lat,
-        "volunteer_lng": r.volunteer_lng,
-        "lat": r.lat,
-        "lng": r.lng,
-        "address": r.address,
-        "in_progress_at": r.in_progress_at,
-        "completed_at": r.completed_at,
-        "canceled_at": r.canceled_at,
-        "reaction_minutes": reaction_minutes,
-        "rating": r.rating,
-        "review_text": r.review_text,
-        "reviewed_at": r.reviewed_at,
-    }
+    return _help_request_detail_payload(db, r)
 
 
 
