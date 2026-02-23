@@ -98,6 +98,23 @@ def _int_env(name: str, default: int, min_value: int | None = None, max_value: i
     return value
 
 
+def _safe_reaction_minutes(created_at: datetime | None, accepted_at: datetime | None) -> int | None:
+    if not created_at or not accepted_at:
+        return None
+    try:
+        c = created_at
+        a = accepted_at
+        # Normalize tz-awareness mismatch that can happen between DB/default timestamps.
+        if c.tzinfo is None and a.tzinfo is not None:
+            c = c.replace(tzinfo=timezone.utc)
+        elif c.tzinfo is not None and a.tzinfo is None:
+            a = a.replace(tzinfo=timezone.utc)
+        delta = a - c
+        return max(0, int(delta.total_seconds() // 60))
+    except Exception:
+        return None
+
+
 DEFAULT_CORS_ORIGINS = [
     "http://127.0.0.1:5500",
     "http://localhost:5500",
@@ -1434,10 +1451,7 @@ def get_request(
             volunteer_name = v.name
             volunteer_phone = v.phone
     
-    reaction_minutes = None
-    if r.accepted_at:
-        delta = r.accepted_at - r.created_at
-        reaction_minutes = max(0, int(delta.total_seconds() // 60))
+    reaction_minutes = _safe_reaction_minutes(r.created_at, r.accepted_at)
 
     
 
@@ -1834,10 +1848,7 @@ def track_request(
             volunteer_name = v.name
             volunteer_phone = v.phone
 
-    reaction_minutes = None
-    if r.accepted_at:
-        delta = r.accepted_at - r.created_at
-        reaction_minutes = max(0, int(delta.total_seconds() // 60))
+    reaction_minutes = _safe_reaction_minutes(r.created_at, r.accepted_at)
 
     return {
         "id": r.id,
