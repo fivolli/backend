@@ -1,4 +1,4 @@
-// Градиенты перенесены из веб-версии (Frontend/index.html)
+
 
 export const Gradients = {
   sos: ['#E57373', '#EF5350'] as const,

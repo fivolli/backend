@@ -4,7 +4,6 @@ import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 
 export async function initNotifications() {
-  // Display notifications even while app is foregrounded.
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
       shouldShowAlert: true,
@@ -25,7 +24,6 @@ export async function initNotifications() {
 
 export async function registerForPushNotificationsAsync(): Promise<string | null> {
   if (!Device.isDevice) {
-    // Push tokens are not available on most simulators/emulators.
     return null;
   }
 

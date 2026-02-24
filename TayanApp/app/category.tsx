@@ -81,7 +81,7 @@ export default function CategoryDetailScreen() {
 
         {isUser ? (
           <Pressable
-            onPress={() => router.push('/map')}
+            onPress={() => router.dismissTo('/home')}
             style={[styles.btn, { backgroundColor: primary, marginTop: 12 }]}
           >
             <ThemedText style={styles.btnTextLight}>{t(lang, 'category.call_volunteer')}</ThemedText>

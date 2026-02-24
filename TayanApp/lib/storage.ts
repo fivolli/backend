@@ -38,7 +38,6 @@ export async function clearToken(): Promise<void> {
   try {
     await SecureStore.deleteItemAsync(TOKEN_KEY);
   } catch {
-    // ignore
   }
 }
 
@@ -62,7 +61,7 @@ export async function clearLastRequestId(): Promise<void> {
   try {
     await SecureStore.deleteItemAsync(LAST_REQUEST_ID_KEY);
   } catch {
-    // ignore
+
   }
 }
 
@@ -83,7 +82,7 @@ export async function setReviewLater(requestId: number, value: boolean = true): 
   try {
     await SecureStore.setItemAsync(REVIEW_LATER_PREFIX + String(id), value ? '1' : '0');
   } catch {
-    // ignore
+
   }
 }
 
@@ -93,7 +92,7 @@ export async function clearReviewLater(requestId: number): Promise<void> {
   try {
     await SecureStore.deleteItemAsync(REVIEW_LATER_PREFIX + String(id));
   } catch {
-    // ignore
+
   }
 }
 
@@ -111,7 +110,7 @@ export async function setAppLang(lang: AppLang): Promise<void> {
   try {
     await SecureStore.setItemAsync(LANG_KEY, lang);
   } catch {
-    // ignore
+
   }
 }
 
@@ -135,7 +134,7 @@ export async function setNotificationPrefs(prefs: NotificationPrefs): Promise<vo
   try {
     await SecureStore.setItemAsync(NOTIFICATIONS_KEY, JSON.stringify(prefs));
   } catch {
-    // ignore
+
   }
 }
 
@@ -155,7 +154,7 @@ export async function setAiPendingJobId(jobId: number): Promise<void> {
   try {
     await SecureStore.setItemAsync(AI_PENDING_JOB_KEY, String(Math.floor(n)));
   } catch {
-    // ignore
+
   }
 }
 
@@ -163,6 +162,6 @@ export async function clearAiPendingJobId(): Promise<void> {
   try {
     await SecureStore.deleteItemAsync(AI_PENDING_JOB_KEY);
   } catch {
-    // ignore
+
   }
 }

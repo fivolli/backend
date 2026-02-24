@@ -48,7 +48,7 @@ export default function HospitalsMapScreen() {
     try {
       scrollRef.current?.scrollTo({ y: Math.max(0, y - 12), animated: true });
     } catch {
-      // ignore
+
     }
   }, []);
 
@@ -107,7 +107,7 @@ export default function HospitalsMapScreen() {
     try {
       m.fitToCoordinates(coords, { edgePadding: { top: 40, right: 40, bottom: 40, left: 40 }, animated: true });
     } catch {
-      // ignore
+  
     }
   }, [userCoord?.latitude, userCoord?.longitude, items.length]);
 
@@ -149,7 +149,7 @@ export default function HospitalsMapScreen() {
         400
       );
     } catch {
-      // ignore
+
     }
 
     const key = hospitalKey(h);
@@ -157,7 +157,7 @@ export default function HospitalsMapScreen() {
     try {
       ref?.showCallout?.();
     } catch {
-      // ignore
+
     }
   }
 

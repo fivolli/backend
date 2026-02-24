@@ -23,7 +23,7 @@ export async function open2GisPoint(args: { lat: number; lng: number; zoom?: num
 	const zoom = Number.isFinite(Number(args.zoom)) ? Number(args.zoom) : 16;
 	if (!Number.isFinite(lat) || !Number.isFinite(lng)) return false;
 
-	// Web map point link is the most reliable fallback.
+	
 	const web = `https://2gis.ru/?m=${encodeURIComponent(`${lng},${lat}/${zoom}`)}`;
 	return tryOpen(web);
 }
@@ -31,7 +31,7 @@ export async function open2GisPoint(args: { lat: number; lng: number; zoom?: num
 export async function open2GisSearch(query: string) {
 	const q = String(query || '').trim();
 	if (!q) return false;
-	// Use web search; works on all platforms (and opens app if installed in some cases).
+	
 	return tryOpen(`https://2gis.ru/search/${encodeURIComponent(q)}`);
 }
 
@@ -59,6 +59,6 @@ export async function open2GisRoute(args: Open2GisRouteArgs) {
 		if (await tryOpen(url)) return true;
 	}
 
-	// Fallback to a map point (user can start navigation inside 2GIS).
+
 	return open2GisPoint({ lat: toLat, lng: toLng, zoom });
 }

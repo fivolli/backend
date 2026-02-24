@@ -42,7 +42,7 @@ export async function loadNearbyHospitals(opts: {
   }
 
   try {
-    // Backend may query Overpass and take ~15–25s on a cold cache.
+    
     const items = await api<HospitalItem[]>(
       `/geo/hospitals?lat=${encodeURIComponent(String(opts.lat))}&lng=${encodeURIComponent(String(opts.lng))}&radius=${encodeURIComponent(String(radius))}&limit=${encodeURIComponent(String(limit))}`,
       { method: 'GET', lang: opts.lang, timeoutMs: 30000 }
@@ -52,7 +52,7 @@ export async function loadNearbyHospitals(opts: {
     cache.set(k, { at: now, items: list });
     return list;
   } catch (e) {
-    // If request fails (timeout/offline), show the last known list if we have it.
+    
     if (cached && Array.isArray(cached.items) && cached.items.length) {
       return cached.items;
     }

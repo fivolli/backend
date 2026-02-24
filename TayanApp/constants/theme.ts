@@ -1,16 +1,13 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
+
 
 import { Platform } from 'react-native';
 
-// Эти цвета синхронизированы с веб-версией (Frontend/index.html)
+
 const primaryColor = '#2C2D5F';
 const dangerColor = '#B91717';
 const successColor = '#2E7D32';
 
-// Soft status surfaces (used in volunteer history cards)
+
 const infoBg = '#E3F2FD';
 const infoBorder = '#90CAF9';
 const successBg = '#E8F5E9';
@@ -67,13 +64,9 @@ export const Colors = {
 
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
     sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
     serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
     rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
     mono: 'ui-monospace',
   },
   default: {

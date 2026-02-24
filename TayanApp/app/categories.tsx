@@ -14,6 +14,12 @@ export default function CategoriesScreen() {
   const insets = useSafeAreaInsets();
   const primary = useThemeColor({}, 'primary');
   const { lang } = useAuth();
+  const getCardTitle = (id: string, rawTitle: string) => {
+    if (id !== 'electric-shock') return rawTitle;
+    const normalized = rawTitle.trim();
+    if (normalized === 'Электрический шок') return 'Электрический\nшок';
+    return normalized.replace('Электрический ', 'Электрический\n');
+  };
 
   return (
     <ThemedView style={styles.container}>
@@ -45,8 +51,8 @@ export default function CategoriesScreen() {
               <View style={styles.categoryIcon}>
                 <ThemedText style={styles.categoryIconText}>{item.icon}</ThemedText>
               </View>
-              <ThemedText numberOfLines={3} style={[styles.categoryTitle, { color: primary }]}>
-                {item.title[lang] || item.title.ru}
+              <ThemedText numberOfLines={2} style={[styles.categoryTitle, { color: primary }]}>
+                {getCardTitle(item.id, item.title[lang] || item.title.ru)}
               </ThemedText>
             </LinearGradient>
           </Pressable>
@@ -104,5 +110,5 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.1)',
   },
   categoryIconText: { fontSize: 32, lineHeight: 36, textAlign: 'center' },
-  categoryTitle: { textAlign: 'center', fontWeight: '700', lineHeight: 20 },
+  categoryTitle: { textAlign: 'center', fontWeight: '700', lineHeight: 20, fontSize: 15 },
 });

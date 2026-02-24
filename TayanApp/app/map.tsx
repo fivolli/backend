@@ -224,8 +224,7 @@ export default function MapScreen() {
 	}, [requestId]);
 
 	useEffect(() => {
-		// Volunteer UX: once the active request is finished, show nearby open requests again.
-		// Do not auto-close when the screen is opened with an explicit id (history/deeplink).
+	
 		if (me?.role !== 'volunteer') return;
 		if (!requestId) return;
 		if (pinnedId) return;
@@ -238,7 +237,7 @@ export default function MapScreen() {
 			try {
 				await clearLastRequestId();
 			} catch {
-				// ignore
+
 			}
 			if (!alive) return;
 			setData(null);
@@ -250,7 +249,7 @@ export default function MapScreen() {
 	}, [me?.role, me?.id, requestId, pinnedId, data?.status, data?.accepted_by]);
 
 	useEffect(() => {
-		// User UX: after request is completed, offer leaving a review (like web).
+		
 		if (!token) return;
 		if (me?.role !== 'user') return;
 		if (!requestId) return;
@@ -282,7 +281,7 @@ export default function MapScreen() {
 	}, [token, me?.role, requestId, data?.status, data?.rating]);
 
 	useEffect(() => {
-		// If user opens map without an active request, still offer review for the latest completed request (if pending).
+		
 		if (!token) return;
 		if (me?.role !== 'user') return;
 		if (requestId) return;
@@ -297,7 +296,7 @@ export default function MapScreen() {
 				if (!alive) return;
 				const list = Array.isArray(items) ? items : [];
 
-				// 1) First priority: restore an active request (new/accepted/in_progress).
+				
 				for (const x of list) {
 					if (!x || typeof x.id !== 'number') continue;
 					if (x.status === 'new' || x.status === 'accepted' || x.status === 'in_progress') {
@@ -307,7 +306,7 @@ export default function MapScreen() {
 					}
 				}
 
-				// 2) If there is no active request, offer review for the latest completed request (if pending).
+				
 				for (const x of list) {
 					if (!x || typeof x.id !== 'number') continue;
 					if (x.status !== 'completed') continue;
@@ -321,7 +320,7 @@ export default function MapScreen() {
 					break;
 				}
 			} catch {
-				// ignore
+
 			} finally {
 				if (alive) setReviewAutoPickLoading(false);
 			}
@@ -332,7 +331,7 @@ export default function MapScreen() {
 	}, [token, lang, me?.role, requestId, pinnedId]);
 
 	useEffect(() => {
-		// Volunteer: restore currently accepted/in-progress request if the app was restarted and local state was lost.
+		
 		if (!token) return;
 		if (me?.role !== 'volunteer') return;
 		if (requestId) return;
@@ -353,7 +352,6 @@ export default function MapScreen() {
 					}
 				}
 			} catch {
-				// ignore
 			}
 		})();
 
@@ -386,8 +384,7 @@ export default function MapScreen() {
 	}
 
 	useEffect(() => {
-		// Default user map state when there is no active request: show nearby volunteers.
-		// Wait until the "pending review" auto-pick finishes so we don't override the review prompt.
+		
 		if (!token) return;
 		if (me?.role !== 'user') return;
 		if (requestId) return;
@@ -490,7 +487,6 @@ export default function MapScreen() {
 				350
 			);
 		} catch {
-			// ignore map animation errors
 		}
 	}
 
@@ -512,7 +508,6 @@ export default function MapScreen() {
 					});
 				}
 			} catch {
-				// ignore
 			}
 
 			Alert.alert(t(lang, 'common.done'), t(lang, 'map.accept_done'));
@@ -533,13 +528,12 @@ export default function MapScreen() {
 			const r = await api<TrackDetail>(`/requests/${id}/track`, { method: 'GET', token, lang });
 			setData(r);
 			if (!r || !id) return;
-			// When switching requests, avoid showing a stale route.
 			if (!r.volunteer_lat || !r.volunteer_lng || !r.lat || !r.lng) {
 				setRoute(null);
 				lastRouteKeyRef.current = '';
 			}
 		} catch (e: any) {
-			// Ignore track polling errors to prevent modal spam in UI.
+
 		} finally {
 			setLoading(false);
 		}
@@ -552,7 +546,6 @@ export default function MapScreen() {
 			const r = await api<VolunteerRequestDetail>(`/volunteer/requests/${id}`, { method: 'GET', token, lang });
 			setVolDetail(r);
 		} catch {
-			// ignore (403/404 etc)
 		}
 	}
 
@@ -614,7 +607,7 @@ export default function MapScreen() {
 		deepLinks.push(`2gis://2gis.ru/routeSearch/rsType/car/to/${to}`);
 
 		const webFallbacks: string[] = [
-			// Map point fallback (works reliably; user can start navigation inside 2GIS)
+			
 			`https://2gis.ru/?m=${encodeURIComponent(`${toLng},${toLat}/16`)}`,
 		];
 
@@ -665,7 +658,7 @@ export default function MapScreen() {
 			});
 			lastRouteKeyRef.current = key;
 		} catch {
-			// keep previous route, fail silently
+			
 		} finally {
 			loadingRouteRef.current = false;
 		}
@@ -674,7 +667,7 @@ export default function MapScreen() {
 	useEffect(() => {
 		if (!token || !requestId) return;
 		if (me?.role === 'volunteer') {
-			// Volunteers can access /track only for requests they accepted.
+			
 			if (!volDetail || !me?.id) return;
 			if (volDetail.accepted_by !== me.id) return;
 		}
@@ -732,7 +725,7 @@ export default function MapScreen() {
 				if (!alive) return;
 				if (geo) setMyGeo({ lat: geo.lat, lng: geo.lng });
 			} catch {
-				// ignore
+
 			}
 		};
 		tick();
@@ -744,8 +737,7 @@ export default function MapScreen() {
 	}, [token, me?.role, requestId]);
 
 	useEffect(() => {
-		// When volunteer opens a specific new request (e.g. from push), still try to get volunteer geo
-		// so we can show distance and (optionally) the volunteer marker.
+		
 		if (!token) return;
 		if (me?.role !== 'volunteer') return;
 		if (!requestId) return;
@@ -758,7 +750,7 @@ export default function MapScreen() {
 				if (!alive) return;
 				if (geo) setMyGeo({ lat: geo.lat, lng: geo.lng });
 			} catch {
-				// ignore
+
 			}
 		};
 		tick();
@@ -802,7 +794,7 @@ export default function MapScreen() {
 						body: { volunteer_lat: geo.lat, volunteer_lng: geo.lng },
 					});
 				} catch {
-					// ignore
+
 				}
 			})();
 		}, 7000);
@@ -841,7 +833,7 @@ export default function MapScreen() {
 		try {
 			m.fitToCoordinates(coords, { edgePadding: { top: 80, right: 60, bottom: 120, left: 60 }, animated: true });
 		} catch {
-			// ignore
+
 		}
 	}, [userPoint?.latitude, userPoint?.longitude, volunteerPoint?.latitude, volunteerPoint?.longitude]);
 
@@ -903,7 +895,7 @@ export default function MapScreen() {
 		try {
 			m.fitToCoordinates(coords, { edgePadding: { top: 80, right: 60, bottom: 120, left: 60 }, animated: true });
 		} catch {
-			// ignore
+	
 		}
 	}, [me?.role, newReqPoint?.latitude, newReqPoint?.longitude, myGeo?.lat, myGeo?.lng]);
 
@@ -923,7 +915,7 @@ export default function MapScreen() {
 				{ edgePadding: { top: 80, right: 60, bottom: 120, left: 60 }, animated: true }
 			);
 		} catch {
-			// ignore
+
 		}
 	}, [me?.role, requestId, openPoints.length, myGeo?.lat, myGeo?.lng]);
 

@@ -14,11 +14,11 @@ export type CategoryData = {
   id: CategoryId;
   title: Localized<string>;
   icon: string;
-  color: string; // base hex color
+  color: string; 
   steps: Localized<string[]>;
 };
 
-// Данные перенесены из Frontend/index.html (categoriesData + ru translations)
+
 export const CATEGORIES: CategoryData[] = [
   {
     id: 'heart-attack',
@@ -36,7 +36,6 @@ export const CATEGORIES: CategoryData[] = [
         'Расстегните тесную одежду, обеспечьте доступ свежего воздуха',
         'Дайте аспирин (если нет аллергии) и нитроглицерин под язык',
         'Успокойте пострадавшего, не оставляйте его одного',
-        'Будьте готовы к сердечно-легочной реанимации',
       ],
       en: [
         'Call an ambulance immediately (103 or 112)',
@@ -44,7 +43,6 @@ export const CATEGORIES: CategoryData[] = [
         'Loosen tight clothing and provide fresh air',
         'Give aspirin (if no allergy) and nitroglycerin under the tongue',
         'Calm the person and do not leave them alone',
-        'Be prepared to perform CPR if needed',
       ],
       kg: [
         'Дароо тез жардам чакырыңыз (103 же 112)',
@@ -52,7 +50,6 @@ export const CATEGORIES: CategoryData[] = [
         'Кысылган кийимди бошотуп, таза аба кирүүсүн камсыз кылыңыз',
         'Аспирин (аллергия жок болсо) жана нитроглицеринди тил астына бериңиз',
         'Жабырлануучуну тынчтандырып, жалгыз калтырбаңыз',
-        'Керек болсо жүрөк-өпкө реанимациясына даяр болуңуз',
       ],
     },
   },
@@ -243,7 +240,6 @@ export function getCategoryById(id: string | undefined) {
 }
 
 export function withAlpha(hex: string, alphaHex: string) {
-  // '#RRGGBB' -> '#RRGGBBAA'
   if (!hex || hex[0] !== '#' || hex.length !== 7) return hex;
   return `${hex}${alphaHex}`;
 }

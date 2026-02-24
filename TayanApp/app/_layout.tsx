@@ -22,17 +22,17 @@ function PersistentBottomNav() {
 
   const goHome = () => {
     if (pathname === '/home') return;
-    // This makes the bottom bar behave like a tab switch: no "back" to settings.
+    
     router.dismissTo('/home');
   };
 
   const goSettings = () => {
     if (pathname === '/settings') return;
-    // Keep Settings as a normal screen so back returns to where user was.
+    
     router.push('/settings');
   };
 
-  // Keep the first screen clean.
+  
   if (!pathname || pathname === '/') return null;
 
   const isHome = pathname === '/home';
