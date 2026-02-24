@@ -1,86 +1,106 @@
 ﻿[
-    {
-        "id":  2,
-        "title":  "РџРµСЂРІР°СЏ РїРѕРјРѕС‰СЊ: РћСЃС‚Р°РЅРѕРІРєР° РєСЂРѕРІРѕС‚РµС‡РµРЅРёСЏ",
-        "video_url":  "https://youtu.be/GL9_WDdTlPw?si=JO6gxSpYmq7MK5V3",
-        "thumbnail_url":  ""
-    },
-    {
-        "id":  3,
-        "title":  "РџРµСЂРІР°СЏ РїРѕРјРѕС‰СЊ: РџРѕРјРѕС‰СЊ РїСЂРё РѕР¶РѕРіР°С…",
-        "video_url":  "https://youtu.be/AJh5ilcq24I?si=5BCy6Zd3FFwcsDU7",
-        "thumbnail_url":  ""
-    },
-    {
-        "id":  4,
-        "title":  "РџРµСЂРІР°СЏ РїРѕРјРѕС‰СЊ: РџРѕРјРѕС‰СЊ РїСЂРё РѕС‚СЂР°РІР»РµРЅРёРё",
-        "video_url":  "https://youtu.be/cvPrIviTVU8?si=w-5lu1E5kBcTbJuo",
-        "thumbnail_url":  ""
-    },
-    {
-        "id":  5,
-        "title":  "РџРµСЂРІР°СЏ РїРѕРјРѕС‰СЊ: РџСЂРёРµРј Р“РµР№РјР»РёС…Р°",
-        "video_url":  "https://youtu.be/mojnDIPpymo?si=4WN2yCq3fdKKvOye",
-        "thumbnail_url":  ""
-    },
-    {
-        "id":  6,
-        "title":  "РџРµСЂРІР°СЏ РїРѕРјРѕС‰СЊ: Р­РїРёР»РµРїСЃРёС‡РµСЃРєРёР№ РїСЂРёРїР°РґРѕРє",
-        "video_url":  "https://youtu.be/ZgYeQYAszgU?si=YdFlWReRS6GtM8iZ",
-        "thumbnail_url":  ""
-    },
-    {
-        "id":  7,
-        "title":  "РџРµСЂРІР°СЏ РїРѕРјРѕС‰СЊ: РћР±РјРѕСЂРѕРє",
-        "video_url":  "https://youtu.be/7ffU8OUydBU?si=MqC2H9C4kWhhUQdL",
-        "thumbnail_url":  ""
-    },
-    {
-        "id":  8,
-        "title":  "РџРµСЂРІР°СЏ РїРѕРјРѕС‰СЊ: РРЅС„Р°СЂРєС‚ РјРёРѕРєР°СЂРґР°",
-        "video_url":  "https://youtu.be/xbm-saOd4eU?si=qnY4JUSOWVv3HUgL",
-        "thumbnail_url":  ""
-    },
-    {
-        "id":  9,
-        "title":  "РџРµСЂРІР°СЏ РїРѕРјРѕС‰СЊ: РЈРґР°СЂ С‚РѕРєРѕРј",
-        "video_url":  "https://youtu.be/ecvofLCggEo?si=HjUHMZEsMVOZdVPq",
-        "thumbnail_url":  ""
-    },
-    {
-        "id":  10,
-        "title":  "РџРµСЂРІР°СЏ РїРѕРјРѕС‰СЊ: РџРµСЂРµР»РѕРјС‹",
-        "video_url":  "https://youtu.be/vUzl-Bp-DEo?si=ZNzHvV7W-yOk8IJQ",
-        "thumbnail_url":  ""
-    },
-    {
-        "id":  11,
-        "title":  "First Aid Training: Choking",
-        "video_url":  "https://youtu.be/HGBBu4zr8sM?si=IDdPrNbKV_ToUbHY",
-        "thumbnail_url":  ""
-    },
-    {
-        "id":  12,
-        "title":  "First Aid Training: Life-threatening bleeding",
-        "video_url":  "https://youtu.be/p9KHec6xfuw?si=86vZfi_NARbNnkye",
-        "thumbnail_url":  ""
-    },
-    {
-        "id":  13,
-        "title":  "First Aid Training",
-        "video_url":  "https://youtu.be/GmqXqwSV3bo?si=KOEcb4tXx91zAIrp",
-        "thumbnail_url":  ""
-    },
-    {
-        "id":  15,
-        "title":  "First Aid Training: Electric Shock",
-        "video_url":  "https://youtu.be/WV5x2PQ71xE?si=GsVNaONjc5v3b18O",
-        "thumbnail_url":  ""
-    },
-    {
-        "id":  16,
-        "title":  "First Aid Training: Burns",
-        "video_url":  "https://youtu.be/XJGPzl3ENKo?si=xNlhbNOxnmQZc0jT",
-        "thumbnail_url":  ""
-    }
+  {
+    "id": 2,
+    "title": "Первая помощь: Остановка кровотечения",
+    "video_url": "https://youtu.be/GL9_WDdTlPw?si=JO6gxSpYmq7MK5V3",
+    "thumbnail_url": ""
+  },
+
+  {
+    "id": 3,
+    "title": "Первая помощь: Помощь при ожогах",
+    "video_url": "https://youtu.be/AJh5ilcq24I?si=5BCy6Zd3FFwcsDU7",
+    "thumbnail_url": ""
+  },
+  {
+    "id": 4,
+    "title": "Первая помощь: Помощь при отравлении",
+    "video_url": "https://youtu.be/cvPrIviTVU8?si=w-5lu1E5kBcTbJuo",
+    "thumbnail_url": ""
+  },
+
+  {
+    "id": 5,
+    "title": "Первая помощь: Прием Геймлиха",
+    "video_url": "https://youtu.be/mojnDIPpymo?si=4WN2yCq3fdKKvOye",
+    "thumbnail_url": ""
+  },
+
+  {
+    "id": 6,
+    "title": "Первая помощь: Эпилепсический припадок",
+    "video_url": "https://youtu.be/ZgYeQYAszgU?si=YdFlWReRS6GtM8iZ",
+    "thumbnail_url": ""
+  },
+
+  {
+    "id": 7,
+    "title": "Первая помощь: Обморок",
+    "video_url": "https://youtu.be/7ffU8OUydBU?si=MqC2H9C4kWhhUQdL",
+    "thumbnail_url": ""
+  },
+
+  {
+    "id": 8,
+    "title": "Первая помощь: Инфаркт миокарда",
+    "video_url": "https://youtu.be/xbm-saOd4eU?si=qnY4JUSOWVv3HUgL",
+    "thumbnail_url": ""
+  }, 
+
+
+  {
+    "id": 9,
+    "title": "Первая помощь: Удар током",
+    "video_url": "https://youtu.be/ecvofLCggEo?si=HjUHMZEsMVOZdVPq",
+    "thumbnail_url": ""
+  },
+
+  {
+    "id": 10,
+    "title": "Первая помощь: Переломы",
+    "video_url": "https://youtu.be/vUzl-Bp-DEo?si=ZNzHvV7W-yOk8IJQ",
+    "thumbnail_url": ""
+  },
+
+  {
+    "id": 11,
+    "title": "First Aid Training: Choking",
+    "video_url": "https://youtu.be/HGBBu4zr8sM?si=IDdPrNbKV_ToUbHY",
+    "thumbnail_url": ""
+  },
+
+  {
+    "id": 12,
+    "title": "First Aid Training: Life-threatening bleeding",
+    "video_url": "https://youtu.be/p9KHec6xfuw?si=86vZfi_NARbNnkye",
+    "thumbnail_url": ""
+  },
+
+  {
+    "id": 13,
+    "title": "First Aid Training",
+    "video_url": "https://youtu.be/GmqXqwSV3bo?si=KOEcb4tXx91zAIrp",
+    "thumbnail_url": ""
+  },
+
+  {
+    "id": 14,
+    "title": "First Aid Training: CPR",
+    "video_url": "https://youtu.be/TsJ49Np3HS0?si=0NHdc1eqgGniPvT_",
+    "thumbnail_url": ""
+  }, 
+
+  {
+    "id": 15,
+    "title": "First Aid Training: Electric Shock",
+    "video_url": "https://youtu.be/WV5x2PQ71xE?si=GsVNaONjc5v3b18O",
+    "thumbnail_url": ""
+  },
+
+  {
+    "id": 16,
+    "title": "First Aid Training: Burns",
+    "video_url": "https://youtu.be/XJGPzl3ENKo?si=xNlhbNOxnmQZc0jT",
+    "thumbnail_url": ""
+  }
 ]
