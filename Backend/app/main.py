@@ -357,7 +357,8 @@ def list_videos():
         return []
 
     try:
-        raw = json.loads(p.read_text(encoding="utf-8"))
+        # Accept UTF-8 with or without BOM (PowerShell often writes BOM by default).
+        raw = json.loads(p.read_text(encoding="utf-8-sig"))
         if not isinstance(raw, list):
             return []
 
