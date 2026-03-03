@@ -4,6 +4,7 @@ import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-na
 declare global {
   interface Window {
     mapkit?: any;
+    L?: any;
   }
 }
 
@@ -125,6 +126,8 @@ function flattenMapChildren(children: React.ReactNode, markers: ParsedMarker[], 
 }
 
 const MAPKIT_SCRIPT_URL = 'https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js';
+const LEAFLET_SCRIPT_URL = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+const LEAFLET_STYLE_URL = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
 
 const MapView = forwardRef<any, MapViewProps>(function MapView({ style, initialRegion, children }, ref) {
   const [region, setRegion] = useState<Region>(normalizeRegion(initialRegion));
@@ -138,6 +141,10 @@ const MapView = forwardRef<any, MapViewProps>(function MapView({ style, initialR
   const appleMapRef = useRef<any>(null);
   const appleAnnotationsRef = useRef<any[]>([]);
   const appleOverlaysRef = useRef<any[]>([]);
+  const [leafletReady, setLeafletReady] = useState(false);
+  const [leafletFailed, setLeafletFailed] = useState(false);
+  const leafletMapRef = useRef<any>(null);
+  const leafletLayerGroupRef = useRef<any>(null);
 
   const parsed = useMemo(() => {
     const markers: ParsedMarker[] = [];
@@ -235,6 +242,49 @@ const MapView = forwardRef<any, MapViewProps>(function MapView({ style, initialR
   }, [wantApple, appleToken]);
 
   useEffect(() => {
+    if (wantApple) return;
+    if (typeof window === 'undefined') return;
+
+    const initLeaflet = () => {
+      if (window.L) {
+        setLeafletReady(true);
+      } else {
+        setLeafletFailed(true);
+      }
+    };
+
+    const existingStyle = document.querySelector('link[data-leaflet-style="1"]');
+    if (!existingStyle) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = LEAFLET_STYLE_URL;
+      link.setAttribute('data-leaflet-style', '1');
+      document.head.appendChild(link);
+    }
+
+    if (window.L) {
+      initLeaflet();
+      return;
+    }
+
+    const existingScript = document.querySelector('script[data-leaflet-script="1"]') as HTMLScriptElement | null;
+    if (existingScript) {
+      existingScript.addEventListener('load', initLeaflet, { once: true });
+      existingScript.addEventListener('error', () => setLeafletFailed(true), { once: true });
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = LEAFLET_SCRIPT_URL;
+    script.async = true;
+    script.defer = true;
+    script.setAttribute('data-leaflet-script', '1');
+    script.addEventListener('load', initLeaflet, { once: true });
+    script.addEventListener('error', () => setLeafletFailed(true), { once: true });
+    document.head.appendChild(script);
+  }, [wantApple]);
+
+  useEffect(() => {
     if (!wantApple || !appleReady || appleFailed) return;
     if (!mapHostRef.current) return;
     if (appleMapRef.current) return;
@@ -309,11 +359,91 @@ const MapView = forwardRef<any, MapViewProps>(function MapView({ style, initialR
     }
   }, [wantApple, appleReady, appleFailed, parsed]);
 
-  const bounds = buildBounds(region);
-  const osmSrc =
-    `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(
-      `${bounds.west},${bounds.south},${bounds.east},${bounds.north}`
-    )}&layer=mapnik`;
+  useEffect(() => {
+    if (wantApple || leafletFailed || !leafletReady) return;
+    if (!mapHostRef.current) return;
+    if (leafletMapRef.current) return;
+
+    try {
+      const L = window.L;
+      if (!L) return;
+      const map = L.map(mapHostRef.current, {
+        zoomControl: true,
+        attributionControl: true,
+      });
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+      }).addTo(map);
+      leafletLayerGroupRef.current = L.layerGroup().addTo(map);
+      leafletMapRef.current = map;
+
+      const lat = region.latitude;
+      const lng = region.longitude;
+      const z = Math.max(3, Math.min(18, Math.round(11 - Math.log2(Math.max(region.latitudeDelta || 0.02, 0.002) / 0.02))));
+      map.setView([lat, lng], z, { animate: false });
+    } catch {
+      setLeafletFailed(true);
+    }
+  }, [wantApple, leafletReady, leafletFailed, mapHostRef.current]);
+
+  useEffect(() => {
+    if (wantApple || leafletFailed || !leafletReady) return;
+    const map = leafletMapRef.current;
+    if (!map) return;
+    try {
+      const z = Math.max(3, Math.min(18, Math.round(11 - Math.log2(Math.max(region.latitudeDelta || 0.02, 0.002) / 0.02))));
+      map.setView([region.latitude, region.longitude], z, { animate: false });
+    } catch {
+      // ignore
+    }
+  }, [wantApple, leafletReady, leafletFailed, region.latitude, region.longitude, region.latitudeDelta, region.longitudeDelta]);
+
+  useEffect(() => {
+    if (wantApple || leafletFailed || !leafletReady) return;
+    const L = window.L;
+    const group = leafletLayerGroupRef.current;
+    if (!L || !group) return;
+    try {
+      group.clearLayers();
+
+      for (const m of parsed.markers) {
+        const marker = L.circleMarker([m.coordinate.latitude, m.coordinate.longitude], {
+          radius: 7,
+          weight: 2,
+          color: '#ffffff',
+          fillColor: m.pinColor || '#D32F2F',
+          fillOpacity: 1,
+        });
+        if (m.title) marker.bindTooltip(m.title, { permanent: false, direction: 'top' });
+        marker.addTo(group);
+      }
+
+      for (const pl of parsed.polylines) {
+        const latlngs = pl.coordinates.map((c) => [c.latitude, c.longitude]);
+        if (latlngs.length >= 2) {
+          L.polyline(latlngs, {
+            color: pl.strokeColor || '#2C2D5F',
+            weight: Math.max(2, Number(pl.strokeWidth || 4)),
+          }).addTo(group);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, [wantApple, leafletReady, leafletFailed, parsed]);
+
+  useEffect(() => {
+    return () => {
+      try {
+        if (leafletMapRef.current) {
+          leafletMapRef.current.remove();
+          leafletMapRef.current = null;
+        }
+      } catch {
+        // ignore
+      }
+    };
+  }, []);
 
   if (wantApple && appleReady && !appleFailed) {
     return (
@@ -322,6 +452,20 @@ const MapView = forwardRef<any, MapViewProps>(function MapView({ style, initialR
       </View>
     );
   }
+
+  if (!wantApple && leafletReady && !leafletFailed) {
+    return (
+      <View style={[styles.map, style]}>
+        <View ref={mapHostRef} collapsable={false} style={styles.host} />
+      </View>
+    );
+  }
+
+  const bounds = buildBounds(region);
+  const osmSrc =
+    `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(
+      `${bounds.west},${bounds.south},${bounds.east},${bounds.north}`
+    )}&layer=mapnik`;
 
   return (
     <View style={[styles.map, style]}>
