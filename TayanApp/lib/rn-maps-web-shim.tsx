@@ -1,5 +1,11 @@
-import React, { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+
+declare global {
+  interface Window {
+    mapkit?: any;
+  }
+}
 
 type Coordinate = { latitude: number; longitude: number };
 type Region = {
@@ -84,11 +90,7 @@ function projectToPercent(coord: Coordinate, bounds: { north: number; south: num
   return { x: clamp(x, 0, 100), y: clamp(y, 0, 100) };
 }
 
-function flattenMapChildren(
-  children: React.ReactNode,
-  markers: ParsedMarker[],
-  polylines: ParsedPolyline[]
-) {
+function flattenMapChildren(children: React.ReactNode, markers: ParsedMarker[], polylines: ParsedPolyline[]) {
   React.Children.forEach(children, (child) => {
     if (!React.isValidElement(child)) return;
     const t: any = child.type;
@@ -106,9 +108,7 @@ function flattenMapChildren(
       }
     } else if (name === 'WebMapPolyline') {
       const coords = Array.isArray(props.coordinates) ? props.coordinates : [];
-      const cleaned = coords.filter(
-        (c: any) => c && Number.isFinite(c.latitude) && Number.isFinite(c.longitude)
-      ) as Coordinate[];
+      const cleaned = coords.filter((c: any) => c && Number.isFinite(c.latitude) && Number.isFinite(c.longitude)) as Coordinate[];
       if (cleaned.length >= 2) {
         polylines.push({
           coordinates: cleaned,
@@ -124,8 +124,20 @@ function flattenMapChildren(
   });
 }
 
+const MAPKIT_SCRIPT_URL = 'https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js';
+
 const MapView = forwardRef<any, MapViewProps>(function MapView({ style, initialRegion, children }, ref) {
   const [region, setRegion] = useState<Region>(normalizeRegion(initialRegion));
+  const [appleReady, setAppleReady] = useState(false);
+  const [appleFailed, setAppleFailed] = useState(false);
+
+  const appleToken = String((process.env.EXPO_PUBLIC_APPLE_MAPKIT_TOKEN as string) || '').trim();
+  const wantApple = !!appleToken;
+
+  const mapHostRef = useRef<any>(null);
+  const appleMapRef = useRef<any>(null);
+  const appleAnnotationsRef = useRef<any[]>([]);
+  const appleOverlaysRef = useRef<any[]>([]);
 
   const parsed = useMemo(() => {
     const markers: ParsedMarker[] = [];
@@ -134,12 +146,27 @@ const MapView = forwardRef<any, MapViewProps>(function MapView({ style, initialR
     return { markers, polylines };
   }, [children]);
 
+  function applyAppleRegion(next: Region) {
+    try {
+      const mapkit = window.mapkit;
+      const map = appleMapRef.current;
+      if (!mapkit || !map) return;
+
+      const center = new mapkit.Coordinate(next.latitude, next.longitude);
+      const span = new mapkit.CoordinateSpan(
+        Math.max(0.002, Number(next.latitudeDelta || 0.12)),
+        Math.max(0.002, Number(next.longitudeDelta || 0.12))
+      );
+      map.region = new mapkit.CoordinateRegion(center, span);
+    } catch {
+      // ignore
+    }
+  }
+
   useImperativeHandle(ref, () => ({
     fitToCoordinates: (coords: Coordinate[]) => {
       if (!Array.isArray(coords) || coords.length === 0) return;
-      const valid = coords.filter(
-        (c: any) => c && Number.isFinite(c.latitude) && Number.isFinite(c.longitude)
-      );
+      const valid = coords.filter((c: any) => c && Number.isFinite(c.latitude) && Number.isFinite(c.longitude));
       if (!valid.length) return;
       let minLat = valid[0].latitude;
       let maxLat = valid[0].latitude;
@@ -157,8 +184,8 @@ const MapView = forwardRef<any, MapViewProps>(function MapView({ style, initialR
         normalizeRegion({
           latitude: (minLat + maxLat) / 2,
           longitude: (minLng + maxLng) / 2,
-          latitudeDelta: (maxLat - minLat) + latPad,
-          longitudeDelta: (maxLng - minLng) + lngPad,
+          latitudeDelta: maxLat - minLat + latPad,
+          longitudeDelta: maxLng - minLng + lngPad,
         })
       );
     },
@@ -167,16 +194,138 @@ const MapView = forwardRef<any, MapViewProps>(function MapView({ style, initialR
     },
   }));
 
+  useEffect(() => {
+    if (!wantApple) return;
+    if (typeof window === 'undefined') return;
+
+    const initMapKit = () => {
+      try {
+        const mapkit = window.mapkit;
+        if (!mapkit) return;
+        mapkit.init({
+          authorizationCallback: (done: (token: string) => void) => done(appleToken),
+          language: 'ru',
+        });
+        setAppleReady(true);
+      } catch {
+        setAppleFailed(true);
+      }
+    };
+
+    if (window.mapkit) {
+      initMapKit();
+      return;
+    }
+
+    const existing = document.querySelector('script[data-apple-mapkit="1"]') as HTMLScriptElement | null;
+    if (existing) {
+      existing.addEventListener('load', initMapKit, { once: true });
+      existing.addEventListener('error', () => setAppleFailed(true), { once: true });
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = MAPKIT_SCRIPT_URL;
+    script.async = true;
+    script.defer = true;
+    script.setAttribute('data-apple-mapkit', '1');
+    script.addEventListener('load', initMapKit, { once: true });
+    script.addEventListener('error', () => setAppleFailed(true), { once: true });
+    document.head.appendChild(script);
+  }, [wantApple, appleToken]);
+
+  useEffect(() => {
+    if (!wantApple || !appleReady || appleFailed) return;
+    if (!mapHostRef.current) return;
+    if (appleMapRef.current) return;
+
+    try {
+      const mapkit = window.mapkit;
+      const map = new mapkit.Map(mapHostRef.current, {
+        isRotationEnabled: false,
+        showsCompass: mapkit.FeatureVisibility.Hidden,
+        showsMapTypeControl: false,
+      });
+      appleMapRef.current = map;
+      applyAppleRegion(region);
+    } catch {
+      setAppleFailed(true);
+    }
+  }, [wantApple, appleReady, appleFailed]);
+
+  useEffect(() => {
+    if (!wantApple || !appleReady || appleFailed) return;
+    applyAppleRegion(region);
+  }, [wantApple, appleReady, appleFailed, region.latitude, region.longitude, region.latitudeDelta, region.longitudeDelta]);
+
+  useEffect(() => {
+    if (!wantApple || !appleReady || appleFailed) return;
+    const mapkit = window.mapkit;
+    const map = appleMapRef.current;
+    if (!mapkit || !map) return;
+
+    try {
+      if (appleAnnotationsRef.current.length) {
+        map.removeAnnotations(appleAnnotationsRef.current);
+        appleAnnotationsRef.current = [];
+      }
+      if (appleOverlaysRef.current.length) {
+        map.removeOverlays(appleOverlaysRef.current);
+        appleOverlaysRef.current = [];
+      }
+
+      const anns = parsed.markers.map((m) => {
+        const coord = new mapkit.Coordinate(m.coordinate.latitude, m.coordinate.longitude);
+        return new mapkit.MarkerAnnotation(coord, {
+          title: m.title || '',
+          color: m.pinColor || '#D32F2F',
+        });
+      });
+      if (anns.length) {
+        map.addAnnotations(anns);
+        appleAnnotationsRef.current = anns;
+      }
+
+      if (mapkit.PolylineOverlay) {
+        const overlays = parsed.polylines
+          .map((pl) => {
+            const coords = pl.coordinates.map((c) => new mapkit.Coordinate(c.latitude, c.longitude));
+            if (coords.length < 2) return null;
+            const line = new mapkit.PolylineOverlay(coords);
+            if (line && line.style) {
+              line.style.strokeColor = pl.strokeColor || '#2C2D5F';
+              line.style.lineWidth = Math.max(2, Number(pl.strokeWidth || 4));
+            }
+            return line;
+          })
+          .filter(Boolean);
+        if (overlays.length) {
+          map.addOverlays(overlays);
+          appleOverlaysRef.current = overlays;
+        }
+      }
+    } catch {
+      // fallback visuals below will still work
+    }
+  }, [wantApple, appleReady, appleFailed, parsed]);
+
   const bounds = buildBounds(region);
-  const iframeSrc =
+  const osmSrc =
     `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(
       `${bounds.west},${bounds.south},${bounds.east},${bounds.north}`
     )}&layer=mapnik`;
 
+  if (wantApple && appleReady && !appleFailed) {
+    return (
+      <View style={[styles.map, style]}>
+        <View ref={mapHostRef} collapsable={false} style={styles.host} />
+      </View>
+    );
+  }
+
   return (
     <View style={[styles.map, style]}>
-      <iframe title="map" src={iframeSrc} style={styles.iframe as any} />
-
+      <iframe title="map" src={osmSrc} style={styles.iframe as any} />
       <View style={styles.overlay} pointerEvents="none">
         {parsed.polylines.map((pl, idx) => {
           const points = pl.coordinates
@@ -203,16 +352,7 @@ const MapView = forwardRef<any, MapViewProps>(function MapView({ style, initialR
           const p = projectToPercent(m.coordinate, bounds);
           const color = m.pinColor || '#D32F2F';
           return (
-            <View
-              key={`mk-${idx}`}
-              style={[
-                styles.pinWrap,
-                {
-                  left: `${p.x}%`,
-                  top: `${p.y}%`,
-                },
-              ]}
-            >
+            <View key={`mk-${idx}`} style={[styles.pinWrap, { left: `${p.x}%`, top: `${p.y}%` }]}>
               <View style={[styles.pinDot, { backgroundColor: color }]} />
               {m.title ? (
                 <View style={styles.label}>
@@ -244,6 +384,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
     backgroundColor: '#e9edf3',
+  },
+  host: {
+    width: '100%',
+    height: '100%',
   },
   iframe: {
     width: '100%',
