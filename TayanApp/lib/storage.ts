@@ -1,4 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
 
 const TOKEN_KEY = 'tayan.token';
 const LAST_REQUEST_ID_KEY = 'tayan.lastRequestId';
@@ -21,7 +22,36 @@ const DEFAULT_NOTIFICATIONS: NotificationPrefs = {
   updates: true,
 };
 
+function webGet(key: string): string | null {
+  try {
+    if (typeof localStorage === 'undefined') return null;
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function webSet(key: string, value: string): void {
+  try {
+    if (typeof localStorage === 'undefined') return;
+    localStorage.setItem(key, value);
+  } catch {
+  }
+}
+
+function webDelete(key: string): void {
+  try {
+    if (typeof localStorage === 'undefined') return;
+    localStorage.removeItem(key);
+  } catch {
+  }
+}
+
 export async function getToken(): Promise<string | null> {
+  if (Platform.OS === 'web') {
+    const t = webGet(TOKEN_KEY);
+    if (t) return t;
+  }
   try {
     const t = await SecureStore.getItemAsync(TOKEN_KEY);
     return t || null;
@@ -31,10 +61,19 @@ export async function getToken(): Promise<string | null> {
 }
 
 export async function setToken(token: string): Promise<void> {
-  await SecureStore.setItemAsync(TOKEN_KEY, token);
+  if (Platform.OS === 'web') {
+    webSet(TOKEN_KEY, token);
+  }
+  try {
+    await SecureStore.setItemAsync(TOKEN_KEY, token);
+  } catch {
+  }
 }
 
 export async function clearToken(): Promise<void> {
+  if (Platform.OS === 'web') {
+    webDelete(TOKEN_KEY);
+  }
   try {
     await SecureStore.deleteItemAsync(TOKEN_KEY);
   } catch {
