@@ -51,7 +51,7 @@ export default function PrivacyScreen() {
 						try {
 							await api('/auth/me', { method: 'DELETE', token, lang });
 							await signOut();
-							router.replace('/home');
+							router.replace('/login');
 						} catch (e: any) {
 							Alert.alert(t(lang, 'common.error'), String(e?.message || t(lang, 'privacy.delete_failed')));
 						}

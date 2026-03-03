@@ -118,8 +118,10 @@ export default function RegisterScreen() {
     setBusy(true);
     try {
       await register({ name, email, phone, password, role });
-      Alert.alert(t(lang, 'common.done'), t(lang, 'profile.register_success'));
       router.replace('/home');
+      if (Platform.OS !== 'web') {
+        Alert.alert(t(lang, 'common.done'), t(lang, 'profile.register_success'));
+      }
     } catch (e: any) {
       Alert.alert(t(lang, 'common.error'), e?.message ? String(e.message) : t(lang, 'profile.operation_failed'));
     } finally {

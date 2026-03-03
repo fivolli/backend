@@ -132,10 +132,13 @@ AI_RATE_LIMIT_RPM = _int_env("AI_RATE_LIMIT_RPM", 12, min_value=2, max_value=120
 TRUSTED_HOSTS = _csv_env("TRUSTED_HOSTS", ["127.0.0.1", "localhost"])
 CORS_ALLOW_ORIGINS = _csv_env("CORS_ALLOW_ORIGINS", DEFAULT_CORS_ORIGINS)
 # Allow common hosted frontend domains (Render/Vercel) without manual per-domain updates.
-CORS_ALLOW_ORIGIN_REGEX = os.getenv(
-    "CORS_ALLOW_ORIGIN_REGEX",
-    r"^https://([a-z0-9-]+\.)?vercel\.app$|^https://frontend-[a-z0-9-]+\.onrender\.com$",
-).strip()
+_DEFAULT_CORS_ALLOW_ORIGIN_REGEX = r"^https://([a-z0-9-]+\.)?vercel\.app$|^https://frontend-[a-z0-9-]+\.onrender\.com$"
+_cors_regex_raw = os.getenv("CORS_ALLOW_ORIGIN_REGEX")
+CORS_ALLOW_ORIGIN_REGEX = (
+    _cors_regex_raw.strip()
+    if _cors_regex_raw and _cors_regex_raw.strip()
+    else _DEFAULT_CORS_ALLOW_ORIGIN_REGEX
+)
 
 ALLOWED_AVATAR_MIME_TO_EXT = {
     "image/jpeg": ".jpg",

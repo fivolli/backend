@@ -87,8 +87,10 @@ export default function LoginScreen() {
     setBusy(true);
     try {
       await signIn(email, password);
-      Alert.alert(t(lang, 'common.done'), t(lang, 'profile.login_success'));
       router.replace('/home');
+      if (Platform.OS !== 'web') {
+        Alert.alert(t(lang, 'common.done'), t(lang, 'profile.login_success'));
+      }
     } catch (e: any) {
       Alert.alert(t(lang, 'common.error'), e?.message ? String(e.message) : t(lang, 'profile.operation_failed'));
     } finally {

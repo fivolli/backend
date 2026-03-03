@@ -81,6 +81,11 @@ export async function clearToken(): Promise<void> {
 }
 
 export async function getLastRequestId(): Promise<number | null> {
+  if (Platform.OS === 'web') {
+    const raw = webGet(LAST_REQUEST_ID_KEY);
+    const n = raw ? Number(raw) : NaN;
+    if (Number.isFinite(n) && n > 0) return Math.floor(n);
+  }
   try {
     const v = await SecureStore.getItemAsync(LAST_REQUEST_ID_KEY);
     const n = v ? Number(v) : NaN;
@@ -93,10 +98,20 @@ export async function getLastRequestId(): Promise<number | null> {
 export async function setLastRequestId(id: number): Promise<void> {
   const n = Number(id);
   if (!Number.isFinite(n) || n <= 0) return;
-  await SecureStore.setItemAsync(LAST_REQUEST_ID_KEY, String(Math.floor(n)));
+  const value = String(Math.floor(n));
+  if (Platform.OS === 'web') {
+    webSet(LAST_REQUEST_ID_KEY, value);
+  }
+  try {
+    await SecureStore.setItemAsync(LAST_REQUEST_ID_KEY, value);
+  } catch {
+  }
 }
 
 export async function clearLastRequestId(): Promise<void> {
+  if (Platform.OS === 'web') {
+    webDelete(LAST_REQUEST_ID_KEY);
+  }
   try {
     await SecureStore.deleteItemAsync(LAST_REQUEST_ID_KEY);
   } catch {
@@ -107,6 +122,10 @@ export async function clearLastRequestId(): Promise<void> {
 export async function getReviewLater(requestId: number): Promise<boolean> {
   const id = Math.floor(Number(requestId));
   if (!Number.isFinite(id) || id <= 0) return false;
+  if (Platform.OS === 'web') {
+    const v = webGet(REVIEW_LATER_PREFIX + String(id));
+    if (v === '1' || v === 'true') return true;
+  }
   try {
     const v = await SecureStore.getItemAsync(REVIEW_LATER_PREFIX + String(id));
     return v === '1' || v === 'true';
@@ -118,6 +137,9 @@ export async function getReviewLater(requestId: number): Promise<boolean> {
 export async function setReviewLater(requestId: number, value: boolean = true): Promise<void> {
   const id = Math.floor(Number(requestId));
   if (!Number.isFinite(id) || id <= 0) return;
+  if (Platform.OS === 'web') {
+    webSet(REVIEW_LATER_PREFIX + String(id), value ? '1' : '0');
+  }
   try {
     await SecureStore.setItemAsync(REVIEW_LATER_PREFIX + String(id), value ? '1' : '0');
   } catch {
@@ -128,6 +150,9 @@ export async function setReviewLater(requestId: number, value: boolean = true): 
 export async function clearReviewLater(requestId: number): Promise<void> {
   const id = Math.floor(Number(requestId));
   if (!Number.isFinite(id) || id <= 0) return;
+  if (Platform.OS === 'web') {
+    webDelete(REVIEW_LATER_PREFIX + String(id));
+  }
   try {
     await SecureStore.deleteItemAsync(REVIEW_LATER_PREFIX + String(id));
   } catch {
@@ -136,6 +161,10 @@ export async function clearReviewLater(requestId: number): Promise<void> {
 }
 
 export async function getAppLang(): Promise<AppLang | null> {
+  if (Platform.OS === 'web') {
+    const v = webGet(LANG_KEY);
+    if (v === 'ru' || v === 'en' || v === 'kg') return v;
+  }
   try {
     const v = await SecureStore.getItemAsync(LANG_KEY);
     if (v === 'ru' || v === 'en' || v === 'kg') return v;
@@ -146,6 +175,9 @@ export async function getAppLang(): Promise<AppLang | null> {
 }
 
 export async function setAppLang(lang: AppLang): Promise<void> {
+  if (Platform.OS === 'web') {
+    webSet(LANG_KEY, lang);
+  }
   try {
     await SecureStore.setItemAsync(LANG_KEY, lang);
   } catch {
@@ -154,6 +186,20 @@ export async function setAppLang(lang: AppLang): Promise<void> {
 }
 
 export async function getNotificationPrefs(): Promise<NotificationPrefs> {
+  if (Platform.OS === 'web') {
+    try {
+      const raw = webGet(NOTIFICATIONS_KEY);
+      if (!raw) return DEFAULT_NOTIFICATIONS;
+      const parsed = JSON.parse(raw);
+      return {
+        sos: typeof parsed?.sos === 'boolean' ? parsed.sos : DEFAULT_NOTIFICATIONS.sos,
+        volunteers: typeof parsed?.volunteers === 'boolean' ? parsed.volunteers : DEFAULT_NOTIFICATIONS.volunteers,
+        updates: typeof parsed?.updates === 'boolean' ? parsed.updates : DEFAULT_NOTIFICATIONS.updates,
+      };
+    } catch {
+      return DEFAULT_NOTIFICATIONS;
+    }
+  }
   try {
     const raw = await SecureStore.getItemAsync(NOTIFICATIONS_KEY);
     if (!raw) return DEFAULT_NOTIFICATIONS;
@@ -170,6 +216,9 @@ export async function getNotificationPrefs(): Promise<NotificationPrefs> {
 }
 
 export async function setNotificationPrefs(prefs: NotificationPrefs): Promise<void> {
+  if (Platform.OS === 'web') {
+    webSet(NOTIFICATIONS_KEY, JSON.stringify(prefs));
+  }
   try {
     await SecureStore.setItemAsync(NOTIFICATIONS_KEY, JSON.stringify(prefs));
   } catch {
@@ -178,6 +227,11 @@ export async function setNotificationPrefs(prefs: NotificationPrefs): Promise<vo
 }
 
 export async function getAiPendingJobId(): Promise<number | null> {
+  if (Platform.OS === 'web') {
+    const raw = webGet(AI_PENDING_JOB_KEY);
+    const n = raw ? Number(raw) : NaN;
+    if (Number.isFinite(n) && n > 0) return Math.floor(n);
+  }
   try {
     const v = await SecureStore.getItemAsync(AI_PENDING_JOB_KEY);
     const n = v ? Number(v) : NaN;
@@ -190,14 +244,21 @@ export async function getAiPendingJobId(): Promise<number | null> {
 export async function setAiPendingJobId(jobId: number): Promise<void> {
   const n = Number(jobId);
   if (!Number.isFinite(n) || n <= 0) return;
+  const value = String(Math.floor(n));
+  if (Platform.OS === 'web') {
+    webSet(AI_PENDING_JOB_KEY, value);
+  }
   try {
-    await SecureStore.setItemAsync(AI_PENDING_JOB_KEY, String(Math.floor(n)));
+    await SecureStore.setItemAsync(AI_PENDING_JOB_KEY, value);
   } catch {
 
   }
 }
 
 export async function clearAiPendingJobId(): Promise<void> {
+  if (Platform.OS === 'web') {
+    webDelete(AI_PENDING_JOB_KEY);
+  }
   try {
     await SecureStore.deleteItemAsync(AI_PENDING_JOB_KEY);
   } catch {

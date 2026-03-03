@@ -612,7 +612,7 @@ export default function ProfileScreen() {
 										style: 'destructive',
 										onPress: async () => {
 											await signOut();
-											Alert.alert(t(lang, 'common.done'), t(lang, 'profile.signed_out'));
+											router.replace('/login');
 										},
 									},
 								]);
