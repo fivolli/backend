@@ -193,8 +193,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!t) throw new Error('Не удалось получить токен');
       await setToken(t);
       setTokenState(t);
-      await refreshMe();
-      await syncPushRegistration(t);
+      try {
+        await refreshMe();
+      } catch {
+        // ignore
+      }
+      void syncPushRegistration(t);
     },
     [lang, refreshMe, syncPushRegistration]
   );
@@ -216,8 +220,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!t) throw new Error('Не удалось получить токен');
       await setToken(t);
       setTokenState(t);
-      await refreshMe();
-      await syncPushRegistration(t);
+      try {
+        await refreshMe();
+      } catch {
+        // ignore
+      }
+      void syncPushRegistration(t);
     },
     [lang, refreshMe, syncPushRegistration]
   );

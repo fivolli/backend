@@ -81,11 +81,19 @@ export default function ProfileScreen() {
 			if (mode === 'login') {
 				await signIn(email, password);
 				Alert.alert(t(lang, 'common.done'), t(lang, 'profile.login_success'));
-				router.back();
+				if (Platform.OS === 'web') {
+					router.replace('/home');
+				} else {
+					router.back();
+				}
 			} else {
 				await register({ name, email, phone, password, role });
 				Alert.alert(t(lang, 'common.done'), t(lang, 'profile.register_success'));
-				router.back();
+				if (Platform.OS === 'web') {
+					router.replace('/home');
+				} else {
+					router.back();
+				}
 			}
 		} catch (e: any) {
 			Alert.alert(t(lang, 'common.error'), e?.message ? String(e.message) : t(lang, 'profile.operation_failed'));
