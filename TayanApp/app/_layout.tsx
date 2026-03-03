@@ -18,7 +18,7 @@ function PersistentBottomNav() {
   const surface = useThemeColor({}, 'surface');
   const border = useThemeColor({}, 'border');
   const text = useThemeColor({}, 'text');
-  const { lang } = useAuth();
+  const { lang, token } = useAuth();
 
   const goHome = () => {
     if (pathname === '/home') return;
@@ -33,7 +33,8 @@ function PersistentBottomNav() {
   };
 
   
-  if (!pathname || pathname === '/') return null;
+  if (!token) return null;
+  if (!pathname || pathname === '/' || pathname === '/login' || pathname === '/register') return null;
 
   const isHome = pathname === '/home';
   const isSettings = pathname === '/settings';

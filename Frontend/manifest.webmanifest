@@ -1,0 +1,18 @@
+﻿{
+  "name": "TAYAN",
+  "short_name": "TAYAN",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f3f4f9",
+  "theme_color": "#2d2d6b",
+  "lang": "ru",
+  "icons": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

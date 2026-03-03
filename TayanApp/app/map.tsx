@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+﻿import { useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Linking, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -155,7 +155,7 @@ function formatMinutesAgo(lang: AppLang, iso?: string | null) {
 	if (Number.isNaN(d.getTime())) return null;
 	const minutes = Math.max(0, Math.floor((Date.now() - d.getTime()) / 60000));
 	if (lang === 'en') return `${minutes} min ago`;
-	if (lang === 'kg') return `${minutes} мүн мурда`;
+	if (lang === 'kg') return `${minutes} мин мурда`;
 	return `${minutes} мин назад`;
 }
 
@@ -1008,7 +1008,7 @@ export default function MapScreen() {
 												{ backgroundColor: primary, opacity: acceptingId === x.id ? 0.7 : pressed ? 0.9 : 1 },
 											]}
 										>
-											<ThemedText style={styles.acceptBtnText}>{acceptingId === x.id ? '…' : t(lang, 'map.accept')}</ThemedText>
+											<ThemedText style={styles.acceptBtnText}>{acceptingId === x.id ? '...' : t(lang, 'map.accept')}</ThemedText>
 										</Pressable>
 									</View>
 								);
@@ -1074,18 +1074,6 @@ export default function MapScreen() {
 														<ThemedText style={styles.openSub}>📏 {t(lang, 'common.distance_km', { km: v.distance_km })}</ThemedText>
 												<ThemedText style={styles.openSub}>{t(lang, 'map.online_ago', { minutes: v.online_minutes_ago })}</ThemedText>
 											</View>
-											<Pressable
-												onPress={async () => {
-												try {
-													await Linking.openURL(`tel:${v.phone}`);
-												} catch {
-													Alert.alert(t(lang, 'common.phone_unavailable_title'), t(lang, 'common.phone_unavailable_text'));
-												}
-											}}
-											style={({ pressed }) => [styles.acceptBtn, { backgroundColor: primary, opacity: pressed ? 0.9 : 1 }]}
-											>
-												<ThemedText style={styles.acceptBtnText}>📞</ThemedText>
-											</Pressable>
 										</View>
 									))}
 								</View>
@@ -1161,7 +1149,7 @@ export default function MapScreen() {
 									{ backgroundColor: primary, opacity: acceptingId === requestId ? 0.7 : pressed ? 0.9 : 1 },
 								]}
 							>
-								<ThemedText style={styles.acceptBtnText}>{acceptingId === requestId ? '…' : t(lang, 'map.accept')}</ThemedText>
+								<ThemedText style={styles.acceptBtnText}>{acceptingId === requestId ? '...' : t(lang, 'map.accept')}</ThemedText>
 							</Pressable>
 						</View>
 					</>
@@ -1217,7 +1205,7 @@ export default function MapScreen() {
 										disabled={reviewSubmitting}
 										style={({ pressed }) => [styles.actionPrimary, { backgroundColor: primary, opacity: reviewSubmitting ? 0.7 : pressed ? 0.9 : 1 }]}
 									>
-										<ThemedText style={styles.actionPrimaryText}>{reviewSubmitting ? '…' : t(lang, 'common.send')}</ThemedText>
+										<ThemedText style={styles.actionPrimaryText}>{reviewSubmitting ? '...' : t(lang, 'common.send')}</ThemedText>
 									</Pressable>
 								</View>
 							</View>
@@ -1590,3 +1578,4 @@ const styles = StyleSheet.create({
 	rowValue: { lineHeight: 20 },
 	sep: { borderTopWidth: 1, marginVertical: 10 },
 });
+
