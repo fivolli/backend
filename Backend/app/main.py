@@ -131,6 +131,11 @@ AUTH_RATE_LIMIT_RPM = _int_env("AUTH_RATE_LIMIT_RPM", 20, min_value=3, max_value
 AI_RATE_LIMIT_RPM = _int_env("AI_RATE_LIMIT_RPM", 12, min_value=2, max_value=120)
 TRUSTED_HOSTS = _csv_env("TRUSTED_HOSTS", ["127.0.0.1", "localhost"])
 CORS_ALLOW_ORIGINS = _csv_env("CORS_ALLOW_ORIGINS", DEFAULT_CORS_ORIGINS)
+# Allow common hosted frontend domains (Render/Vercel) without manual per-domain updates.
+CORS_ALLOW_ORIGIN_REGEX = os.getenv(
+    "CORS_ALLOW_ORIGIN_REGEX",
+    r"^https://([a-z0-9-]+\.)?vercel\.app$|^https://frontend-[a-z0-9-]+\.onrender\.com$",
+).strip()
 
 ALLOWED_AVATAR_MIME_TO_EXT = {
     "image/jpeg": ".jpg",
@@ -484,6 +489,7 @@ app.add_middleware(TrustedHostMiddleware, allowed_hosts=TRUSTED_HOSTS)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=CORS_ALLOW_ORIGINS,
+    allow_origin_regex=CORS_ALLOW_ORIGIN_REGEX or None,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type", "Accept", "Accept-Language"],
