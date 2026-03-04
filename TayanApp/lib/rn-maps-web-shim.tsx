@@ -371,6 +371,8 @@ const MapView = forwardRef<any, MapViewProps>(function MapView({ style, initialR
         zoomControl: true,
         attributionControl: true,
       });
+      // Keep OSM attribution but remove the default Leaflet prefix/logo.
+      map.attributionControl.setPrefix(false);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
       }).addTo(map);
