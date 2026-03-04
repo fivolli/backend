@@ -549,28 +549,39 @@ export default function MapScreen() {
 		}
 	}
 
-	async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'canceled') {
+async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'canceled') {
 		if (!token || !requestId) return;
 		if (me?.role !== 'volunteer') return;
 		if (!data || !data.accepted_by || data.accepted_by !== me.id) return;
 
-		if (status === 'canceled') {
-			const ok = await new Promise<boolean>((resolve) => {
-				Alert.alert(t(lang, 'map.cancel_confirm_title'), t(lang, 'map.cancel_confirm_text'), [
+		const confirmAction = async (title: string, message: string, okText: string, destructive = false) => {
+			if (Platform.OS === 'web' && typeof window !== 'undefined' && typeof window.confirm === 'function') {
+				return window.confirm(`${title}\n\n${message}`);
+			}
+			return await new Promise<boolean>((resolve) => {
+				Alert.alert(title, message, [
 					{ text: t(lang, 'map.no'), style: 'cancel', onPress: () => resolve(false) },
-					{ text: t(lang, 'map.yes_cancel'), style: 'destructive', onPress: () => resolve(true) },
-				]);
+					{ text: okText, style: destructive ? 'destructive' : 'default', onPress: () => resolve(true) },
+				], { cancelable: true, onDismiss: () => resolve(false) });
 			});
+		};
+
+		if (status === 'canceled') {
+			const ok = await confirmAction(
+				t(lang, 'map.cancel_confirm_title'),
+				t(lang, 'map.cancel_confirm_text'),
+				t(lang, 'map.yes_cancel'),
+				true
+			);
 			if (!ok) return;
 		}
 
 		if (status === 'completed') {
-			const ok = await new Promise<boolean>((resolve) => {
-				Alert.alert(t(lang, 'map.finish_confirm_title'), t(lang, 'map.finish_confirm_text'), [
-					{ text: t(lang, 'map.no'), style: 'cancel', onPress: () => resolve(false) },
-					{ text: t(lang, 'map.yes_finish'), style: 'default', onPress: () => resolve(true) },
-				]);
-			});
+			const ok = await confirmAction(
+				t(lang, 'map.finish_confirm_title'),
+				t(lang, 'map.finish_confirm_text'),
+				t(lang, 'map.yes_finish')
+			);
 			if (!ok) return;
 		}
 
