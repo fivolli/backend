@@ -1,4 +1,4 @@
-import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Alert, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -83,7 +83,12 @@ export default function SettingsScreen() {
 
 				<Pressable
 					style={[styles.logoutBtn, { borderColor: '#B91717' }]}
-					onPress={() => {
+					onPress={async () => {
+						if (Platform.OS === 'web') {
+							await signOut();
+							router.replace('/login');
+							return;
+						}
 						Alert.alert(t(lang, 'settings.logout_title'), t(lang, 'settings.logout_confirm'), [
 							{ text: t(lang, 'common.cancel'), style: 'cancel' },
 							{

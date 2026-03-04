@@ -604,7 +604,12 @@ export default function ProfileScreen() {
 
 						<Pressable
 							style={styles.logoutOutline}
-							onPress={() => {
+							onPress={async () => {
+								if (Platform.OS === 'web') {
+									await signOut();
+									router.replace('/login');
+									return;
+								}
 								Alert.alert(t(lang, 'settings.logout_title'), t(lang, 'settings.logout_confirm'), [
 									{ text: t(lang, 'common.cancel'), style: 'cancel' },
 									{
