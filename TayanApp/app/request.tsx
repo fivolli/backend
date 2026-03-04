@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Linking, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Linking, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -261,21 +261,30 @@ export default function RequestScreen() {
 
 	async function cancelRequest() {
 		if (!id || !token) return;
-		Alert.alert(t(lang, 'request.cancel_confirm_title'), t(lang, 'request.cancel_confirm_text'), [
-			{ text: t(lang, 'request.cancel_no'), style: 'cancel' },
-			{
-				text: t(lang, 'request.cancel_yes'),
-				style: 'destructive',
-				onPress: async () => {
-					try {
-						await api<RequestDetail>(`/requests/${id}/status`, { method: 'PATCH', token, lang, body: { status: 'canceled' } });
-						await load();
-					} catch (e: any) {
-						Alert.alert(t(lang, 'common.error'), e?.message ? String(e.message) : t(lang, 'request.cancel_failed'));
-					}
-				},
-			},
-		]);
+		let confirmed = false;
+		if (Platform.OS === 'web' && typeof window !== 'undefined' && typeof window.confirm === 'function') {
+			confirmed = window.confirm(`${t(lang, 'request.cancel_confirm_title')}\n\n${t(lang, 'request.cancel_confirm_text')}`);
+		} else {
+			confirmed = await new Promise<boolean>((resolve) => {
+				Alert.alert(
+					t(lang, 'request.cancel_confirm_title'),
+					t(lang, 'request.cancel_confirm_text'),
+					[
+						{ text: t(lang, 'request.cancel_no'), style: 'cancel', onPress: () => resolve(false) },
+						{ text: t(lang, 'request.cancel_yes'), style: 'destructive', onPress: () => resolve(true) },
+					],
+					{ cancelable: true, onDismiss: () => resolve(false) }
+				);
+			});
+		}
+		if (!confirmed) return;
+
+		try {
+			await api<RequestDetail>(`/requests/${id}/status`, { method: 'PATCH', token, lang, body: { status: 'canceled' } });
+			await load();
+		} catch (e: any) {
+			Alert.alert(t(lang, 'common.error'), e?.message ? String(e.message) : t(lang, 'request.cancel_failed'));
+		}
 	}
 
 	async function submitReview() {
