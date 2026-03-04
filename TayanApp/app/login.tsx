@@ -62,6 +62,10 @@ export default function LoginScreen() {
   const danger = useThemeColor({}, 'danger');
   const border = useThemeColor({}, 'border');
   const text = useThemeColor({}, 'text');
+  const isWeb = Platform.OS === 'web';
+  const labelColor = isWeb ? '#2C2D5F' : primary;
+  const inputBorderColor = isWeb ? '#CCD6DD' : border;
+  const inputTextColor = isWeb ? '#151718' : text;
 
   const { signIn, lang } = useAuth();
 
@@ -123,11 +127,13 @@ export default function LoginScreen() {
         </View>
 
         <ScrollView
+          style={{ flex: 1 }}
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ paddingVertical: contentPadV, paddingHorizontal: contentPadH, flexGrow: 1 }}
+          contentContainerStyle={{ paddingVertical: contentPadV, paddingHorizontal: contentPadH }}
         >
+          <View style={[styles.formWrap, { alignSelf: 'center' }]}>
           <View style={styles.inputGroup}>
-            <ThemedText style={[styles.inputLabel, { color: primary }]}>{copy.email}</ThemedText>
+            <ThemedText style={[styles.inputLabel, { color: labelColor }]}>{copy.email}</ThemedText>
             <TextInput
               value={email}
               onChangeText={setEmail}
@@ -138,8 +144,8 @@ export default function LoginScreen() {
               style={[
                 styles.inputField,
                 {
-                  borderColor: focused === 'email' ? primary : border,
-                  color: text,
+                  borderColor: focused === 'email' ? primary : inputBorderColor,
+                  color: inputTextColor,
                 },
               ]}
               onFocus={() => setFocused('email')}
@@ -149,7 +155,7 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <ThemedText style={[styles.inputLabel, { color: primary }]}>{copy.password}</ThemedText>
+            <ThemedText style={[styles.inputLabel, { color: labelColor }]}>{copy.password}</ThemedText>
             <TextInput
               value={password}
               onChangeText={setPassword}
@@ -160,8 +166,8 @@ export default function LoginScreen() {
               style={[
                 styles.inputField,
                 {
-                  borderColor: focused === 'password' ? primary : border,
-                  color: text,
+                  borderColor: focused === 'password' ? primary : inputBorderColor,
+                  color: inputTextColor,
                 },
               ]}
               onFocus={() => setFocused('password')}
@@ -194,6 +200,7 @@ export default function LoginScreen() {
               {copy.goRegister}
             </ThemedText>
           </ThemedText>
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </ThemedView>
@@ -217,12 +224,17 @@ const styles = StyleSheet.create({
   },
 
   inputGroup: { marginBottom: 20 },
+  formWrap: {
+    width: '100%',
+    maxWidth: 560,
+  },
   inputLabel: {
     marginBottom: 8,
     fontWeight: '600',
   },
   inputField: {
     width: '100%',
+    minHeight: 48,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderWidth: 2,
