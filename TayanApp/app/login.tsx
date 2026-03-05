@@ -104,28 +104,31 @@ export default function LoginScreen() {
   return (
     <ThemedView style={styles.container}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-        <View
-          style={[
-            styles.authHeader,
-            {
-              backgroundColor: primary,
-              paddingTop: insets.top + headerTopPad,
-              paddingHorizontal: headerHPad,
-              paddingBottom: headerBottomPad,
-            },
-          ]}
-        >
-          <Image
-            source={LOGO}
-            style={{ width: imageSize, height: imageSize, borderRadius: imageRadius, resizeMode: 'cover' }}
-          />
-          <ThemedText style={styles.headerTitle}>{copy.title}</ThemedText>
-        </View>
-
         <ScrollView
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ paddingVertical: contentPadV, paddingHorizontal: contentPadH, flexGrow: 1 }}
         >
+          <View
+            style={[
+              styles.authHeader,
+              {
+                backgroundColor: primary,
+                paddingTop: insets.top + headerTopPad,
+                paddingHorizontal: headerHPad,
+                paddingBottom: headerBottomPad,
+                marginHorizontal: -contentPadH,
+                marginTop: -contentPadV,
+                marginBottom: contentPadV,
+              },
+            ]}
+          >
+            <Image
+              source={LOGO}
+              style={{ width: imageSize, height: imageSize, borderRadius: imageRadius, resizeMode: 'cover' }}
+            />
+            <ThemedText style={styles.headerTitle}>{copy.title}</ThemedText>
+          </View>
+
           <View style={styles.inputGroup}>
             <ThemedText style={[styles.inputLabel, { color: primary }]}>{copy.email}</ThemedText>
             <TextInput
