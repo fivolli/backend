@@ -132,25 +132,28 @@ export default function RegisterScreen() {
   return (
     <ThemedView style={[styles.container, { backgroundColor: primary }]}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-        <View
-          style={[
-            styles.authHeader,
-            {
-              backgroundColor: '#fff',
-              paddingTop: insets.top + headerTopPad,
-              paddingHorizontal: headerHPad,
-              paddingBottom: headerBottomPad,
-            },
-          ]}
-        >
-          <Image source={LOGO} style={{ width: 130, height: 150, resizeMode: 'contain' }} />
-          <ThemedText style={[styles.welcomeTitle, { color: primary }]}>{copy.welcome}</ThemedText>
-        </View>
-
         <ScrollView
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ paddingVertical: contentPadV, paddingHorizontal: contentPadH, flexGrow: 1 }}
         >
+          <View
+            style={[
+              styles.authHeader,
+              {
+                backgroundColor: '#fff',
+                paddingTop: insets.top + headerTopPad,
+                paddingHorizontal: headerHPad,
+                paddingBottom: headerBottomPad,
+                marginHorizontal: -contentPadH,
+                marginTop: -contentPadV,
+                marginBottom: contentPadV,
+              },
+            ]}
+          >
+            <Image source={LOGO} style={{ width: 130, height: 150, resizeMode: 'contain' }} />
+            <ThemedText style={[styles.welcomeTitle, { color: primary }]}>{copy.welcome}</ThemedText>
+          </View>
+
           <View style={styles.inputGroup}>
             <ThemedText style={[styles.inputLabel, { color: '#fff' }]}>{copy.name}</ThemedText>
             <TextInput
