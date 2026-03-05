@@ -1459,7 +1459,7 @@ def my_requests(
             "in_progress_at": r.in_progress_at,
             "completed_at": r.completed_at,
             "canceled_at": r.canceled_at,
-            "reaction_minutes": r.reaction_minutes,
+            "reaction_minutes": _safe_reaction_minutes(r.created_at, r.accepted_at),
             "rating": r.rating,
             "review_text": r.review_text,
             "reviewed_at": r.reviewed_at,
