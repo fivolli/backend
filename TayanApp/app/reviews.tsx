@@ -28,6 +28,15 @@ type ReviewFeedItem = {
   kind: string;
 };
 
+type MyRequestReviewItem = {
+  id: number;
+  kind: string;
+  accepted_by?: number | null;
+  rating?: number | null;
+  review_text?: string | null;
+  reviewed_at?: string | null;
+};
+
 function fmtTimeIso(iso: string) {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '—';
@@ -46,7 +55,7 @@ export default function ReviewsScreen() {
   const surface = useThemeColor({}, 'surface');
   const bg = useThemeColor({}, 'background');
   const border = useThemeColor({}, 'border');
-  const { token, lang } = useAuth();
+  const { token, lang, me } = useAuth();
 
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<ReviewsStats | null>(null);
@@ -64,12 +73,61 @@ export default function ReviewsScreen() {
       pollInFlight.current = true;
       if (showSpinner) setLoading(true);
       try {
-        const [s, r] = await Promise.all([
-          api<ReviewsStats>('/reviews/stats', { method: 'GET', token, lang }),
-          api<ReviewFeedItem[]>('/reviews/latest?limit=30', { method: 'GET', token, lang }),
-        ]);
-        setStats(s || null);
-        setItems(Array.isArray(r) ? r : []);
+        if (!token || !me?.id) {
+          setStats({ avg_rating: 0, reviews_count: 0 });
+          setItems([]);
+          return;
+        }
+
+        if (me.role === 'volunteer') {
+          const [s, r] = await Promise.all([
+            api<ReviewsStats>(`/volunteer/${me.id}/rating`, { method: 'GET', token, lang }),
+            api<ReviewFeedItem[]>(`/volunteer/${me.id}/reviews?limit=50&offset=0`, { method: 'GET', token, lang }),
+          ]);
+
+          const mapped = (Array.isArray(r) ? r : []).map((x: any) => ({
+            request_id: Number(x.request_id),
+            rating: Number(x.rating || 0),
+            review_text: x.review_text ?? null,
+            reviewed_at: String(x.reviewed_at || ''),
+            volunteer_id: Number(me.id),
+            volunteer_name: me.name || null,
+            user_id: Number(x.user_id || 0),
+            user_name: x.user_name ?? null,
+            kind: String(x.kind || 'symptom'),
+          })) as ReviewFeedItem[];
+
+          setStats({
+            avg_rating: Number(s?.avg_rating || 0),
+            reviews_count: Number(s?.reviews_count || mapped.length || 0),
+          });
+          setItems(mapped);
+          return;
+        }
+
+        const mine = await api<MyRequestReviewItem[]>('/requests/my', { method: 'GET', token, lang });
+        const mapped = (Array.isArray(mine) ? mine : [])
+          .filter((x) => Number.isFinite(Number(x.rating)) && x.reviewed_at)
+          .sort((a, b) => new Date(String(b.reviewed_at || '')).getTime() - new Date(String(a.reviewed_at || '')).getTime())
+          .map((x) => ({
+            request_id: Number(x.id),
+            rating: Number(x.rating || 0),
+            review_text: x.review_text ?? null,
+            reviewed_at: String(x.reviewed_at || ''),
+            volunteer_id: Number(x.accepted_by || 0),
+            volunteer_name: null,
+            user_id: Number(me.id),
+            user_name: me.name || null,
+            kind: String(x.kind || 'symptom'),
+          })) as ReviewFeedItem[];
+
+        const count = mapped.length;
+        const sum = mapped.reduce((acc, x) => acc + Number(x.rating || 0), 0);
+        setStats({
+          avg_rating: count ? sum / count : 0,
+          reviews_count: count,
+        });
+        setItems(mapped);
       } catch (e: any) {
         const msg = e?.message ? String(e.message) : t(lang, 'reviews.load_failed');
         Alert.alert(t(lang, 'common.error'), msg, [{ text: t(lang, 'common.ok'), onPress: () => router.replace('/home') }]);
@@ -78,7 +136,7 @@ export default function ReviewsScreen() {
         if (showSpinner) setLoading(false);
       }
     },
-    [token, lang]
+    [token, lang, me?.id, me?.role, me?.name]
   );
 
   useFocusEffect(
@@ -144,6 +202,7 @@ export default function ReviewsScreen() {
             {items.map((x) => {
               const userName = x.user_name || t(lang, 'reviews.user_fallback', { id: String(x.user_id) });
               const volunteerName = x.volunteer_name || t(lang, 'reviews.volunteer_fallback', { id: String(x.volunteer_id) });
+              const isVolunteer = me?.role === 'volunteer';
 
               return (
                 <View key={String(x.request_id)} style={styles.reviewCard}>
@@ -164,25 +223,28 @@ export default function ReviewsScreen() {
                     <ThemedText style={styles.reviewText}>{String(x.review_text)}</ThemedText>
                   ) : null}
 
-                  <View style={[styles.volBox, { backgroundColor: bg, borderColor: border }]}
-                  >
-                    <View style={styles.volLeft}>
-                      <ThemedText style={styles.volLabel}>{t(lang, 'common.volunteer')}</ThemedText>
-                      <ThemedText style={[styles.volName, { color: primary }]}>{volunteerName}</ThemedText>
-                    </View>
+                  {!isVolunteer ? (
+                    <View style={[styles.volBox, { backgroundColor: bg, borderColor: border }]}>
+                      <View style={styles.volLeft}>
+                        <ThemedText style={styles.volLabel}>{t(lang, 'common.volunteer')}</ThemedText>
+                        <ThemedText style={[styles.volName, { color: primary }]}>{volunteerName}</ThemedText>
+                      </View>
 
-                    <Pressable
-                      style={({ pressed }) => [styles.profileBtn, { backgroundColor: primary }, pressed ? { opacity: 0.9 } : null]}
-                      onPress={() =>
-                        router.push({
-                          pathname: '/volunteer-profile',
-                          params: { volunteerId: String(x.volunteer_id), name: x.volunteer_name || t(lang, 'common.volunteer') },
-                        })
-                      }
-                    >
-                      <ThemedText style={styles.profileBtnText}>{t(lang, 'reviews.profile_button')}</ThemedText>
-                    </Pressable>
-                  </View>
+                      {x.volunteer_id > 0 ? (
+                        <Pressable
+                          style={({ pressed }) => [styles.profileBtn, { backgroundColor: primary }, pressed ? { opacity: 0.9 } : null]}
+                          onPress={() =>
+                            router.push({
+                              pathname: '/volunteer-profile',
+                              params: { volunteerId: String(x.volunteer_id), name: x.volunteer_name || t(lang, 'common.volunteer') },
+                            })
+                          }
+                        >
+                          <ThemedText style={styles.profileBtnText}>{t(lang, 'reviews.profile_button')}</ThemedText>
+                        </Pressable>
+                      ) : null}
+                    </View>
+                  ) : null}
                 </View>
               );
             })}
