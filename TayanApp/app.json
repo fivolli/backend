@@ -26,7 +26,14 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "name": "TAYAN",
+      "shortName": "TAYAN",
+      "lang": "ru",
+      "backgroundColor": "#2C2D5F",
+      "themeColor": "#2C2D5F",
+      "display": "standalone",
+      "orientation": "portrait"
     },
     "plugins": [
       "expo-router",
