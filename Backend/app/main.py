@@ -122,6 +122,8 @@ DEFAULT_CORS_ORIGINS = [
     "http://localhost:5501",
     "http://127.0.0.1:8000",
     "http://localhost:8000",
+    "https://tayan.help",
+    "https://www.tayan.help",
 ]
 
 MAX_BODY_BYTES = _int_env("MAX_BODY_BYTES", 5 * 1024 * 1024, min_value=64 * 1024, max_value=25 * 1024 * 1024)
@@ -132,7 +134,7 @@ AI_RATE_LIMIT_RPM = _int_env("AI_RATE_LIMIT_RPM", 12, min_value=2, max_value=120
 TRUSTED_HOSTS = _csv_env("TRUSTED_HOSTS", ["127.0.0.1", "localhost"])
 CORS_ALLOW_ORIGINS = _csv_env("CORS_ALLOW_ORIGINS", DEFAULT_CORS_ORIGINS)
 # Allow common hosted frontend domains (Render/Vercel) without manual per-domain updates.
-_DEFAULT_CORS_ALLOW_ORIGIN_REGEX = r"^https://([a-z0-9-]+\.)?vercel\.app$|^https://frontend-[a-z0-9-]+\.onrender\.com$"
+_DEFAULT_CORS_ALLOW_ORIGIN_REGEX = r"^https://([a-z0-9-]+\.)?vercel\.app$|^https://frontend-[a-z0-9-]+\.onrender\.com$|^https://(www\.)?tayan\.help$"
 _cors_regex_raw = os.getenv("CORS_ALLOW_ORIGIN_REGEX")
 CORS_ALLOW_ORIGIN_REGEX = (
     _cors_regex_raw.strip()
