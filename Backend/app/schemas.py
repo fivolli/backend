@@ -73,6 +73,7 @@ class HelpRequestItem(BaseModel):
     kind: str
     status: str
     created_at: datetime
+    volunteer_name: Optional[str] = None
     symptoms: Optional[str] = None
     comments: Optional[str] = None
     accepted_by: Optional[int] = None

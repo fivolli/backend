@@ -32,6 +32,7 @@ type MyRequestReviewItem = {
   id: number;
   kind: string;
   accepted_by?: number | null;
+  volunteer_name?: string | null;
   rating?: number | null;
   review_text?: string | null;
   reviewed_at?: string | null;
@@ -115,7 +116,7 @@ export default function ReviewsScreen() {
             review_text: x.review_text ?? null,
             reviewed_at: String(x.reviewed_at || ''),
             volunteer_id: Number(x.accepted_by || 0),
-            volunteer_name: null,
+            volunteer_name: x.volunteer_name ?? null,
             user_id: Number(me.id),
             user_name: me.name || null,
             kind: String(x.kind || 'symptom'),

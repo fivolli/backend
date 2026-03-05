@@ -1434,13 +1434,38 @@ def my_requests(
     if not u:
         raise HTTPException(401, tr("auth.unauthorized"))
 
-    items = (
-        db.query(HelpRequest)
+    volunteer = aliased(User)
+    rows = (
+        db.query(HelpRequest, volunteer.name.label("volunteer_name"))
+        .outerjoin(volunteer, volunteer.id == HelpRequest.accepted_by)
         .filter(HelpRequest.user_id == u.id)
         .order_by(HelpRequest.id.desc())
         .all()
     )
-    return items
+    return [
+        {
+            "id": r.id,
+            "kind": r.kind,
+            "status": r.status,
+            "created_at": r.created_at,
+            "volunteer_name": volunteer_name,
+            "symptoms": r.symptoms,
+            "comments": r.comments,
+            "accepted_by": r.accepted_by,
+            "accepted_at": r.accepted_at,
+            "lat": r.lat,
+            "lng": r.lng,
+            "address": r.address,
+            "in_progress_at": r.in_progress_at,
+            "completed_at": r.completed_at,
+            "canceled_at": r.canceled_at,
+            "reaction_minutes": r.reaction_minutes,
+            "rating": r.rating,
+            "review_text": r.review_text,
+            "reviewed_at": r.reviewed_at,
+        }
+        for r, volunteer_name in rows
+    ]
 @app.get("/requests/open", response_model=List[OpenRequestItem])
 def open_requests(
     creds: HTTPAuthorizationCredentials = Depends(bearer),
