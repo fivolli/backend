@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import {
-  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -17,6 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { showAlert } from '@/lib/alerts';
 import { t } from '@/lib/i18n';
 import { useAuth, type UserRole } from '@/providers/auth-provider';
 
@@ -39,6 +39,13 @@ const COPY = {
     register: 'Зарегистрироваться',
     haveAccount: 'Уже есть аккаунт?',
     login: 'Войти',
+    nameRequired: 'Введите имя',
+    emailRequired: 'Введите email',
+    emailInvalid: 'Введите корректный email (должен содержать @)',
+    phoneRequired: 'Введите номер телефона',
+    phoneInvalid: 'Введите корректный номер телефона',
+    passwordRequired: 'Введите пароль',
+    passwordTooShort: 'Пароль должен быть не менее 8 символов',
   },
   en: {
     welcome: 'Welcome',
@@ -56,6 +63,13 @@ const COPY = {
     register: 'Sign up',
     haveAccount: 'Already have an account?',
     login: 'Log in',
+    nameRequired: 'Enter your name',
+    emailRequired: 'Enter email',
+    emailInvalid: 'Enter a valid email (must include @)',
+    phoneRequired: 'Enter phone number',
+    phoneInvalid: 'Enter a valid phone number',
+    passwordRequired: 'Enter password',
+    passwordTooShort: 'Password must be at least 8 characters',
   },
   kg: {
     welcome: 'Кош келиңиз',
@@ -73,8 +87,17 @@ const COPY = {
     register: 'Катталуу',
     haveAccount: 'Аккаунтуңуз барбы?',
     login: 'Кирүү',
+    nameRequired: 'Атыңызды жазыңыз',
+    emailRequired: 'Email жазыңыз',
+    emailInvalid: 'Туура email жазыңыз (@ болушу керек)',
+    phoneRequired: 'Телефон номерин жазыңыз',
+    phoneInvalid: 'Туура телефон номерин жазыңыз',
+    passwordRequired: 'Сыр сөздү жазыңыз',
+    passwordTooShort: 'Сыр сөз кеминде 8 белгиден турушу керек',
   },
 } as const;
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export default function RegisterScreen() {
   const insets = useSafeAreaInsets();
@@ -114,16 +137,48 @@ export default function RegisterScreen() {
   }, [busy, name, email, phone, password]);
 
   async function onSubmit() {
-    if (!canSubmit) return;
+    const nameTrimmed = name.trim();
+    const emailTrimmed = email.trim();
+    const phoneTrimmed = phone.trim();
+    const phoneDigits = phoneTrimmed.replace(/\D/g, '');
+
+    if (!nameTrimmed) {
+      showAlert(t(lang, 'common.error'), copy.nameRequired);
+      return;
+    }
+    if (!emailTrimmed) {
+      showAlert(t(lang, 'common.error'), copy.emailRequired);
+      return;
+    }
+    if (!EMAIL_RE.test(emailTrimmed)) {
+      showAlert(t(lang, 'common.error'), copy.emailInvalid);
+      return;
+    }
+    if (!phoneTrimmed) {
+      showAlert(t(lang, 'common.error'), copy.phoneRequired);
+      return;
+    }
+    if (phoneDigits.length < 6) {
+      showAlert(t(lang, 'common.error'), copy.phoneInvalid);
+      return;
+    }
+    if (!password) {
+      showAlert(t(lang, 'common.error'), copy.passwordRequired);
+      return;
+    }
+    if (password.length < 8) {
+      showAlert(t(lang, 'common.error'), copy.passwordTooShort);
+      return;
+    }
+    if (busy) return;
+
     setBusy(true);
     try {
-      await register({ name, email, phone, password, role });
+      await register({ name: nameTrimmed, email: emailTrimmed, phone: phoneTrimmed, password, role });
       router.replace('/home');
-      if (Platform.OS !== 'web') {
-        Alert.alert(t(lang, 'common.done'), t(lang, 'profile.register_success'));
-      }
+      showAlert(t(lang, 'common.done'), t(lang, 'profile.register_success'));
     } catch (e: any) {
-      Alert.alert(t(lang, 'common.error'), e?.message ? String(e.message) : t(lang, 'profile.operation_failed'));
+      showAlert(t(lang, 'common.error'), e?.message ? String(e.message) : t(lang, 'profile.operation_failed'));
     } finally {
       setBusy(false);
     }

@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import {
-  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -17,6 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { showAlert } from '@/lib/alerts';
 import { t } from '@/lib/i18n';
 import { useAuth } from '@/providers/auth-provider';
 
@@ -32,6 +32,9 @@ const COPY = {
     login: 'Войти',
     noAccount: 'Нет аккаунта?',
     goRegister: 'Зарегистрироваться',
+    emailRequired: 'Введите email',
+    emailInvalid: 'Введите корректный email (должен содержать @)',
+    passwordRequired: 'Введите пароль',
   },
   en: {
     title: 'Log in',
@@ -42,6 +45,9 @@ const COPY = {
     login: 'Log in',
     noAccount: "Don't have an account?",
     goRegister: 'Sign up',
+    emailRequired: 'Enter email',
+    emailInvalid: 'Enter a valid email (must include @)',
+    passwordRequired: 'Enter password',
   },
   kg: {
     title: 'Кирүү',
@@ -52,6 +58,9 @@ const COPY = {
     login: 'Кирүү',
     noAccount: 'Аккаунт жокпу?',
     goRegister: 'Катталуу',
+    emailRequired: 'Email жазыңыз',
+    emailInvalid: 'Туура email жазыңыз (@ болушу керек)',
+    passwordRequired: 'Сыр сөздү жазыңыз',
   },
 } as const;
 
@@ -83,16 +92,28 @@ export default function LoginScreen() {
   const canSubmit = useMemo(() => !!email.trim() && !!password && !busy, [email, password, busy]);
 
   async function onSubmit() {
-    if (!canSubmit) return;
+    const emailTrimmed = email.trim();
+    if (!emailTrimmed) {
+      showAlert(t(lang, 'common.error'), copy.emailRequired);
+      return;
+    }
+    if (!emailTrimmed.includes('@')) {
+      showAlert(t(lang, 'common.error'), copy.emailInvalid);
+      return;
+    }
+    if (!password) {
+      showAlert(t(lang, 'common.error'), copy.passwordRequired);
+      return;
+    }
+    if (busy) return;
+
     setBusy(true);
     try {
-      await signIn(email, password);
+      await signIn(emailTrimmed, password);
       router.replace('/home');
-      if (Platform.OS !== 'web') {
-        Alert.alert(t(lang, 'common.done'), t(lang, 'profile.login_success'));
-      }
+      showAlert(t(lang, 'common.done'), t(lang, 'profile.login_success'));
     } catch (e: any) {
-      Alert.alert(t(lang, 'common.error'), e?.message ? String(e.message) : t(lang, 'profile.operation_failed'));
+      showAlert(t(lang, 'common.error'), e?.message ? String(e.message) : t(lang, 'profile.operation_failed'));
     } finally {
       setBusy(false);
     }

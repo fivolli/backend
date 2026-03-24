@@ -38,6 +38,75 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+function normalizeAuthErrorMessage(rawError: unknown, lang: 'ru' | 'en' | 'kg'): string {
+  const fallback = lang === 'en'
+    ? 'Failed to complete the operation'
+    : lang === 'kg'
+      ? 'Аракетти аткаруу мүмкүн болгон жок'
+      : 'Не удалось выполнить операцию';
+
+  const raw = String((rawError as any)?.message || rawError || '').trim();
+  if (!raw) return fallback;
+
+  const msg = raw.toLowerCase();
+
+  if (msg.includes('invalid email or password')) {
+    return lang === 'en'
+      ? 'Invalid email or password'
+      : lang === 'kg'
+        ? 'Email же сыр сөз туура эмес'
+        : 'Неверный email или пароль';
+  }
+
+  if (msg.includes('password must be at least')) {
+    return lang === 'en'
+      ? 'Password must be at least 8 characters'
+      : lang === 'kg'
+        ? 'Сыр сөз кеминде 8 белгиден турушу керек'
+        : 'Пароль должен быть не менее 8 символов';
+  }
+
+  if (msg.includes('email is invalid')) {
+    return lang === 'en'
+      ? 'Invalid email'
+      : lang === 'kg'
+        ? 'Email туура эмес'
+        : 'Некорректный email';
+  }
+
+  if (msg.includes('phone is invalid')) {
+    return lang === 'en'
+      ? 'Invalid phone number'
+      : lang === 'kg'
+        ? 'Телефон номери туура эмес'
+        : 'Некорректный номер телефона';
+  }
+
+  if (
+    msg.includes('email is already in use')
+    || (msg.includes('email') && (msg.includes('already') || msg.includes('exists') || msg.includes('taken')))
+  ) {
+    return lang === 'en'
+      ? 'This email is already registered'
+      : lang === 'kg'
+        ? 'Бул email мурунтан катталган'
+        : 'Этот email уже зарегистрирован';
+  }
+
+  if (
+    (msg.includes('phone') || msg.includes('телефон') || msg.includes('номер'))
+    && (msg.includes('already') || msg.includes('exists') || msg.includes('taken') || msg.includes('зарегистр'))
+  ) {
+    return lang === 'en'
+      ? 'This phone number is already registered'
+      : lang === 'kg'
+        ? 'Бул телефон номери мурунтан катталган'
+        : 'Этот номер телефона уже зарегистрирован';
+  }
+
+  return raw;
+}
+
 export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuth must be used within AuthProvider');
@@ -184,48 +253,56 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = useCallback(
     async (email: string, password: string) => {
-      const data = await api<{ access_token: string; token_type: string }>('/auth/login', {
-        method: 'POST',
-        body: { email: email.trim().toLowerCase(), password },
-        lang,
-      });
-      const t = data?.access_token || null;
-      if (!t) throw new Error('Не удалось получить токен');
-      await setToken(t);
-      setTokenState(t);
       try {
-        await refreshMe();
-      } catch {
-        // ignore
+        const data = await api<{ access_token: string; token_type: string }>('/auth/login', {
+          method: 'POST',
+          body: { email: email.trim().toLowerCase(), password },
+          lang,
+        });
+        const t = data?.access_token || null;
+        if (!t) throw new Error('Не удалось получить токен');
+        await setToken(t);
+        setTokenState(t);
+        try {
+          await refreshMe();
+        } catch {
+          // ignore
+        }
+        void syncPushRegistration(t);
+      } catch (e) {
+        throw new Error(normalizeAuthErrorMessage(e, lang));
       }
-      void syncPushRegistration(t);
     },
     [lang, refreshMe, syncPushRegistration]
   );
 
   const register = useCallback(
     async (data: { name: string; email: string; phone: string; password: string; role: UserRole }) => {
-      const resp = await api<{ access_token: string; token_type: string }>('/auth/register', {
-        method: 'POST',
-        body: {
-          name: data.name.trim(),
-          email: data.email.trim().toLowerCase(),
-          phone: data.phone.trim(),
-          password: data.password,
-          role: data.role,
-        },
-        lang,
-      });
-      const t = resp?.access_token || null;
-      if (!t) throw new Error('Не удалось получить токен');
-      await setToken(t);
-      setTokenState(t);
       try {
-        await refreshMe();
-      } catch {
-        // ignore
+        const resp = await api<{ access_token: string; token_type: string }>('/auth/register', {
+          method: 'POST',
+          body: {
+            name: data.name.trim(),
+            email: data.email.trim().toLowerCase(),
+            phone: data.phone.trim(),
+            password: data.password,
+            role: data.role,
+          },
+          lang,
+        });
+        const t = resp?.access_token || null;
+        if (!t) throw new Error('Не удалось получить токен');
+        await setToken(t);
+        setTokenState(t);
+        try {
+          await refreshMe();
+        } catch {
+          // ignore
+        }
+        void syncPushRegistration(t);
+      } catch (e) {
+        throw new Error(normalizeAuthErrorMessage(e, lang));
       }
-      void syncPushRegistration(t);
     },
     [lang, refreshMe, syncPushRegistration]
   );
