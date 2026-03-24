@@ -111,7 +111,6 @@ export default function LoginScreen() {
     try {
       await signIn(emailTrimmed, password);
       router.replace('/home');
-      showAlert(t(lang, 'common.done'), t(lang, 'profile.login_success'));
     } catch (e: any) {
       showAlert(t(lang, 'common.error'), e?.message ? String(e.message) : t(lang, 'profile.operation_failed'));
     } finally {
