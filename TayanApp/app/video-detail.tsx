@@ -1,8 +1,7 @@
-import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert, ImageBackground, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useEffect, useMemo, useState } from 'react';
-import { WebView } from 'react-native-webview';
 import * as WebBrowser from 'expo-web-browser';
 
 import { ThemedText } from '@/components/themed-text';
@@ -25,7 +24,6 @@ export default function VideoDetailScreen() {
 
   const [loading, setLoading] = useState(true);
   const [video, setVideo] = useState<NormalizedVideoItem | null>(null);
-  const [webError, setWebError] = useState(false);
 
   const initialFromParams = useMemo(() => {
     if (!id) return null;
@@ -87,16 +85,7 @@ export default function VideoDetailScreen() {
     }
   }
 
-  const embedUrl = useMemo(() => {
-    if (!video?.youtube_id) return '';
-    const q = [
-      'playsinline=1',
-      'rel=0',
-      'modestbranding=1',
-      'autoplay=0',
-    ].join('&');
-    return `https://www.youtube.com/embed/${video.youtube_id}?${q}`;
-  }, [video?.youtube_id]);
+  const previewUrl = useMemo(() => video?.thumbnail_url || '', [video?.thumbnail_url]);
 
   return (
     <ThemedView style={styles.container}>
@@ -123,35 +112,31 @@ export default function VideoDetailScreen() {
         </ScrollView>
       ) : (
         <>
-          <View style={[styles.playerWrap, { backgroundColor: '#000' }]}>
-            {embedUrl && !webError ? (
-              <WebView
-                source={{
-                  uri: embedUrl,
-                  headers: {
-                    Referer: 'https://www.youtube.com/',
-                  },
-                }}
-                style={styles.playerImage}
-                allowsFullscreenVideo
-                javaScriptEnabled
-                domStorageEnabled
-                allowsInlineMediaPlayback
-                mediaPlaybackRequiresUserAction={false}
-                userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
-                onError={() => setWebError(true)}
-              />
+          <Pressable
+            onPress={() => openVideoExternal(video.video_url)}
+            disabled={!video.video_url}
+            style={[styles.playerWrap, { backgroundColor: '#000' }]}
+          >
+            {previewUrl ? (
+              <ImageBackground source={{ uri: previewUrl }} style={styles.playerImage} resizeMode="cover">
+                <View style={styles.previewOverlay}>
+                  <View style={styles.playPill}>
+                    <ThemedText style={styles.playIcon}>▶</ThemedText>
+                    <ThemedText style={styles.playText}>YouTube</ThemedText>
+                  </View>
+                </View>
+              </ImageBackground>
             ) : (
               <View style={[styles.playerImage, styles.fallbackWrap]}>
-                <ThemedText style={styles.fallbackText}>{t(lang, 'video_detail.open_failed')}</ThemedText>
+                <ThemedText style={styles.fallbackText}>{t(lang, 'video_detail.open_link')}</ThemedText>
                 {video.video_url ? (
-                  <Pressable onPress={() => openVideoExternal(video.video_url)} style={[styles.btn, { backgroundColor: primary }]}>
+                  <View style={[styles.btn, { backgroundColor: primary }]}>
                     <ThemedText style={styles.btnText}>{t(lang, 'video_detail.open_link')}</ThemedText>
-                  </Pressable>
+                  </View>
                 ) : null}
               </View>
             )}
-          </View>
+          </Pressable>
 
           <ScrollView contentContainerStyle={[styles.content, { backgroundColor: bg }]}>
             <ThemedText style={[styles.title, { color: primary }]}>{video.title}</ThemedText>
@@ -197,6 +182,31 @@ const styles = StyleSheet.create({
   },
   playerImage: {
     flex: 1,
+  },
+  previewOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.28)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  playPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    borderRadius: 999,
+    backgroundColor: 'rgba(0,0,0,0.72)',
+  },
+  playIcon: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  playText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
   },
   fallbackWrap: {
     alignItems: 'center',
