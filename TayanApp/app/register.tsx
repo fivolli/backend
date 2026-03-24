@@ -372,7 +372,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderWidth: 2,
     borderRadius: 12,
-    fontSize: 14,
+    // iOS Safari/PWA zooms inputs when font-size is below 16px.
+    fontSize: 16,
     backgroundColor: 'rgba(255,255,255,0.1)',
   },
 
