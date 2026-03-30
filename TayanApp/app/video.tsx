@@ -14,9 +14,12 @@ import { useAuth } from '@/providers/auth-provider';
 export default function VideoScreen() {
   const insets = useSafeAreaInsets();
   const primary = useThemeColor({}, 'primary');
+  const titleColor = useThemeColor({ light: primary, dark: '#E7ECF5' }, 'text');
   const surface = useThemeColor({}, 'surface');
   const bg = useThemeColor({}, 'background');
   const border = useThemeColor({}, 'border');
+  const infoSurface = useThemeColor({ light: '#E3F2FD', dark: '#1A2236' }, 'surface');
+  const infoText = useThemeColor({ light: '#1565C0', dark: '#E7ECF5' }, 'text');
   const { lang } = useAuth();
 
   const [loading, setLoading] = useState(true);
@@ -80,8 +83,8 @@ export default function VideoScreen() {
         ListHeaderComponent={() => (
           <>
             {loading && !items.length ? (
-              <View style={[styles.alertBox, styles.alertInfo]}>
-                <Text style={styles.alertInfoText}>{t(lang, 'video.loading')}</Text>
+              <View style={[styles.alertBox, styles.alertInfo, { backgroundColor: infoSurface, borderColor: border }]}>
+                <Text style={[styles.alertInfoText, { color: infoText }]}>{t(lang, 'video.loading')}</Text>
               </View>
             ) : null}
             {!loading && !items.length ? (
@@ -114,7 +117,7 @@ export default function VideoScreen() {
                 )}
               </View>
               <View style={styles.videoBody}>
-                <ThemedText numberOfLines={3} style={[styles.videoTitle, { color: primary }]}>
+                <ThemedText numberOfLines={3} style={[styles.videoTitle, { color: titleColor }]}>
                   {item.title || t(lang, 'video.item_fallback')}
                 </ThemedText>
               </View>
@@ -160,12 +163,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   alertInfo: {
-    backgroundColor: '#E3F2FD',
     borderWidth: 1,
-    borderColor: '#90CAF9',
   },
   alertInfoText: {
-    color: '#1565C0',
     fontSize: 14,
     fontWeight: '600',
   },

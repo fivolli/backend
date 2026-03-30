@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Gradients } from '@/constants/gradients';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { api } from '@/lib/api';
 import { t } from '@/lib/i18n';
@@ -25,6 +26,9 @@ export default function HomeScreen() {
 	const mutedBg = useThemeColor({}, 'background');
 	const text = useThemeColor({}, 'text');
 	const titleColor = useThemeColor({ light: primary, dark: '#E7ECF5' }, 'text');
+	const colorScheme = useColorScheme();
+	const lightDamageColors = colorScheme === 'dark' ? ['#2B2630', '#3A3127'] as const : Gradients.lightDamage;
+	const unstableColors = colorScheme === 'dark' ? ['#2B2C22', '#3A3928'] as const : Gradients.unstableState;
 
 	const isUser = me?.role === 'user';
 
@@ -111,12 +115,12 @@ export default function HomeScreen() {
 					<View style={styles.cardGrid}>
 						<Pressable style={styles.cardItem} onPress={() => router.push({ pathname: '/symptom', params: { severity: 'light' } })}>
 							<LinearGradient
-								colors={[...Gradients.lightDamage]}
+								colors={[...lightDamageColors]}
 								start={{ x: 0, y: 0 }}
 								end={{ x: 1, y: 1 }}
 								style={styles.categoryCard}
 							>
-								<View style={[styles.categoryIcon, { backgroundColor: 'rgba(255,152,0,0.2)' }]}>
+								<View style={[styles.categoryIcon, { backgroundColor: colorScheme === 'dark' ? 'rgba(255,183,77,0.18)' : 'rgba(255,152,0,0.2)' }]}>
 									<ThemedText style={styles.categoryIconText}>🩹</ThemedText>
 								</View>
 								<ThemedText numberOfLines={2} style={[styles.categoryTitle, { color: titleColor }]}>
@@ -127,12 +131,12 @@ export default function HomeScreen() {
 
 						<Pressable style={styles.cardItem} onPress={() => router.push({ pathname: '/symptom', params: { severity: 'unstable' } })}>
 							<LinearGradient
-								colors={[...Gradients.unstableState]}
+								colors={[...unstableColors]}
 								start={{ x: 0, y: 0 }}
 								end={{ x: 1, y: 1 }}
 								style={styles.categoryCard}
 							>
-								<View style={[styles.categoryIcon, { backgroundColor: 'rgba(255,235,59,0.3)' }]}>
+								<View style={[styles.categoryIcon, { backgroundColor: colorScheme === 'dark' ? 'rgba(255,235,59,0.18)' : 'rgba(255,235,59,0.3)' }]}>
 									<ThemedText style={styles.categoryIconText}>⚠️</ThemedText>
 								</View>
 								<ThemedText numberOfLines={2} style={[styles.categoryTitle, { color: titleColor }]}>

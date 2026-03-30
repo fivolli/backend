@@ -65,6 +65,7 @@ export default function RequestChatScreen() {
 
   const insets = useSafeAreaInsets();
   const primary = useThemeColor({}, 'primary');
+  const titleColor = useThemeColor({ light: primary, dark: '#E7ECF5' }, 'text');
   const surface = useThemeColor({}, 'surface');
   const border = useThemeColor({}, 'border');
   const bg = useThemeColor({}, 'background');
@@ -321,7 +322,7 @@ export default function RequestChatScreen() {
                           : { backgroundColor: bubbleBg, borderColor: border, borderWidth: 1 },
                       ]}
                     >
-                      <ThemedText style={[styles.bubbleText, mine ? { color: '#fff' } : { color: primary }]}>{m.text}</ThemedText>
+                      <ThemedText style={[styles.bubbleText, mine ? { color: '#fff' } : { color: titleColor }]}>{m.text}</ThemedText>
                     </View>
                   </View>
                 );

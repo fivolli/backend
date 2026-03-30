@@ -22,6 +22,7 @@ const LIMIT = 30;
 export default function HospitalsMapScreen() {
   const insets = useSafeAreaInsets();
   const primary = useThemeColor({}, 'primary');
+  const titleColor = useThemeColor({ light: primary, dark: '#E7ECF5' }, 'text');
   const danger = useThemeColor({}, 'danger');
   const surface = useThemeColor({}, 'surface');
   const border = useThemeColor({}, 'border');
@@ -257,14 +258,14 @@ export default function HospitalsMapScreen() {
             { backgroundColor: bg, borderColor: isSelected ? primary : border },
           ]}
         >
-          <ThemedText style={[styles.hTitle, { color: primary }]}>🏥 {h.name}</ThemedText>
+          <ThemedText style={[styles.hTitle, { color: titleColor }]}>🏥 {h.name}</ThemedText>
           {h.address ? (
             <ThemedText style={styles.hAddr}>📍 {h.address}</ThemedText>
           ) : null}
           <ThemedText style={styles.hDist}>📏 {t(lang, 'hospitals_map.distance_km', { km: String(h.distance_km) })}</ThemedText>
           <View style={styles.hActions}>
             <Pressable onPress={() => openRoute(h)} style={[styles.btnOutline, { borderColor: primary }]}>
-              <ThemedText style={[styles.btnOutlineText, { color: primary }]}>🧭 {t(lang, 'common.route')}</ThemedText>
+              <ThemedText style={[styles.btnOutlineText, { color: titleColor }]}>🧭 {t(lang, 'common.route')}</ThemedText>
             </Pressable>
             <Pressable onPress={() => focusOnMap(h)} style={[styles.btnPrimary, { backgroundColor: primary }]}>
               <ThemedText style={styles.btnPrimaryText}>📌 {t(lang, 'hospitals_map.on_map')}</ThemedText>

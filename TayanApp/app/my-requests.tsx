@@ -52,6 +52,7 @@ export default function MyRequestsScreen() {
   const border = useThemeColor({}, 'border');
   const bg = useThemeColor({}, 'background');
   const text = useThemeColor({}, 'text');
+  const titleColor = useThemeColor({ light: primary, dark: '#E7ECF5' }, 'text');
   const { token, lang } = useAuth();
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<MyRequestItem[]>([]);
@@ -122,7 +123,7 @@ export default function MyRequestsScreen() {
                     <ThemedText style={styles.functionIconText}>{itemIcon(x.kind, x.status)}</ThemedText>
                   </View>
                   <View style={{ flex: 1 }}>
-                    <ThemedText style={[styles.rowTitle, { color: primary }]}>
+                    <ThemedText style={[styles.rowTitle, { color: titleColor }]}>
                       {kindLabel(lang, x.kind)} • {statusLabel(lang, x.status)}
                     </ThemedText>
                     <ThemedText style={styles.rowSub}>{fmtTimeIso(x.created_at)}</ThemedText>

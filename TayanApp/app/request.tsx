@@ -119,6 +119,7 @@ export default function RequestScreen() {
 	const tint = useThemeColor({}, 'tint');
 	const text = useThemeColor({}, 'text');
 	const danger = useThemeColor({}, 'danger');
+	const titleColor = useThemeColor({ light: primary, dark: '#E7ECF5' }, 'text');
 	const [loading, setLoading] = useState(false);
 	const [data, setData] = useState<RequestDetail | null>(null);
 	const [loadError, setLoadError] = useState<string>('');
@@ -346,20 +347,20 @@ export default function RequestScreen() {
 				) : data ? (
 					<>
 						<View style={[styles.card, { backgroundColor: surface, borderColor: border }]}>
-							<ThemedText style={[styles.h3, { color: primary }]}>
+							<ThemedText style={[styles.h3, { color: titleColor }]}>
 								{iconFor(data.kind)} {requestKindLabel(lang, data.kind)} • {requestStatusLabel(lang, data.status)}
 							</ThemedText>
 							<ThemedText style={mutedTextStyle}>{fmtTimeIso(data.created_at)}</ThemedText>
 
 							{!isVolunteer && (data.status === 'accepted' || data.status === 'in_progress' || data.status === 'completed') && (data.volunteer_name || data.volunteer_phone) ? (
 								<View style={[styles.alertBox, { backgroundColor: bg, borderColor: border }]}>
-									<ThemedText style={[styles.alertTitle, { color: primary }]}>{t(lang, 'request.volunteer_accepted')}</ThemedText>
+									<ThemedText style={[styles.alertTitle, { color: titleColor }]}>{t(lang, 'request.volunteer_accepted')}</ThemedText>
 									{data.volunteer_name ? <ThemedText style={[styles.alertLine, { color: text }]}>👤 {data.volunteer_name}</ThemedText> : null}
 									{data.volunteer_phone ? <ThemedText style={[styles.alertLine, { color: text }]}>📞 {data.volunteer_phone}</ThemedText> : null}
 									{vRating ? (
 										<ThemedText style={[styles.alertSmall, { color: text }]}>
 											{t(lang, 'request.volunteer_rating_label')}{' '}
-											<ThemedText style={{ fontWeight: '800', color: primary }}>{(vRating.avg_rating ?? 0).toFixed(1)}</ThemedText> / 5{' '}
+											<ThemedText style={{ fontWeight: '800', color: titleColor }}>{(vRating.avg_rating ?? 0).toFixed(1)}</ThemedText> / 5{' '}
 											<ThemedText style={mutedTextStyle}>
 												{t(lang, 'request.reviews_count', { count: String(vRating.reviews_count ?? 0) })}
 											</ThemedText>
@@ -386,15 +387,15 @@ export default function RequestScreen() {
 
 							{(data.address || (data.lat != null && data.lng != null)) ? (
 								<View style={[styles.innerCard, { backgroundColor: surface, borderColor: border }]}>
-									<ThemedText style={[styles.sectionTitle, { color: primary }]}>{t(lang, 'request.location')}</ThemedText>
+									<ThemedText style={[styles.sectionTitle, { color: titleColor }]}>{t(lang, 'request.location')}</ThemedText>
 									{data.address ? (
 										<ThemedText style={[styles.paragraph, { color: text }]}>
-											<ThemedText style={[styles.strong, { color: primary }]}>{t(lang, 'request.address')}</ThemedText> {data.address}
+											<ThemedText style={[styles.strong, { color: titleColor }]}>{t(lang, 'request.address')}</ThemedText> {data.address}
 										</ThemedText>
 									) : null}
 									{(data.lat != null && data.lng != null) ? (
 										<ThemedText style={[styles.paragraph, { color: text }]}>
-											<ThemedText style={[styles.strong, { color: primary }]}>{t(lang, 'request.coords')}</ThemedText> {Number(data.lat).toFixed(6)}, {Number(data.lng).toFixed(6)}
+											<ThemedText style={[styles.strong, { color: titleColor }]}>{t(lang, 'request.coords')}</ThemedText> {Number(data.lat).toFixed(6)}, {Number(data.lng).toFixed(6)}
 										</ThemedText>
 									) : null}
 								</View>
@@ -404,7 +405,7 @@ export default function RequestScreen() {
 								<>
 									{data.user_phone ? (
 										<View style={[styles.alertBox, { backgroundColor: bg, borderColor: border }]}>
-											<ThemedText style={[styles.alertTitle, { color: primary }]}>{t(lang, 'request.user_contact')}</ThemedText>
+											<ThemedText style={[styles.alertTitle, { color: titleColor }]}>{t(lang, 'request.user_contact')}</ThemedText>
 											{data.user_name ? <ThemedText style={[styles.alertLine, { color: text }]}>👤 {data.user_name}</ThemedText> : null}
 											<ThemedText style={[styles.alertLine, { color: text }]}>📞 {data.user_phone}</ThemedText>
 											<Pressable
@@ -487,20 +488,20 @@ export default function RequestScreen() {
 
 							{data.symptoms ? (
 								<ThemedText style={[styles.paragraph, { color: text }]}>
-									<ThemedText style={[styles.strong, { color: primary }]}>{t(lang, 'request.symptoms')}</ThemedText>{'\n'}
+									<ThemedText style={[styles.strong, { color: titleColor }]}>{t(lang, 'request.symptoms')}</ThemedText>{'\n'}
 									{data.symptoms}
 								</ThemedText>
 							) : null}
 							{data.comments ? (
 								<ThemedText style={[styles.paragraph, { color: text }]}>
-									<ThemedText style={[styles.strong, { color: primary }]}>{t(lang, 'request.comment')}</ThemedText>{'\n'}
+									<ThemedText style={[styles.strong, { color: titleColor }]}>{t(lang, 'request.comment')}</ThemedText>{'\n'}
 									{data.comments}
 								</ThemedText>
 							) : null}
 						</View>
 
 						<View style={[styles.card, { backgroundColor: surface, borderColor: border }]}>
-							<ThemedText style={[styles.sectionTitle, { color: primary }]}>{t(lang, 'request.timeline')}</ThemedText>
+							<ThemedText style={[styles.sectionTitle, { color: titleColor }]}>{t(lang, 'request.timeline')}</ThemedText>
 							<ThemedText style={styles.timelineLine}>{t(lang, 'request.created', { time: fmtTimeIso(data.created_at) })}</ThemedText>
 							{data.accepted_at ? <ThemedText style={styles.timelineLine}>{t(lang, 'request.accepted', { time: fmtTimeIso(data.accepted_at) })}</ThemedText> : null}
 							{data.in_progress_at ? <ThemedText style={styles.timelineLine}>{t(lang, 'request.in_progress', { time: fmtTimeIso(data.in_progress_at) })}</ThemedText> : null}
@@ -531,7 +532,7 @@ export default function RequestScreen() {
 
 						{!isVolunteer && data.status === 'completed' && data.rating == null ? (
 							<View style={[styles.card, { backgroundColor: surface, borderColor: border }]}>
-								<ThemedText style={[styles.sectionTitle, { color: primary }]}>{t(lang, 'request.rate_volunteer')}</ThemedText>
+								<ThemedText style={[styles.sectionTitle, { color: titleColor }]}>{t(lang, 'request.rate_volunteer')}</ThemedText>
 								<ThemedText style={styles.inputLabel}>{t(lang, 'request.rating_label')}</ThemedText>
 								<View style={styles.starsRow}>
 									{[1, 2, 3, 4, 5].map((n) => (
@@ -577,7 +578,7 @@ export default function RequestScreen() {
 						<ThemedText style={{ opacity: 0.85 }}>{t(lang, 'request.no_request_data')}</ThemedText>
 						{loadError ? <ThemedText style={{ opacity: 0.75 }}>{loadError}</ThemedText> : null}
 						<Pressable onPress={load} style={[styles.btn, { backgroundColor: bg, borderColor: border }]}>
-							<ThemedText style={[styles.btnTextAlt, { color: primary }]}>{t(lang, 'common.refresh')}</ThemedText>
+						<ThemedText style={[styles.btnTextAlt, { color: titleColor }]}>{t(lang, 'common.refresh')}</ThemedText>
 						</Pressable>
 					</View>
 				)}

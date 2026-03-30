@@ -20,6 +20,9 @@ export default function SymptomScreen() {
   const surface = useThemeColor({}, 'surface');
   const border = useThemeColor({}, 'border');
   const background = useThemeColor({}, 'background');
+  const text = useThemeColor({}, 'text');
+  const titleColor = useThemeColor({ light: primary, dark: '#E7ECF5' }, 'text');
+  const infoSurface = useThemeColor({ light: background, dark: '#1A2236' }, 'surface');
   const { me, token, lang } = useAuth();
 
   const preselected = params.severity === 'unstable' ? 'unstable' : params.severity === 'light' ? 'light' : '';
@@ -152,7 +155,7 @@ export default function SymptomScreen() {
         {isVolunteer ? (
           <View style={styles.volBox}>
             <View style={[styles.alertBox, { backgroundColor: surface, borderColor: border }]}>
-              <ThemedText style={[styles.alertText, { color: primary }]}>
+              <ThemedText style={[styles.alertText, { color: titleColor }]}>
                 {t(lang, 'symptom.volunteer_blocked')}
               </ThemedText>
             </View>
@@ -165,12 +168,12 @@ export default function SymptomScreen() {
           <>
             <View style={[styles.card, { backgroundColor: surface, borderColor: border }]}>
               {severityLocked && severity ? (
-                <ThemedText style={[styles.stateTitle, { color: primary }]}>
+                <ThemedText style={[styles.stateTitle, { color: titleColor }]}>
                   {severity === 'unstable' ? t(lang, 'symptom.state_unstable') : t(lang, 'symptom.state_light')}
                 </ThemedText>
               ) : (
                 <>
-                  <ThemedText style={[styles.chooseTitle, { color: primary }]}>{t(lang, 'symptom.choose_state_title')}</ThemedText>
+                  <ThemedText style={[styles.chooseTitle, { color: titleColor }]}>{t(lang, 'symptom.choose_state_title')}</ThemedText>
                   <View style={styles.sevList}>
                     <Pressable
                       onPress={() => chooseSeverity('unstable')}
@@ -182,7 +185,7 @@ export default function SymptomScreen() {
                         pressed ? { opacity: 0.9 } : null,
                       ]}
                     >
-                      <ThemedText style={[styles.sevBtnText, severity === 'unstable' ? { color: '#fff' } : { color: primary }]}>
+                      <ThemedText style={[styles.sevBtnText, severity === 'unstable' ? { color: '#fff' } : { color: titleColor }]}>
                         {t(lang, 'symptom.state_unstable_btn')}
                       </ThemedText>
                     </Pressable>
@@ -196,15 +199,15 @@ export default function SymptomScreen() {
                         pressed ? { opacity: 0.9 } : null,
                       ]}
                     >
-                      <ThemedText style={[styles.sevBtnText, severity === 'light' ? { color: '#fff' } : { color: primary }]}>
+                      <ThemedText style={[styles.sevBtnText, severity === 'light' ? { color: '#fff' } : { color: titleColor }]}>
                         {t(lang, 'symptom.state_light_btn')}
                       </ThemedText>
                     </Pressable>
                   </View>
 
                   {severity ? (
-                    <View style={[styles.alertBox, { backgroundColor: background, borderColor: border, marginTop: 12 }]}>
-                      <ThemedText style={[styles.alertText, { color: primary }]}>
+                    <View style={[styles.alertBox, { backgroundColor: infoSurface, borderColor: border, marginTop: 12 }]}>
+                      <ThemedText style={[styles.alertText, { color: titleColor }]}>
                         {t(lang, 'symptom.selected_prefix')}{' '}
                         <ThemedText style={{ fontWeight: '700' }}>{severity === 'unstable' ? t(lang, 'symptom.state_unstable_plain') : t(lang, 'symptom.state_light_plain')}</ThemedText>
                       </ThemedText>
@@ -219,43 +222,43 @@ export default function SymptomScreen() {
             </View>
 
             <View style={styles.inputGroup}>
-              <ThemedText style={[styles.inputLabel, { color: primary }]}>{t(lang, 'symptom.symptoms_label')}</ThemedText>
+              <ThemedText style={[styles.inputLabel, { color: titleColor }]}>{t(lang, 'symptom.symptoms_label')}</ThemedText>
               <TextInput
                 value={symptoms}
                 onChangeText={setSymptoms}
                 placeholder={t(lang, 'symptom.symptoms_placeholder')}
                 placeholderTextColor="#999"
                 multiline
-                style={[styles.textArea, { backgroundColor: surface, borderColor: border, color: primary }]}
+                style={[styles.textArea, { backgroundColor: surface, borderColor: border, color: text }]}
               />
             </View>
 
             <View style={styles.inputGroup}>
-              <ThemedText style={[styles.inputLabel, { color: primary }]}>{t(lang, 'symptom.address_label')}</ThemedText>
+              <ThemedText style={[styles.inputLabel, { color: titleColor }]}>{t(lang, 'symptom.address_label')}</ThemedText>
               <TextInput
                 value={address}
                 onChangeText={setAddress}
                 placeholder={t(lang, 'symptom.address_placeholder')}
                 placeholderTextColor="#999"
-                style={[styles.input, { backgroundColor: surface, borderColor: border, color: primary }]}
+                style={[styles.input, { backgroundColor: surface, borderColor: border, color: text }]}
               />
             </View>
 
             <View style={styles.inputGroup}>
-              <ThemedText style={[styles.inputLabel, { color: primary }]}>{t(lang, 'symptom.comments_label')}</ThemedText>
+              <ThemedText style={[styles.inputLabel, { color: titleColor }]}>{t(lang, 'symptom.comments_label')}</ThemedText>
               <TextInput
                 value={comments}
                 onChangeText={setComments}
                 placeholder={t(lang, 'symptom.comments_placeholder')}
                 placeholderTextColor="#999"
                 multiline
-                style={[styles.textArea, { backgroundColor: surface, borderColor: border, color: primary }]}
+                style={[styles.textArea, { backgroundColor: surface, borderColor: border, color: text }]}
               />
             </View>
 
-            <View style={[styles.alertBox, { backgroundColor: background, borderColor: border }]}
+            <View style={[styles.alertBox, { backgroundColor: infoSurface, borderColor: border }]}
             >
-              <ThemedText style={[styles.alertText, { color: primary }]}>
+              <ThemedText style={[styles.alertText, { color: titleColor }]}>
                 💡 <ThemedText style={{ fontWeight: '700' }}>{t(lang, 'symptom.tip_label')}</ThemedText> {t(lang, 'symptom.tip_text')}
               </ThemedText>
             </View>

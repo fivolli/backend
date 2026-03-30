@@ -107,6 +107,10 @@ export default function RegisterScreen() {
   const danger = useThemeColor({}, 'danger');
   const border = useThemeColor({}, 'border');
   const text = useThemeColor({}, 'text');
+  const surface = useThemeColor({}, 'surface');
+  const background = useThemeColor({}, 'background');
+  const titleColor = useThemeColor({ light: primary, dark: '#E7ECF5' }, 'text');
+  const muted = useThemeColor({ light: '#666', dark: '#C3CCDA' }, 'tabIconDefault');
 
   const { register, lang } = useAuth();
   const copy = COPY[(lang as keyof typeof COPY) || 'ru'] ?? COPY.ru;
@@ -185,7 +189,7 @@ export default function RegisterScreen() {
   }
 
   return (
-    <ThemedView style={[styles.container, { backgroundColor: primary }]}>
+    <ThemedView style={[styles.container, { backgroundColor: background }]}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView
           keyboardShouldPersistTaps="handled"
@@ -195,7 +199,7 @@ export default function RegisterScreen() {
             style={[
               styles.authHeader,
               {
-                backgroundColor: '#fff',
+                backgroundColor: surface,
                 paddingTop: insets.top + headerTopPad,
                 paddingHorizontal: headerHPad,
                 paddingBottom: headerBottomPad,
@@ -206,111 +210,81 @@ export default function RegisterScreen() {
             ]}
           >
             <Image source={LOGO} style={{ width: 130, height: 150, resizeMode: 'contain' }} />
-            <ThemedText style={[styles.welcomeTitle, { color: primary }]}>{copy.welcome}</ThemedText>
+            <ThemedText style={[styles.welcomeTitle, { color: titleColor }]}>{copy.welcome}</ThemedText>
           </View>
 
           <View style={styles.inputGroup}>
-            <ThemedText style={[styles.inputLabel, { color: '#fff' }]}>{copy.name}</ThemedText>
+            <ThemedText style={[styles.inputLabel, { color: titleColor }]}>{copy.name}</ThemedText>
             <TextInput
               value={name}
               onChangeText={setName}
               placeholder={copy.namePh}
-              placeholderTextColor="rgba(255,255,255,0.7)"
+              placeholderTextColor={muted}
               autoCapitalize="words"
-              style={[
-                styles.inputFieldBlue,
-                {
-                  borderColor: focused === 'name' ? '#fff' : 'rgba(255,255,255,0.2)',
-                  color: '#fff',
-                },
-              ]}
+              style={[styles.inputField, { borderColor: focused === 'name' ? primary : border, color: text, backgroundColor: surface }]}
               onFocus={() => setFocused('name')}
               onBlur={() => setFocused(null)}
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <ThemedText style={[styles.inputLabel, { color: '#fff' }]}>{copy.email}</ThemedText>
+            <ThemedText style={[styles.inputLabel, { color: titleColor }]}>{copy.email}</ThemedText>
             <TextInput
               value={email}
               onChangeText={setEmail}
               placeholder={copy.emailPh}
-              placeholderTextColor="rgba(255,255,255,0.7)"
+              placeholderTextColor={muted}
               keyboardType="email-address"
               autoCapitalize="none"
-              style={[
-                styles.inputFieldBlue,
-                {
-                  borderColor: focused === 'email' ? '#fff' : 'rgba(255,255,255,0.2)',
-                  color: '#fff',
-                },
-              ]}
+              style={[styles.inputField, { borderColor: focused === 'email' ? primary : border, color: text, backgroundColor: surface }]}
               onFocus={() => setFocused('email')}
               onBlur={() => setFocused(null)}
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <ThemedText style={[styles.inputLabel, { color: '#fff' }]}>{copy.phone}</ThemedText>
+            <ThemedText style={[styles.inputLabel, { color: titleColor }]}>{copy.phone}</ThemedText>
             <TextInput
               value={phone}
               onChangeText={setPhone}
               placeholder={copy.phonePh}
-              placeholderTextColor="rgba(255,255,255,0.7)"
+              placeholderTextColor={muted}
               keyboardType="phone-pad"
               autoCapitalize="none"
-              style={[
-                styles.inputFieldBlue,
-                {
-                  borderColor: focused === 'phone' ? '#fff' : 'rgba(255,255,255,0.2)',
-                  color: '#fff',
-                },
-              ]}
+              style={[styles.inputField, { borderColor: focused === 'phone' ? primary : border, color: text, backgroundColor: surface }]}
               onFocus={() => setFocused('phone')}
               onBlur={() => setFocused(null)}
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <ThemedText style={[styles.inputLabel, { color: '#fff' }]}>{copy.role}</ThemedText>
-            <View style={[styles.roleRow, { borderColor: 'rgba(255,255,255,0.2)' }]}>
+            <ThemedText style={[styles.inputLabel, { color: titleColor }]}>{copy.role}</ThemedText>
+            <View style={styles.roleRow}>
               <Pressable
                 onPress={() => setRole('user')}
-                style={[styles.roleBtn, role === 'user' ? [styles.roleBtnActive, { borderColor: '#fff' }] : null]}
+                style={[styles.roleBtn, { borderColor: role === 'user' ? primary : border, backgroundColor: surface }]}
               >
-                <ThemedText style={[styles.roleText, { color: '#fff', opacity: role === 'user' ? 1 : 0.8 }]}
-                >
-                  {copy.roleUser}
-                </ThemedText>
+                <ThemedText style={[styles.roleText, { color: role === 'user' ? titleColor : muted }]}>{copy.roleUser}</ThemedText>
               </Pressable>
               <Pressable
                 onPress={() => setRole('volunteer')}
-                style={[styles.roleBtn, role === 'volunteer' ? [styles.roleBtnActive, { borderColor: '#fff' }] : null]}
+                style={[styles.roleBtn, { borderColor: role === 'volunteer' ? primary : border, backgroundColor: surface }]}
               >
-                <ThemedText style={[styles.roleText, { color: '#fff', opacity: role === 'volunteer' ? 1 : 0.8 }]}
-                >
-                  {copy.roleVolunteer}
-                </ThemedText>
+                <ThemedText style={[styles.roleText, { color: role === 'volunteer' ? titleColor : muted }]}>{copy.roleVolunteer}</ThemedText>
               </Pressable>
             </View>
           </View>
 
           <View style={styles.inputGroup}>
-            <ThemedText style={[styles.inputLabel, { color: '#fff' }]}>{copy.password}</ThemedText>
+            <ThemedText style={[styles.inputLabel, { color: titleColor }]}>{copy.password}</ThemedText>
             <TextInput
               value={password}
               onChangeText={setPassword}
               placeholder={copy.passwordPh}
-              placeholderTextColor="rgba(255,255,255,0.7)"
+              placeholderTextColor={muted}
               secureTextEntry
               autoCapitalize="none"
-              style={[
-                styles.inputFieldBlue,
-                {
-                  borderColor: focused === 'password' ? '#fff' : 'rgba(255,255,255,0.2)',
-                  color: '#fff',
-                },
-              ]}
+              style={[styles.inputField, { borderColor: focused === 'password' ? primary : border, color: text, backgroundColor: surface }]}
               onFocus={() => setFocused('password')}
               onBlur={() => setFocused(null)}
               returnKeyType="done"
@@ -321,21 +295,14 @@ export default function RegisterScreen() {
           <Pressable
             onPress={onSubmit}
             disabled={!canSubmit}
-            style={({ pressed }) => [
-              styles.btn,
-              { backgroundColor: danger, opacity: !canSubmit ? 0.65 : pressed ? 0.9 : 1 },
-            ]}
+            style={({ pressed }) => [styles.btn, { backgroundColor: danger, opacity: !canSubmit ? 0.65 : pressed ? 0.9 : 1 }]}
           >
             <ThemedText style={styles.btnText}>{busy ? t(lang, 'profile.please_wait') : copy.register}</ThemedText>
           </Pressable>
 
-          <ThemedText style={[styles.authLink, { color: 'rgba(255,255,255,0.7)' }]}>
+          <ThemedText style={[styles.authLink, { color: muted }]}>
             {copy.haveAccount}{' '}
-            <ThemedText
-              type="link"
-              style={[styles.authLinkSpan, { color: '#fff' }]}
-              onPress={() => router.replace('/login')}
-            >
+            <ThemedText type="link" style={[styles.authLinkSpan, { color: titleColor }]} onPress={() => router.replace('/login')}>
               {copy.login}
             </ThemedText>
           </ThemedText>
@@ -347,36 +314,29 @@ export default function RegisterScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-
   authHeader: {
     borderBottomLeftRadius: 40,
     borderBottomRightRadius: 40,
     alignItems: 'center',
     gap: 14,
   },
-
   welcomeTitle: {
     fontSize: 20,
     fontWeight: '700',
   },
-
   inputGroup: { marginBottom: 20 },
   inputLabel: {
     marginBottom: 8,
     fontWeight: '600',
   },
-
-  inputFieldBlue: {
+  inputField: {
     width: '100%',
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderWidth: 2,
     borderRadius: 12,
-    // iOS Safari/PWA zooms inputs when font-size is below 16px.
     fontSize: 16,
-    backgroundColor: 'rgba(255,255,255,0.1)',
   },
-
   roleRow: {
     flexDirection: 'row',
     gap: 12,
@@ -386,18 +346,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.2)',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  roleBtnActive: {
-    borderWidth: 2,
   },
   roleText: {
     fontWeight: '600',
     fontSize: 14,
   },
-
   btn: {
     width: '100%',
     paddingVertical: 16,
@@ -411,7 +366,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 16,
   },
-
   authLink: {
     textAlign: 'center',
     marginTop: 24,

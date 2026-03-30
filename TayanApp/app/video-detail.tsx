@@ -14,6 +14,7 @@ import { useAuth } from '@/providers/auth-provider';
 export default function VideoDetailScreen() {
   const insets = useSafeAreaInsets();
   const primary = useThemeColor({}, 'primary');
+  const titleColor = useThemeColor({ light: primary, dark: '#E7ECF5' }, 'text');
   const surface = useThemeColor({}, 'surface');
   const border = useThemeColor({}, 'border');
   const bg = useThemeColor({}, 'background');
@@ -139,7 +140,7 @@ export default function VideoDetailScreen() {
           </Pressable>
 
           <ScrollView contentContainerStyle={[styles.content, { backgroundColor: bg }]}>
-            <ThemedText style={[styles.title, { color: primary }]}>{video.title}</ThemedText>
+            <ThemedText style={[styles.title, { color: titleColor }]}>{video.title}</ThemedText>
 
             {video.video_url ? (
               <>

@@ -173,6 +173,7 @@ export default function MapScreen() {
 	const danger = useThemeColor({}, 'danger');
 	const bg = useThemeColor({}, 'background');
 	const text = useThemeColor({}, 'text');
+	const titleColor = useThemeColor({ light: primary, dark: '#E7ECF5' }, 'text');
 	const { token, lang, me } = useAuth();
 
 	const [requestId, setRequestId] = useState<number>(0);
@@ -1003,7 +1004,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 											onPress={() => focusOpenRequestOnMap(x)}
 											style={({ pressed }) => [{ flex: 1, opacity: pressed ? 0.95 : 1 }]}
 										>
-											<ThemedText style={[styles.openTitle, { color: primary }]}>{requestKindTitle(lang, x.kind, x.severity)}</ThemedText>
+											<ThemedText style={[styles.openTitle, { color: titleColor }]}>{requestKindTitle(lang, x.kind, x.severity)}</ThemedText>
 											{x.user_name ? <ThemedText style={styles.openSub}>👤 {x.user_name}</ThemedText> : null}
 											{age ? <ThemedText style={styles.openSub}>🕒 {age}</ThemedText> : null}
 											{d ? <ThemedText style={styles.openSub}>📏 {d}</ThemedText> : null}
@@ -1029,7 +1030,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 							<View style={[styles.card, { backgroundColor: surface, borderColor: border }]}>
 							<ThemedText>{t(lang, 'map.no_new_requests')}</ThemedText>
 								<Pressable onPress={() => loadOpenRequests()} style={[styles.refreshBtn, { borderColor: border }]}>
-								<ThemedText style={{ color: primary, fontWeight: '700' }}>{t(lang, 'common.refresh')}</ThemedText>
+								<ThemedText style={{ color: titleColor, fontWeight: '700' }}>{t(lang, 'common.refresh')}</ThemedText>
 								</Pressable>
 							</View>
 						)}
@@ -1038,7 +1039,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 					me?.role === 'user' && token && showNearbyVolunteers ? (
 						<>
 							<View style={[styles.alertBox, { backgroundColor: bg, borderColor: border }]}>
-								<ThemedText style={[styles.alertText, { color: primary }]}>{t(lang, 'map.nearby_volunteers')}</ThemedText>
+								<ThemedText style={[styles.alertText, { color: titleColor }]}>{t(lang, 'map.nearby_volunteers')}</ThemedText>
 							</View>
 
 							<View style={[styles.mapWrap, { borderColor: border, backgroundColor: surface }]}>
@@ -1081,7 +1082,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 												<ThemedText style={styles.openIconText}>🧑‍⚕️</ThemedText>
 											</View>
 											<View style={{ flex: 1 }}>
-														<ThemedText style={[styles.openTitle, { color: primary }]}>{v.name}</ThemedText>
+														<ThemedText style={[styles.openTitle, { color: titleColor }]}>{v.name}</ThemedText>
 														<ThemedText style={styles.openSub}>📏 {t(lang, 'common.distance_km', { km: v.distance_km })}</ThemedText>
 												<ThemedText style={styles.openSub}>{t(lang, 'map.online_ago', { minutes: v.online_minutes_ago })}</ThemedText>
 											</View>
@@ -1106,7 +1107,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 				) : me?.role === 'volunteer' && requestId && !data && volDetail && volDetail.status === 'new' ? (
 					<>
 						<View style={[styles.alertBox, { backgroundColor: bg, borderColor: border }]}>
-							<ThemedText style={[styles.alertText, { color: primary }]}>{t(lang, 'map.new_request')}</ThemedText>
+							<ThemedText style={[styles.alertText, { color: titleColor }]}>{t(lang, 'map.new_request')}</ThemedText>
 						</View>
 
 						{newReqPoint ? (
@@ -1143,7 +1144,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 						)}
 
 						<View style={[styles.card, { backgroundColor: surface, borderColor: border }]}>
-							<ThemedText style={[styles.rowTitle, { color: primary }]}>{requestKindTitle(lang, volDetail.kind, volDetail.severity)}</ThemedText>
+							<ThemedText style={[styles.rowTitle, { color: titleColor }]}>{requestKindTitle(lang, volDetail.kind, volDetail.severity)}</ThemedText>
 							{newReqDistance ? <ThemedText style={[styles.rowValue, { color: text }]}>📏 {newReqDistance}</ThemedText> : null}
 							{!volDetail.address && newReqPoint ? (
 								<ThemedText style={[styles.rowValue, { color: text }]}>📍 {newReqPoint.latitude.toFixed(6)}, {newReqPoint.longitude.toFixed(6)}</ThemedText>
@@ -1171,14 +1172,14 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 				) : data ? (
 					<>
 						<View style={[styles.alertBox, { backgroundColor: bg, borderColor: border }]}>
-							<ThemedText style={[styles.alertText, { color: primary }]}>
+								<ThemedText style={[styles.alertText, { color: titleColor }]}>
 								{statusText(lang, data.status, me?.role)}
 							</ThemedText>
 						</View>
 
 						{me?.role === 'user' && data.status === 'completed' && reviewOpen ? (
 							<View style={[styles.card, { backgroundColor: surface, borderColor: border }]}>
-								<ThemedText style={[styles.rowTitle, { color: primary }]}>{t(lang, 'map.review_title')}</ThemedText>
+								<ThemedText style={[styles.rowTitle, { color: titleColor }]}>{t(lang, 'map.review_title')}</ThemedText>
 								{volunteerName ? <ThemedText style={[styles.rowValue, { color: text }]}>🧑‍⚕️ {volunteerName}</ThemedText> : null}
 
 								<View style={styles.starsRow}>
@@ -1209,7 +1210,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 										disabled={reviewSubmitting}
 										style={({ pressed }) => [styles.actionOutline, { borderColor: border, opacity: reviewSubmitting ? 0.6 : pressed ? 0.9 : 1 }]}
 									>
-										<ThemedText style={{ color: primary, fontWeight: '800' }}>{t(lang, 'common.later')}</ThemedText>
+										<ThemedText style={{ color: titleColor, fontWeight: '800' }}>{t(lang, 'common.later')}</ThemedText>
 									</Pressable>
 									<Pressable
 										onPress={submitReview}
@@ -1224,7 +1225,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 
 						{me?.role === 'volunteer' && data.status === 'in_progress' && etaText ? (
 							<View style={[styles.alertBox, { backgroundColor: bg, borderColor: border }]}>
-								<ThemedText style={[styles.alertText, { color: primary }]}>{etaText}</ThemedText>
+								<ThemedText style={[styles.alertText, { color: titleColor }]}>{etaText}</ThemedText>
 							</View>
 						) : null}
 
@@ -1268,7 +1269,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 							<View style={styles.row}>
 								<ThemedText style={styles.rowIcon}>📌</ThemedText>
 								<View style={{ flex: 1 }}>
-									<ThemedText style={[styles.rowTitle, { color: primary }]}>{t(lang, 'map.status')}</ThemedText>
+									<ThemedText style={[styles.rowTitle, { color: titleColor }]}>{t(lang, 'map.status')}</ThemedText>
 									<ThemedText style={[styles.rowValue, { color: text }]}>{t(lang, `request.status.${data.status}`)}</ThemedText>
 								</View>
 							</View>
@@ -1280,7 +1281,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 								<View style={styles.row}>
 									<ThemedText style={styles.rowIcon}>📍</ThemedText>
 									<View style={{ flex: 1 }}>
-										<ThemedText style={[styles.rowTitle, { color: primary }]}>{t(lang, 'map.address')}</ThemedText>
+										<ThemedText style={[styles.rowTitle, { color: titleColor }]}>{t(lang, 'map.address')}</ThemedText>
 										<ThemedText style={[styles.rowValue, { color: text }]}>{data.address}</ThemedText>
 									</View>
 								</View>
@@ -1293,7 +1294,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 								<View style={styles.row}>
 									<ThemedText style={styles.rowIcon}>🩹</ThemedText>
 									<View style={{ flex: 1 }}>
-										<ThemedText style={[styles.rowTitle, { color: primary }]}>{t(lang, 'map.symptoms')}</ThemedText>
+										<ThemedText style={[styles.rowTitle, { color: titleColor }]}>{t(lang, 'map.symptoms')}</ThemedText>
 										<ThemedText style={[styles.rowValue, { color: text }]}>{data.symptoms}</ThemedText>
 									</View>
 								</View>
@@ -1306,7 +1307,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 								<View style={styles.row}>
 									<ThemedText style={styles.rowIcon}>💬</ThemedText>
 									<View style={{ flex: 1 }}>
-										<ThemedText style={[styles.rowTitle, { color: primary }]}>{t(lang, 'map.comment')}</ThemedText>
+										<ThemedText style={[styles.rowTitle, { color: titleColor }]}>{t(lang, 'map.comment')}</ThemedText>
 										<ThemedText style={[styles.rowValue, { color: text }]}>{data.comments}</ThemedText>
 									</View>
 								</View>
@@ -1315,7 +1316,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 
 						{me?.role === 'user' && data.accepted_by && (volunteerName || data.volunteer_phone) ? (
 							<View style={[styles.card, { backgroundColor: surface, borderColor: border }]}>
-								<ThemedText style={[styles.rowTitle, { color: primary }]}>{t(lang, 'common.volunteer')}</ThemedText>
+								<ThemedText style={[styles.rowTitle, { color: titleColor }]}>{t(lang, 'common.volunteer')}</ThemedText>
 								{volunteerName ? <ThemedText style={[styles.rowValue, { color: text }]}>👤 {volunteerName}</ThemedText> : null}
 								{data.volunteer_phone ? <ThemedText style={[styles.rowValue, { color: text }]}>📞 {data.volunteer_phone}</ThemedText> : null}
 								{data.volunteer_phone ? (
@@ -1353,7 +1354,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 
 							{me?.role === 'volunteer' && (userName || userPhone) ? (
 								<View style={[styles.card, { backgroundColor: surface, borderColor: border }]}>
-									<ThemedText style={[styles.rowTitle, { color: primary }]}>{t(lang, 'map.user_card')}</ThemedText>
+									<ThemedText style={[styles.rowTitle, { color: titleColor }]}>{t(lang, 'map.user_card')}</ThemedText>
 									{userName ? <ThemedText style={[styles.rowValue, { color: text }]}>👤 {userName}</ThemedText> : null}
 									{userPhone ? <ThemedText style={[styles.rowValue, { color: text }]}>📞 {userPhone}</ThemedText> : null}
 									{userPhone ? (
@@ -1390,7 +1391,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 							) : null}
 
 							<View style={[styles.card, { backgroundColor: surface, borderColor: border }]}>
-								<ThemedText style={[styles.rowTitle, { color: primary }]}>{t(lang, 'map.timeline')}</ThemedText>
+								<ThemedText style={[styles.rowTitle, { color: titleColor }]}>{t(lang, 'map.timeline')}</ThemedText>
 								<ThemedText style={[styles.rowValue, { color: text }]}>{t(lang, 'request.created', { time: fmtTimeIso(data.created_at) })}</ThemedText>
 								{data.accepted_at ? <ThemedText style={[styles.rowValue, { color: text }]}>{t(lang, 'request.accepted', { time: fmtTimeIso(data.accepted_at) })}</ThemedText> : null}
 								{data.in_progress_at ? <ThemedText style={[styles.rowValue, { color: text }]}>{t(lang, 'request.in_progress', { time: fmtTimeIso(data.in_progress_at) })}</ThemedText> : null}
@@ -1404,7 +1405,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 									onPress={openRouteByGps}
 									style={({ pressed }) => [styles.routeBtn, { borderColor: border, opacity: pressed ? 0.9 : 1 }]}
 								>
-									<ThemedText style={{ color: primary, fontWeight: '800' }}>🧭 {t(lang, 'common.route_gps')}</ThemedText>
+									<ThemedText style={{ color: titleColor, fontWeight: '800' }}>🧭 {t(lang, 'common.route_gps')}</ThemedText>
 								</Pressable>
 							) : null}
 
@@ -1414,7 +1415,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 										onPress={() => setVolunteerStatus('in_progress')}
 										style={({ pressed }) => [styles.actionOutline, { borderColor: border, opacity: pressed ? 0.9 : 1 }]}
 									>
-										<ThemedText style={{ color: primary, fontWeight: '800' }}>{t(lang, 'map.action_in_progress')}</ThemedText>
+										<ThemedText style={{ color: titleColor, fontWeight: '800' }}>{t(lang, 'map.action_in_progress')}</ThemedText>
 									</Pressable>
 									<Pressable
 										onPress={() => setVolunteerStatus('canceled')}

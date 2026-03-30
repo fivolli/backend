@@ -19,6 +19,9 @@ export default function ProfileScreen() {
 	const danger = useThemeColor({}, 'danger');
 	const surface = useThemeColor({}, 'surface');
 	const mutedBg = useThemeColor({}, 'background');
+	const border = useThemeColor({}, 'border');
+	const text = useThemeColor({}, 'text');
+	const titleColor = useThemeColor({ light: primary, dark: '#E7ECF5' }, 'text');
 
 	const [mode, setMode] = useState<'login' | 'register'>('login');
 
@@ -253,14 +256,14 @@ export default function ProfileScreen() {
 					<>
 						<View style={[styles.authHeader, styles.authHeaderWhite, { paddingTop: headerTopPad, paddingBottom: headerBottomPad }]}>
 							<Pressable onPress={() => router.back()} style={[styles.authBackBtn, styles.authBackBtnOnWhite]}>
-								<Text style={[styles.authBackText, { color: primary }]}>←</Text>
+								<Text style={[styles.authBackText, { color: titleColor }]}>←</Text>
 							</Pressable>
 							<Image
 								source={require('../assets/images/logo2-removebg-preview.png')}
 								style={[styles.authLogoSmall, keyboardOpen ? styles.authLogoSmallCompact : null]}
 								resizeMode="contain"
 							/>
-							<Text style={[styles.authWelcome, { color: primary }]}>{t(lang, 'profile.welcome')}</Text>
+							<Text style={[styles.authWelcome, { color: titleColor }]}>{t(lang, 'profile.welcome')}</Text>
 						</View>
 
 						<ScrollView
@@ -414,7 +417,7 @@ export default function ProfileScreen() {
 							automaticallyAdjustKeyboardInsets
 						>
 							<View style={styles.inputGroup}>
-								<Text style={[styles.inputLabel, { color: primary }]}>{t(lang, 'profile.email_label')}</Text>
+								<Text style={[styles.inputLabel, { color: titleColor }]}>{t(lang, 'profile.email_label')}</Text>
 								<TextInput
 									style={[styles.inputField, focused === 'email' ? [styles.inputFieldFocused, { borderColor: primary }] : null]}
 									value={email}
@@ -429,7 +432,7 @@ export default function ProfileScreen() {
 							</View>
 
 							<View style={styles.inputGroup}>
-								<Text style={[styles.inputLabel, { color: primary }]}>{t(lang, 'profile.password_label')}</Text>
+								<Text style={[styles.inputLabel, { color: titleColor }]}>{t(lang, 'profile.password_label')}</Text>
 								<TextInput
 									style={[styles.inputField, focused === 'password' ? [styles.inputFieldFocused, { borderColor: primary }] : null]}
 									value={password}
@@ -516,9 +519,9 @@ export default function ProfileScreen() {
 					<>
 						{editing ? (
 							<View style={[styles.card, { backgroundColor: surface }]}>
-								<ThemedText style={styles.label}>{t(lang, 'profile.name_label')}</ThemedText>
+								<ThemedText style={[styles.label, { color: titleColor }]}>{t(lang, 'profile.name_label')}</ThemedText>
 								<TextInput
-									style={styles.input}
+									style={[styles.input, { backgroundColor: mutedBg, borderColor, color: text }]}
 									value={editName}
 									onChangeText={setEditName}
 									placeholder={t(lang, 'profile.name_placeholder')}
@@ -527,9 +530,9 @@ export default function ProfileScreen() {
 									editable={!saveBusy}
 								/>
 
-								<ThemedText style={styles.label}>{t(lang, 'profile.email_label')}</ThemedText>
+								<ThemedText style={[styles.label, { color: titleColor }]}>{t(lang, 'profile.email_label')}</ThemedText>
 								<TextInput
-									style={styles.input}
+									style={[styles.input, { backgroundColor: mutedBg, borderColor, color: text }]}
 									value={editEmail}
 									onChangeText={setEditEmail}
 									placeholder="example@mail.com"
@@ -553,12 +556,12 @@ export default function ProfileScreen() {
 									<Pressable
 										style={({ pressed }) => [
 											styles.secondaryBtn,
-											{ borderColor: primary, opacity: saveBusy ? 0.6 : pressed ? 0.9 : 1 },
+											{ borderColor: primary, backgroundColor: surface, opacity: saveBusy ? 0.6 : pressed ? 0.9 : 1 },
 										]}
 										onPress={onCancelEdit}
 										disabled={saveBusy}
 									>
-										<Text style={[styles.secondaryBtnText, { color: primary }]}>{t(lang, 'profile.cancel')}</Text>
+									<Text style={[styles.secondaryBtnText, { color: titleColor }]}>{t(lang, 'profile.cancel')}</Text>
 									</Pressable>
 								</View>
 							</View>
@@ -570,7 +573,7 @@ export default function ProfileScreen() {
 								]}
 								onPress={() => setEditing(true)}
 							>
-								<ThemedText style={[styles.editOutlineText, { color: primary }]}>{t(lang, 'profile.edit')}</ThemedText>
+								<ThemedText style={[styles.editOutlineText, { color: titleColor }]}>{t(lang, 'profile.edit')}</ThemedText>
 							</Pressable>
 						)}
 
@@ -581,7 +584,7 @@ export default function ProfileScreen() {
 								</View>
 								<View style={{ flex: 1 }}>
 									<ThemedText style={styles.infoLabel}>{t(lang, 'profile.email_label')}</ThemedText>
-									<ThemedText style={[styles.infoValue, { color: primary }]}>
+									<ThemedText style={[styles.infoValue, { color: titleColor }]}>
 										{me.email || 'email@example.com'}
 									</ThemedText>
 								</View>
@@ -595,7 +598,7 @@ export default function ProfileScreen() {
 								</View>
 								<View style={{ flex: 1 }}>
 									<ThemedText style={styles.infoLabel}>{t(lang, 'profile.phone_label')}</ThemedText>
-									<ThemedText style={[styles.infoValue, { color: primary }]}>
+									<ThemedText style={[styles.infoValue, { color: titleColor }]}>
 										{me.phone || '+996 XXX XXX XXX'}
 									</ThemedText>
 								</View>
@@ -782,7 +785,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 	infoIconText: { fontSize: 18 },
-	infoLabel: { opacity: 0.5, fontSize: 12 },
+	infoLabel: { opacity: 0.75, fontSize: 12 },
 	infoValue: { fontWeight: '700', marginTop: 2 },
 	logoutOutline: {
 		marginTop: 12,
@@ -808,7 +811,7 @@ const styles = StyleSheet.create({
 	editBtnRow: { flexDirection: 'row', gap: 10, marginTop: 12 },
 	primaryBtn: { flex: 1, paddingVertical: 12, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
 	primaryBtnText: { color: 'white', fontWeight: '800' },
-	secondaryBtn: { flex: 1, paddingVertical: 12, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'white' },
+	secondaryBtn: { flex: 1, paddingVertical: 12, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
 	secondaryBtnText: { fontWeight: '800' },
 	editOutline: { width: '100%', borderRadius: 14, borderWidth: 1, paddingVertical: 14, alignItems: 'center' },
 	editOutlineText: { fontWeight: '800' },

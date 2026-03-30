@@ -12,8 +12,11 @@ import { useAuth } from '@/providers/auth-provider';
 export default function PolicyScreen() {
   const insets = useSafeAreaInsets();
   const primary = useThemeColor({}, 'primary');
+  const titleColor = useThemeColor({ light: primary, dark: '#E7ECF5' }, 'text');
   const surface = useThemeColor({}, 'surface');
   const border = useThemeColor({}, 'border');
+  const text = useThemeColor({}, 'text');
+  const muted = useThemeColor({ light: '#555', dark: '#C3CCDA' }, 'tabIconDefault');
   const { lang } = useAuth();
 
   const doc = getLegalDoc('policy', lang);
@@ -31,14 +34,14 @@ export default function PolicyScreen() {
 
       <ScrollView contentContainerStyle={styles.content}>
         <View style={[styles.metaCard, { backgroundColor: surface, borderColor: border }]}>
-          <ThemedText style={styles.metaText}>{t(lang, 'legal.updated_at', { date: doc.updatedAt })}</ThemedText>
-          <ThemedText style={styles.metaHint}>{t(lang, 'legal.template_notice')}</ThemedText>
+          <ThemedText style={[styles.metaText, { color: titleColor }]}>{t(lang, 'legal.updated_at', { date: doc.updatedAt })}</ThemedText>
+          <ThemedText style={[styles.metaHint, { color: muted }]}>{t(lang, 'legal.template_notice')}</ThemedText>
         </View>
 
         {doc.blocks.map((b, idx) => (
           <View key={String(idx)} style={[styles.block, { backgroundColor: surface, borderColor: border }]}>
-            <ThemedText style={styles.blockTitle}>{b.title}</ThemedText>
-            <ThemedText style={styles.blockText}>{b.text}</ThemedText>
+            <ThemedText style={[styles.blockTitle, { color: titleColor }]}>{b.title}</ThemedText>
+            <ThemedText style={[styles.blockText, { color: text }]}>{b.text}</ThemedText>
           </View>
         ))}
       </ScrollView>
@@ -74,8 +77,8 @@ const styles = StyleSheet.create({
     padding: 14,
     gap: 6,
   },
-  metaText: { fontWeight: '800', color: '#2C2D5F' },
-  metaHint: { opacity: 0.8, color: '#555' },
+  metaText: { fontWeight: '800' },
+  metaHint: { opacity: 0.8 },
 
   block: {
     borderWidth: 1,
@@ -83,6 +86,6 @@ const styles = StyleSheet.create({
     padding: 14,
     gap: 8,
   },
-  blockTitle: { fontWeight: '900', color: '#2C2D5F' },
-  blockText: { color: '#555', lineHeight: 20 },
+  blockTitle: { fontWeight: '900' },
+  blockText: { lineHeight: 20 },
 });

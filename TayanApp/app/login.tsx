@@ -71,16 +71,18 @@ export default function LoginScreen() {
   const danger = useThemeColor({}, 'danger');
   const border = useThemeColor({}, 'border');
   const text = useThemeColor({}, 'text');
+  const surface = useThemeColor({}, 'surface');
+  const background = useThemeColor({}, 'background');
+  const titleColor = useThemeColor({ light: primary, dark: '#E7ECF5' }, 'text');
+  const muted = useThemeColor({ light: '#666', dark: '#C3CCDA' }, 'tabIconDefault');
 
   const { signIn, lang } = useAuth();
-
   const copy = COPY[(lang as keyof typeof COPY) || 'ru'] ?? COPY.ru;
 
   const isCompact = width <= 480;
   const headerTopPad = 64;
   const headerHPad = 32;
   const headerBottomPad = 48;
-
   const contentPadV = isCompact ? 24 : 48;
   const contentPadH = isCompact ? 16 : 32;
 
@@ -122,7 +124,7 @@ export default function LoginScreen() {
   const imageRadius = Math.round(imageSize * 0.2);
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={[styles.container, { backgroundColor: background }]}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView
           keyboardShouldPersistTaps="handled"
@@ -150,12 +152,12 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <ThemedText style={[styles.inputLabel, { color: primary }]}>{copy.email}</ThemedText>
+            <ThemedText style={[styles.inputLabel, { color: titleColor }]}>{copy.email}</ThemedText>
             <TextInput
               value={email}
               onChangeText={setEmail}
               placeholder={copy.emailPh}
-              placeholderTextColor="#9BA1A6"
+              placeholderTextColor={muted}
               keyboardType="email-address"
               autoCapitalize="none"
               style={[
@@ -163,6 +165,7 @@ export default function LoginScreen() {
                 {
                   borderColor: focused === 'email' ? primary : border,
                   color: text,
+                  backgroundColor: surface,
                 },
               ]}
               onFocus={() => setFocused('email')}
@@ -172,12 +175,12 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <ThemedText style={[styles.inputLabel, { color: primary }]}>{copy.password}</ThemedText>
+            <ThemedText style={[styles.inputLabel, { color: titleColor }]}>{copy.password}</ThemedText>
             <TextInput
               value={password}
               onChangeText={setPassword}
               placeholder={copy.passwordPh}
-              placeholderTextColor="#9BA1A6"
+              placeholderTextColor={muted}
               secureTextEntry
               autoCapitalize="none"
               style={[
@@ -185,6 +188,7 @@ export default function LoginScreen() {
                 {
                   borderColor: focused === 'password' ? primary : border,
                   color: text,
+                  backgroundColor: surface,
                 },
               ]}
               onFocus={() => setFocused('password')}
@@ -207,13 +211,9 @@ export default function LoginScreen() {
 
           <View style={{ flex: 1 }} />
 
-          <ThemedText style={[styles.authLink, { color: '#666' }]}>
+          <ThemedText style={[styles.authLink, { color: muted }]}>
             {copy.noAccount}{' '}
-            <ThemedText
-              type="link"
-              style={[styles.authLinkSpan, { color: primary }]}
-              onPress={() => router.replace('/register')}
-            >
+            <ThemedText type="link" style={[styles.authLinkSpan, { color: titleColor }]} onPress={() => router.replace('/register')}>
               {copy.goRegister}
             </ThemedText>
           </ThemedText>
@@ -225,20 +225,17 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-
   authHeader: {
     borderBottomLeftRadius: 40,
     borderBottomRightRadius: 40,
     alignItems: 'center',
     gap: 14,
   },
-
   headerTitle: {
     color: '#fff',
     fontSize: 20,
     fontWeight: '700',
   },
-
   inputGroup: { marginBottom: 20 },
   inputLabel: {
     marginBottom: 8,
@@ -250,11 +247,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderWidth: 2,
     borderRadius: 12,
-    // iOS Safari/PWA zooms inputs when font-size is below 16px.
     fontSize: 16,
-    backgroundColor: '#fff',
   },
-
   btn: {
     width: '100%',
     paddingVertical: 16,
@@ -270,7 +264,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 16,
   },
-
   authLink: {
     textAlign: 'center',
     marginTop: 24,
@@ -280,4 +273,3 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
 });
-
