@@ -10,6 +10,7 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { ThemedText } from '@/components/themed-text';
 import { t } from '@/lib/i18n';
 import { useAuth } from '@/providers/auth-provider';
+import { ThemeProvider } from '@/providers/theme-provider';
 
 function PersistentBottomNav() {
   const insets = useSafeAreaInsets();
@@ -136,46 +137,48 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <AuthProvider>
-      <View style={{ flex: 1 }}>
+    <ThemeProvider>
+      <AuthProvider>
         <View style={{ flex: 1 }}>
-          <Stack
-            screenOptions={{
-              headerShown: false,
-            }}
-          >
-            <Stack.Screen name="index" />
-            <Stack.Screen name="home" />
-            <Stack.Screen name="categories" />
-            <Stack.Screen name="category" />
-            <Stack.Screen name="symptom" />
-            <Stack.Screen name="map" />
-            <Stack.Screen name="request" />
-            <Stack.Screen name="request-chat" />
-            <Stack.Screen name="profile" />
+          <View style={{ flex: 1 }}>
+            <Stack
+              screenOptions={{
+                headerShown: false,
+              }}
+            >
+              <Stack.Screen name="index" />
+              <Stack.Screen name="home" />
+              <Stack.Screen name="categories" />
+              <Stack.Screen name="category" />
+              <Stack.Screen name="symptom" />
+              <Stack.Screen name="map" />
+              <Stack.Screen name="request" />
+              <Stack.Screen name="request-chat" />
+              <Stack.Screen name="profile" />
 
-            <Stack.Screen name="video" />
-            <Stack.Screen name="video-detail" />
-            <Stack.Screen name="hospitals-map" />
-            <Stack.Screen name="chat" />
-            <Stack.Screen name="reviews" />
-            <Stack.Screen name="volunteer-profile" />
-            <Stack.Screen name="my-requests" />
-            <Stack.Screen name="volunteer-my" />
+              <Stack.Screen name="video" />
+              <Stack.Screen name="video-detail" />
+              <Stack.Screen name="hospitals-map" />
+              <Stack.Screen name="chat" />
+              <Stack.Screen name="reviews" />
+              <Stack.Screen name="volunteer-profile" />
+              <Stack.Screen name="my-requests" />
+              <Stack.Screen name="volunteer-my" />
 
-            <Stack.Screen name="settings" />
-            <Stack.Screen name="notifications" />
-            <Stack.Screen name="language" />
-            <Stack.Screen name="privacy" />
-            <Stack.Screen name="policy" />
-            <Stack.Screen name="terms" />
-            <Stack.Screen name="help" />
-          </Stack>
+              <Stack.Screen name="settings" />
+              <Stack.Screen name="notifications" />
+              <Stack.Screen name="language" />
+              <Stack.Screen name="privacy" />
+              <Stack.Screen name="policy" />
+              <Stack.Screen name="terms" />
+              <Stack.Screen name="help" />
+            </Stack>
+          </View>
+
+          <PersistentBottomNav />
         </View>
-
-        <PersistentBottomNav />
-      </View>
-    </AuthProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

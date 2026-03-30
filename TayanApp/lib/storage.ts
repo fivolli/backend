@@ -7,8 +7,10 @@ const REVIEW_LATER_PREFIX = 'tayan.reviewLater.';
 const LANG_KEY = 'tayan.lang';
 const NOTIFICATIONS_KEY = 'tayan.notifications';
 const AI_PENDING_JOB_KEY = 'tayan.aiPendingJobId';
+const THEME_KEY = 'tayan.theme';
 
 export type AppLang = 'ru' | 'en' | 'kg';
+export type ThemePreference = 'system' | 'light' | 'dark';
 
 export type NotificationPrefs = {
   sos: boolean;
@@ -261,6 +263,31 @@ export async function clearAiPendingJobId(): Promise<void> {
   }
   try {
     await SecureStore.deleteItemAsync(AI_PENDING_JOB_KEY);
+  } catch {
+
+  }
+}
+
+export async function getThemePreference(): Promise<ThemePreference | null> {
+  if (Platform.OS === 'web') {
+    const v = webGet(THEME_KEY);
+    if (v === 'system' || v === 'light' || v === 'dark') return v;
+  }
+  try {
+    const v = await SecureStore.getItemAsync(THEME_KEY);
+    if (v === 'system' || v === 'light' || v === 'dark') return v;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export async function setThemePreference(theme: ThemePreference): Promise<void> {
+  if (Platform.OS === 'web') {
+    webSet(THEME_KEY, theme);
+  }
+  try {
+    await SecureStore.setItemAsync(THEME_KEY, theme);
   } catch {
 
   }

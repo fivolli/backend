@@ -17,6 +17,9 @@ const dangerBorder = '#EF9A9A';
 const surfaceLight = '#ffffff';
 const bgLight = '#F5F5F8';
 const borderLight = '#e5e5e5';
+const bgDark = '#0F1220';
+const surfaceDark = '#171B2B';
+const borderDark = '#2A3046';
 
 const tintColorLight = primaryColor;
 const tintColorDark = '#fff';
@@ -42,19 +45,19 @@ export const Colors = {
     tabIconSelected: tintColorLight,
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    surface: '#1C1C1E',
-    border: '#2A2A2A',
+    text: '#EEF2F7',
+    background: bgDark,
+    surface: surfaceDark,
+    border: borderDark,
     primary: primaryColor,
     danger: dangerColor,
     success: successColor,
-    infoBg,
-    infoBorder,
-    successBg,
-    successBorder,
-    dangerBg,
-    dangerBorder,
+    infoBg: '#16263C',
+    infoBorder: '#3A6EA5',
+    successBg: '#173224',
+    successBorder: '#2E7D32',
+    dangerBg: '#3A1D24',
+    dangerBorder: '#B44A5A',
     tint: tintColorDark,
     icon: '#9BA1A6',
     tabIconDefault: '#9BA1A6',
