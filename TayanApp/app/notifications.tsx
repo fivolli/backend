@@ -15,9 +15,13 @@ import { useAuth } from '@/providers/auth-provider';
 export default function NotificationsScreen() {
 	const insets = useSafeAreaInsets();
 	const primary = useThemeColor({}, 'primary');
+	const titleColor = useThemeColor({ light: primary, dark: '#E7ECF5' }, 'text');
 	const surface = useThemeColor({}, 'surface');
 	const border = useThemeColor({}, 'border');
 	const mutedBg = useThemeColor({}, 'background');
+	const text = useThemeColor({}, 'text');
+	const muted = useThemeColor({ light: '#2C2D5F', dark: '#C3CCDA' }, 'tabIconDefault');
+	const infoSurface = useThemeColor({ light: '#EAF2FF', dark: '#1A2236' }, 'surface');
 	const { token, lang } = useAuth();
 
 	const [prefs, setPrefs] = useState<NotificationPrefs | null>(null);
@@ -118,8 +122,8 @@ export default function NotificationsScreen() {
 			</View>
 
 			<ScrollView contentContainerStyle={styles.content}>
-				<View style={styles.tipBox}>
-					<ThemedText style={styles.tipText}>
+				<View style={[styles.tipBox, { backgroundColor: infoSurface }]}>
+					<ThemedText style={[styles.tipText, { color: text }]}>
 						{t(lang, 'notifications.tip')}
 					</ThemedText>
 				</View>
@@ -129,6 +133,8 @@ export default function NotificationsScreen() {
 						surface={surface}
 						mutedBg={mutedBg}
 						border={border}
+						titleColor={titleColor}
+						subtitleColor={muted}
 						icon="🚨"
 						title={t(lang, 'notifications.sos_title')}
 						subtitle={t(lang, 'notifications.sos_sub')}
@@ -139,6 +145,8 @@ export default function NotificationsScreen() {
 						surface={surface}
 						mutedBg={mutedBg}
 						border={border}
+						titleColor={titleColor}
+						subtitleColor={muted}
 						icon="👥"
 						title={t(lang, 'notifications.volunteers_title')}
 						subtitle={t(lang, 'notifications.volunteers_sub')}
@@ -149,6 +157,8 @@ export default function NotificationsScreen() {
 						surface={surface}
 						mutedBg={mutedBg}
 						border={border}
+						titleColor={titleColor}
+						subtitleColor={muted}
 						icon="📢"
 						title={t(lang, 'notifications.updates_title')}
 						subtitle={t(lang, 'notifications.updates_sub')}
@@ -167,7 +177,7 @@ export default function NotificationsScreen() {
 						pressed ? { opacity: 0.9 } : null,
 					]}
 				>
-					<ThemedText style={[styles.testBtnText, { color: primary }]}>
+					<ThemedText style={[styles.testBtnText, { color: titleColor }]}>
 						{sendingTest ? t(lang, 'notifications.test_sending') : t(lang, 'notifications.test_send')}
 					</ThemedText>
 				</Pressable>
@@ -180,6 +190,8 @@ function NotifItem(props: {
 	surface: string;
 	mutedBg: string;
 	border: string;
+	titleColor: string;
+	subtitleColor: string;
 	icon: string;
 	title: string;
 	subtitle: string;
@@ -192,8 +204,8 @@ function NotifItem(props: {
 				<ThemedText style={styles.iconText}>{props.icon}</ThemedText>
 			</View>
 			<View style={{ flex: 1 }}>
-				<ThemedText style={styles.title}>{props.title}</ThemedText>
-				<ThemedText style={styles.subtitle}>{props.subtitle}</ThemedText>
+				<ThemedText style={[styles.title, { color: props.titleColor }]}>{props.title}</ThemedText>
+				<ThemedText style={[styles.subtitle, { color: props.subtitleColor }]}>{props.subtitle}</ThemedText>
 			</View>
 			<Toggle enabled={props.enabled} />
 		</Pressable>
@@ -229,8 +241,8 @@ const styles = StyleSheet.create({
 	headerTitle: { color: '#fff', fontSize: 20, fontWeight: '700', flex: 1 },
 
 	content: { padding: 24 },
-	tipBox: { borderRadius: 14, backgroundColor: '#EAF2FF', padding: 12, marginBottom: 12 },
-	tipText: { color: '#2C2D5F' },
+	tipBox: { borderRadius: 14, padding: 12, marginBottom: 12 },
+	tipText: {},
 
 	functionList: { gap: 12 },
 	item: {
@@ -249,8 +261,8 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 	iconText: { fontSize: 18 },
-	title: { fontSize: 15, fontWeight: '700', color: '#2C2D5F' },
-	subtitle: { fontSize: 12, opacity: 0.7, marginTop: 2 },
+	title: { fontSize: 15, fontWeight: '700' },
+	subtitle: { fontSize: 12, marginTop: 2 },
 
 	toggle: {
 		width: 48,

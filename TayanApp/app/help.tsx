@@ -18,9 +18,12 @@ const FAQ: { qKey: string; aKey: string }[] = [
 export default function HelpScreen() {
 	const insets = useSafeAreaInsets();
 	const primary = useThemeColor({}, 'primary');
+	const titleColor = useThemeColor({ light: primary, dark: '#E7ECF5' }, 'text');
 	const surface = useThemeColor({}, 'surface');
 	const border = useThemeColor({}, 'border');
 	const mutedBg = useThemeColor({}, 'background');
+	const text = useThemeColor({}, 'text');
+	const muted = useThemeColor({ light: '#555', dark: '#C3CCDA' }, 'tabIconDefault');
 	const { lang } = useAuth();
 
 	return (
@@ -35,20 +38,22 @@ export default function HelpScreen() {
 			</View>
 
 			<ScrollView contentContainerStyle={styles.content}>
-				<ThemedText style={styles.sectionTitle}>{t(lang, 'help.faq')}</ThemedText>
+				<ThemedText style={[styles.sectionTitle, { color: titleColor }]}>{t(lang, 'help.faq')}</ThemedText>
 				{FAQ.map((x, idx) => (
 					<View key={idx} style={[styles.card, { backgroundColor: surface, borderColor: border }]}>
-						<ThemedText style={styles.q}>❓ {t(lang, x.qKey)}</ThemedText>
-						<ThemedText style={styles.a}>{t(lang, x.aKey)}</ThemedText>
+						<ThemedText style={[styles.q, { color: titleColor }]}>❓ {t(lang, x.qKey)}</ThemedText>
+						<ThemedText style={[styles.a, { color: muted }]}>{t(lang, x.aKey)}</ThemedText>
 					</View>
 				))}
 
-				<ThemedText style={[styles.sectionTitle, { marginTop: 18 }]}>{t(lang, 'help.contacts')}</ThemedText>
+				<ThemedText style={[styles.sectionTitle, { marginTop: 18, color: titleColor }]}>{t(lang, 'help.contacts')}</ThemedText>
 				<View style={styles.functionList}>
 					<ContactItem
 						surface={surface}
 						border={border}
 						mutedBg={mutedBg}
+						titleColor={titleColor}
+						subtitleColor={text}
 						icon="📞"
 						title={t(lang, 'help.phone')}
 						subtitle="+996 555 000 000"
@@ -58,6 +63,8 @@ export default function HelpScreen() {
 						surface={surface}
 						border={border}
 						mutedBg={mutedBg}
+						titleColor={titleColor}
+						subtitleColor={text}
 						icon="📧"
 						title={t(lang, 'help.email')}
 						subtitle="fiptayan@gmail.com"
@@ -67,6 +74,8 @@ export default function HelpScreen() {
 						surface={surface}
 						border={border}
 						mutedBg={mutedBg}
+						titleColor={titleColor}
+						subtitleColor={text}
 						icon="🌐"
 						title={t(lang, 'help.website')}
 						subtitle="www.tayan.kg"
@@ -82,6 +91,8 @@ function ContactItem(props: {
 	surface: string;
 	border: string;
 	mutedBg: string;
+	titleColor: string;
+	subtitleColor: string;
 	icon: string;
 	title: string;
 	subtitle: string;
@@ -93,8 +104,8 @@ function ContactItem(props: {
 				<ThemedText style={styles.iconText}>{props.icon}</ThemedText>
 			</View>
 			<View style={{ flex: 1 }}>
-				<ThemedText style={styles.rowTitle}>{props.title}</ThemedText>
-				<ThemedText style={styles.rowSubtitle}>{props.subtitle}</ThemedText>
+				<ThemedText style={[styles.rowTitle, { color: props.titleColor }]}>{props.title}</ThemedText>
+				<ThemedText style={[styles.rowSubtitle, { color: props.subtitleColor }]}>{props.subtitle}</ThemedText>
 			</View>
 			<ThemedText style={{ opacity: 0.7 }}>›</ThemedText>
 		</Pressable>
@@ -122,10 +133,10 @@ const styles = StyleSheet.create({
 	headerTitle: { color: '#fff', fontSize: 20, fontWeight: '700', flex: 1 },
 
 	content: { padding: 24 },
-	sectionTitle: { fontSize: 16, fontWeight: '800', color: '#2C2D5F', marginBottom: 10 },
+	sectionTitle: { fontSize: 16, fontWeight: '800', marginBottom: 10 },
 	card: { borderWidth: 1, borderRadius: 16, padding: 14, marginBottom: 12 },
-	q: { fontWeight: '800', color: '#2C2D5F', marginBottom: 6 },
-	a: { color: '#555', lineHeight: 20 },
+	q: { fontWeight: '800', marginBottom: 6 },
+	a: { lineHeight: 20 },
 
 	functionList: { gap: 12 },
 	row: {
@@ -144,6 +155,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 	iconText: { fontSize: 18 },
-	rowTitle: { fontSize: 15, fontWeight: '700', color: '#2C2D5F' },
-	rowSubtitle: { fontSize: 12, opacity: 0.7, marginTop: 2 },
+	rowTitle: { fontSize: 15, fontWeight: '700' },
+	rowSubtitle: { fontSize: 12, marginTop: 2 },
 });

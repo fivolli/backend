@@ -19,6 +19,8 @@ export default function CategoryDetailScreen() {
   const danger = useThemeColor({}, 'danger');
   const surface = useThemeColor({}, 'surface');
   const border = useThemeColor({}, 'border');
+  const text = useThemeColor({}, 'text');
+  const titleColor = useThemeColor({ light: primary, dark: '#E7ECF5' }, 'text');
 
   if (!category) {
     return (
@@ -56,7 +58,7 @@ export default function CategoryDetailScreen() {
           <ThemedText style={styles.alertDangerText}>{t(lang, 'category.warning_text')}</ThemedText>
         </View>
 
-        <ThemedText style={[styles.sectionTitle, { color: primary }]}>{t(lang, 'category.step_by_step')}</ThemedText>
+        <ThemedText style={[styles.sectionTitle, { color: titleColor }]}>{t(lang, 'category.step_by_step')}</ThemedText>
 
         <View style={styles.stepList}>
           {(category.steps[lang] || category.steps.ru).map((step, idx) => (
@@ -67,7 +69,7 @@ export default function CategoryDetailScreen() {
               <View style={[styles.stepNumber, { backgroundColor: primary }]}>
                 <ThemedText style={styles.stepNumberText}>{idx + 1}</ThemedText>
               </View>
-              <ThemedText style={[styles.stepText, { color: primary }]}>{step}</ThemedText>
+              <ThemedText style={[styles.stepText, { color: text }]}>{step}</ThemedText>
             </View>
           ))}
         </View>

@@ -54,6 +54,7 @@ export default function SettingsScreen() {
   const surface = useThemeColor({}, 'surface');
   const mutedBg = useThemeColor({}, 'background');
   const text = useThemeColor({}, 'text');
+  const titleColor = useThemeColor({ light: primary, dark: '#E7ECF5' }, 'text');
   const { signOut, lang } = useAuth();
   const { themePreference, setThemePreference, colorScheme } = useAppTheme();
   const darkModeEnabled = colorScheme === 'dark';
@@ -74,7 +75,7 @@ export default function SettingsScreen() {
           <ThemeItem
             surface={surface}
             mutedBg={mutedBg}
-            primary={primary}
+            primary={titleColor}
             lang={lang}
             title={themeTitle(lang)}
             subtitle={themeSubtitle(lang, themePreference, darkModeEnabled)}
@@ -88,7 +89,7 @@ export default function SettingsScreen() {
             surface={surface}
             mutedBg={mutedBg}
             textColor={text}
-            primary={primary}
+            primary={titleColor}
             icon="🔔"
             title={t(lang, 'settings.notifications')}
             subtitle={t(lang, 'settings.notifications_sub')}
@@ -99,7 +100,7 @@ export default function SettingsScreen() {
             surface={surface}
             mutedBg={mutedBg}
             textColor={text}
-            primary={primary}
+            primary={titleColor}
             icon="🌐"
             title={t(lang, 'settings.language')}
             subtitle={langLabel(lang)}
@@ -110,7 +111,7 @@ export default function SettingsScreen() {
             surface={surface}
             mutedBg={mutedBg}
             textColor={text}
-            primary={primary}
+            primary={titleColor}
             icon="🔒"
             title={t(lang, 'settings.privacy')}
             subtitle={t(lang, 'settings.privacy_sub')}
@@ -121,7 +122,7 @@ export default function SettingsScreen() {
             surface={surface}
             mutedBg={mutedBg}
             textColor={text}
-            primary={primary}
+            primary={titleColor}
             icon="❓"
             title={t(lang, 'settings.help')}
             subtitle={t(lang, 'settings.help_sub')}

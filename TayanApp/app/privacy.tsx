@@ -12,9 +12,11 @@ import { useAuth } from '@/providers/auth-provider';
 export default function PrivacyScreen() {
 	const insets = useSafeAreaInsets();
 	const primary = useThemeColor({}, 'primary');
+	const titleColor = useThemeColor({ light: primary, dark: '#E7ECF5' }, 'text');
 	const surface = useThemeColor({}, 'surface');
 	const border = useThemeColor({}, 'border');
 	const mutedBg = useThemeColor({}, 'background');
+	const text = useThemeColor({}, 'text');
 	const { token, lang, signOut } = useAuth();
 
 	async function openAppSettings() {
@@ -73,13 +75,15 @@ export default function PrivacyScreen() {
 			</View>
 
 			<ScrollView contentContainerStyle={styles.content}>
-				<ThemedText style={styles.sectionTitle}>{t(lang, 'privacy.data_mgmt')}</ThemedText>
+				<ThemedText style={[styles.sectionTitle, { color: titleColor }]}>{t(lang, 'privacy.data_mgmt')}</ThemedText>
 
 				<View style={styles.functionList}>
 					<RowItem
 						surface={surface}
 						border={border}
 						mutedBg={mutedBg}
+						titleColor={titleColor}
+						subtitleColor={text}
 						icon="📍"
 						title={t(lang, 'privacy.location_title')}
 						subtitle={t(lang, 'privacy.location_sub')}
@@ -89,6 +93,8 @@ export default function PrivacyScreen() {
 						surface={surface}
 						border={border}
 						mutedBg={mutedBg}
+						titleColor={titleColor}
+						subtitleColor={text}
 						icon="📊"
 						title={t(lang, 'privacy.analytics_title')}
 						subtitle={t(lang, 'privacy.analytics_sub')}
@@ -96,12 +102,13 @@ export default function PrivacyScreen() {
 					/>
 				</View>
 
-				<ThemedText style={[styles.sectionTitle, { marginTop: 22 }]}>{t(lang, 'privacy.documents')}</ThemedText>
+				<ThemedText style={[styles.sectionTitle, { marginTop: 22, color: titleColor }]}>{t(lang, 'privacy.documents')}</ThemedText>
 				<View style={styles.functionList}>
 					<LinkRow
 						surface={surface}
 						border={border}
 						mutedBg={mutedBg}
+						titleColor={titleColor}
 						icon="📄"
 						title={t(lang, 'privacy.policy')}
 						onPress={() => openDoc('policy')}
@@ -110,6 +117,7 @@ export default function PrivacyScreen() {
 						surface={surface}
 						border={border}
 						mutedBg={mutedBg}
+						titleColor={titleColor}
 						icon="📋"
 						title={t(lang, 'privacy.terms')}
 						onPress={() => openDoc('terms')}
@@ -119,10 +127,7 @@ export default function PrivacyScreen() {
 				<View style={styles.dangerBox}>
 					<ThemedText style={styles.dangerTitle}>{t(lang, 'privacy.delete_section_title')}</ThemedText>
 					<ThemedText style={styles.dangerText}>{t(lang, 'privacy.delete_section_text')}</ThemedText>
-					<Pressable
-						style={styles.dangerBtn}
-						onPress={deleteMyData}
-					>
+					<Pressable style={styles.dangerBtn} onPress={deleteMyData}>
 						<ThemedText style={styles.dangerBtnText}>{t(lang, 'privacy.delete_button')}</ThemedText>
 					</Pressable>
 				</View>
@@ -135,6 +140,8 @@ function RowItem(props: {
 	surface: string;
 	border: string;
 	mutedBg: string;
+	titleColor: string;
+	subtitleColor: string;
 	icon: string;
 	title: string;
 	subtitle: string;
@@ -146,8 +153,8 @@ function RowItem(props: {
 				<ThemedText style={styles.iconText}>{props.icon}</ThemedText>
 			</View>
 			<View style={{ flex: 1 }}>
-				<ThemedText style={styles.rowTitle}>{props.title}</ThemedText>
-				<ThemedText style={styles.rowSubtitle}>{props.subtitle}</ThemedText>
+				<ThemedText style={[styles.rowTitle, { color: props.titleColor }]}>{props.title}</ThemedText>
+				<ThemedText style={[styles.rowSubtitle, { color: props.subtitleColor }]}>{props.subtitle}</ThemedText>
 			</View>
 			{props.onPress ? <ThemedText style={{ opacity: 0.7 }}>›</ThemedText> : null}
 		</>
@@ -166,6 +173,7 @@ function LinkRow(props: {
 	surface: string;
 	border: string;
 	mutedBg: string;
+	titleColor: string;
 	icon: string;
 	title: string;
 	onPress: () => void;
@@ -175,7 +183,7 @@ function LinkRow(props: {
 			<View style={[styles.iconBox, { backgroundColor: props.mutedBg }]}>
 				<ThemedText style={styles.iconText}>{props.icon}</ThemedText>
 			</View>
-			<ThemedText style={[styles.rowTitle, { flex: 1 }]}>{props.title}</ThemedText>
+			<ThemedText style={[styles.rowTitle, { flex: 1, color: props.titleColor }]}>{props.title}</ThemedText>
 			<ThemedText style={{ opacity: 0.7 }}>›</ThemedText>
 		</Pressable>
 	);
@@ -202,7 +210,7 @@ const styles = StyleSheet.create({
 	headerTitle: { color: '#fff', fontSize: 20, fontWeight: '700', flex: 1 },
 
 	content: { padding: 24 },
-	sectionTitle: { fontSize: 16, fontWeight: '800', color: '#2C2D5F', marginBottom: 10 },
+	sectionTitle: { fontSize: 16, fontWeight: '800', marginBottom: 10 },
 	functionList: { gap: 12 },
 	row: {
 		borderWidth: 1,
@@ -220,19 +228,8 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 	iconText: { fontSize: 18 },
-	rowTitle: { fontSize: 15, fontWeight: '700', color: '#2C2D5F' },
-	rowSubtitle: { fontSize: 12, opacity: 0.7, marginTop: 2 },
-
-	toggle: {
-		width: 48,
-		height: 28,
-		borderRadius: 14,
-		padding: 3,
-		justifyContent: 'center',
-	},
-	toggleOn: { backgroundColor: '#2C2D5F', alignItems: 'flex-end' },
-	toggleOff: { backgroundColor: '#D0D5DD', alignItems: 'flex-start' },
-	toggleKnob: { width: 22, height: 22, borderRadius: 11, backgroundColor: 'white' },
+	rowTitle: { fontSize: 15, fontWeight: '700' },
+	rowSubtitle: { fontSize: 12, marginTop: 2 },
 
 	dangerBox: {
 		marginTop: 18,

@@ -44,9 +44,11 @@ export default function VolunteerProfileScreen() {
   const { volunteerId, name } = useLocalSearchParams<{ volunteerId?: string; name?: string }>();
 
   const primary = useThemeColor({}, 'primary');
+  const titleColor = useThemeColor({ light: primary, dark: '#E7ECF5' }, 'text');
   const surface = useThemeColor({}, 'surface');
   const border = useThemeColor({}, 'border');
   const text = useThemeColor({}, 'text');
+  const muted = useThemeColor({ light: '#555', dark: '#C3CCDA' }, 'tabIconDefault');
 
   const { token, lang } = useAuth();
 
@@ -125,7 +127,7 @@ export default function VolunteerProfileScreen() {
                 </View>
 
                 <View style={styles.volMain}>
-                  <ThemedText style={[styles.volName, { color: primary }]}>{title}</ThemedText>
+                  <ThemedText style={[styles.volName, { color: titleColor }]}>{title}</ThemedText>
 
                   <View style={styles.volRatingRow}>
                     <ThemedText style={[styles.volAvg, { color: text }]}>{avgText}</ThemedText>
@@ -160,24 +162,24 @@ export default function VolunteerProfileScreen() {
               </View>
             </View>
 
-            <ThemedText style={[styles.sectionTitle, { color: primary }]}>{t(lang, 'volunteer_profile.reviews_title')}</ThemedText>
+            <ThemedText style={[styles.sectionTitle, { color: titleColor }]}>{t(lang, 'volunteer_profile.reviews_title')}</ThemedText>
 
             {reviews.length ? (
               <View style={styles.list}>
                 {reviews.map((x) => {
                   const userName = x.user_name || t(lang, 'reviews.user_fallback', { id: x.user_id });
                   return (
-                    <View key={String(x.request_id)} style={styles.reviewCard}>
+                    <View key={String(x.request_id)} style={[styles.reviewCard, { backgroundColor: surface }]}>
                       <View style={styles.reviewTopRow}>
                         <View>
-                          <ThemedText style={[styles.userName, { color: primary }]}>{userName}</ThemedText>
+                          <ThemedText style={[styles.userName, { color: titleColor }]}>{userName}</ThemedText>
                           <ThemedText style={styles.reviewedAt}>{fmtTimeIso(x.reviewed_at)}</ThemedText>
                         </View>
                         <Text style={styles.ratingStars}>{renderStars(x.rating || 0)}</Text>
                       </View>
 
                       {x.review_text ? (
-                        <ThemedText style={styles.reviewText}>{String(x.review_text)}</ThemedText>
+                        <ThemedText style={[styles.reviewText, { color: muted }]}>{String(x.review_text)}</ThemedText>
                       ) : (
                         <ThemedText style={styles.noComment}>{t(lang, 'volunteer_profile.no_comment')}</ThemedText>
                       )}
@@ -247,7 +249,7 @@ const styles = StyleSheet.create({
   badgeBlue: { backgroundColor: 'rgba(21,101,192,0.15)' },
   badgeGreen: { backgroundColor: 'rgba(46,125,50,0.15)' },
   badgeGray: { backgroundColor: 'rgba(0,0,0,0.08)' },
-  badgeText: { fontSize: 12, fontWeight: '600', color: '#2C2D5F' },
+  badgeText: { fontSize: 12, fontWeight: '600', color: '#E7ECF5' },
 
   actions: { flexDirection: 'row', gap: 10 },
   iconBtn: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
@@ -258,7 +260,6 @@ const styles = StyleSheet.create({
 
   list: { gap: 16 },
   reviewCard: {
-    backgroundColor: '#fff',
     borderRadius: 16,
     padding: 16,
     shadowColor: '#000',
@@ -271,7 +272,7 @@ const styles = StyleSheet.create({
   userName: { fontWeight: '700' },
   reviewedAt: { color: '#999', fontSize: 12, marginTop: 2 },
   ratingStars: { fontSize: 18 },
-  reviewText: { color: '#555', fontSize: 14, lineHeight: 20 },
+  reviewText: { fontSize: 14, lineHeight: 20 },
   noComment: { color: '#999', fontSize: 13 },
 
   emptyCard: { borderWidth: 1, borderRadius: 16, padding: 16 },

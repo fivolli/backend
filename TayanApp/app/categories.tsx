@@ -13,6 +13,7 @@ import { useAuth } from '@/providers/auth-provider';
 export default function CategoriesScreen() {
   const insets = useSafeAreaInsets();
   const primary = useThemeColor({}, 'primary');
+  const titleColor = useThemeColor({ light: primary, dark: '#E7ECF5' }, 'text');
   const { lang } = useAuth();
   const getCardTitle = (id: string, rawTitle: string) => {
     if (id !== 'electric-shock') return rawTitle;
@@ -51,7 +52,7 @@ export default function CategoriesScreen() {
               <View style={styles.categoryIcon}>
                 <ThemedText style={styles.categoryIconText}>{item.icon}</ThemedText>
               </View>
-              <ThemedText numberOfLines={2} style={[styles.categoryTitle, { color: primary }]}>
+              <ThemedText numberOfLines={2} style={[styles.categoryTitle, { color: titleColor }]}>
                 {getCardTitle(item.id, item.title[lang] || item.title.ru)}
               </ThemedText>
             </LinearGradient>

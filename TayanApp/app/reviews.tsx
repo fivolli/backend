@@ -53,9 +53,11 @@ function renderStars(rating: number) {
 export default function ReviewsScreen() {
   const insets = useSafeAreaInsets();
   const primary = useThemeColor({}, 'primary');
+  const titleColor = useThemeColor({ light: primary, dark: '#E7ECF5' }, 'text');
   const surface = useThemeColor({}, 'surface');
   const bg = useThemeColor({}, 'background');
   const border = useThemeColor({}, 'border');
+  const muted = useThemeColor({ light: '#555', dark: '#C3CCDA' }, 'tabIconDefault');
   const { token, lang, me } = useAuth();
 
   const [loading, setLoading] = useState(true);
@@ -190,7 +192,7 @@ export default function ReviewsScreen() {
 
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.sectionHead}>
-          <ThemedText style={[styles.sectionTitle, { color: primary }]}>{t(lang, 'reviews.section_title')}</ThemedText>
+          <ThemedText style={[styles.sectionTitle, { color: titleColor }]}>{t(lang, 'reviews.section_title')}</ThemedText>
           <ThemedText style={styles.sectionNote}>{t(lang, 'reviews.section_note')}</ThemedText>
         </View>
 
@@ -206,14 +208,14 @@ export default function ReviewsScreen() {
               const isVolunteer = me?.role === 'volunteer';
 
               return (
-                <View key={String(x.request_id)} style={styles.reviewCard}>
+                <View key={String(x.request_id)} style={[styles.reviewCard, { backgroundColor: surface }]}>
                   <View style={styles.reviewTopRow}>
                     <View style={styles.userRow}>
                       <View style={[styles.userAvatar, { backgroundColor: 'rgba(44,45,95,0.1)' }]}>
                         <Text style={styles.userAvatarText}>👤</Text>
                       </View>
                       <View>
-                        <ThemedText style={[styles.userName, { color: primary }]}>{userName}</ThemedText>
+                        <ThemedText style={[styles.userName, { color: titleColor }]}>{userName}</ThemedText>
                         <ThemedText style={styles.reviewedAt}>{fmtTimeIso(x.reviewed_at)}</ThemedText>
                       </View>
                     </View>
@@ -221,14 +223,14 @@ export default function ReviewsScreen() {
                   </View>
 
                   {x.review_text ? (
-                    <ThemedText style={styles.reviewText}>{String(x.review_text)}</ThemedText>
+                    <ThemedText style={[styles.reviewText, { color: muted }]}>{String(x.review_text)}</ThemedText>
                   ) : null}
 
                   {!isVolunteer ? (
                     <View style={[styles.volBox, { backgroundColor: bg, borderColor: border }]}>
                       <View style={styles.volLeft}>
                         <ThemedText style={styles.volLabel}>{t(lang, 'common.volunteer')}</ThemedText>
-                        <ThemedText style={[styles.volName, { color: primary }]}>{volunteerName}</ThemedText>
+                        <ThemedText style={[styles.volName, { color: titleColor }]}>{volunteerName}</ThemedText>
                       </View>
 
                       {x.volunteer_id > 0 ? (
@@ -303,7 +305,6 @@ const styles = StyleSheet.create({
   list: { gap: 16 },
 
   reviewCard: {
-    backgroundColor: '#fff',
     borderRadius: 16,
     padding: 16,
     shadowColor: '#000',
@@ -319,7 +320,7 @@ const styles = StyleSheet.create({
   userName: { fontWeight: '600' },
   reviewedAt: { color: '#999', fontSize: 12, marginTop: 2 },
   ratingEmoji: { fontSize: 18 },
-  reviewText: { color: '#555', fontSize: 14, marginBottom: 12, lineHeight: 20 },
+  reviewText: { fontSize: 14, marginBottom: 12, lineHeight: 20 },
 
   volBox: {
     borderWidth: 1,

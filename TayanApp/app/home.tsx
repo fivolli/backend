@@ -24,6 +24,7 @@ export default function HomeScreen() {
 	const border = useThemeColor({}, 'border');
 	const mutedBg = useThemeColor({}, 'background');
 	const text = useThemeColor({}, 'text');
+	const titleColor = useThemeColor({ light: primary, dark: '#E7ECF5' }, 'text');
 
 	const isUser = me?.role === 'user';
 
@@ -103,7 +104,7 @@ export default function HomeScreen() {
 
 			<ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
 				{isUser ? (
-					<ThemedText style={[styles.sectionTitle, { color: primary }]}>{t(lang, 'home.quick_access')}</ThemedText>
+					<ThemedText style={[styles.sectionTitle, { color: titleColor }]}>{t(lang, 'home.quick_access')}</ThemedText>
 				) : null}
 
 				{isUser ? (
@@ -118,7 +119,7 @@ export default function HomeScreen() {
 								<View style={[styles.categoryIcon, { backgroundColor: 'rgba(255,152,0,0.2)' }]}>
 									<ThemedText style={styles.categoryIconText}>🩹</ThemedText>
 								</View>
-								<ThemedText numberOfLines={2} style={[styles.categoryTitle, { color: primary }]}>
+								<ThemedText numberOfLines={2} style={[styles.categoryTitle, { color: titleColor }]}>
 									{t(lang, 'home.light_damage')}
 								</ThemedText>
 							</LinearGradient>
@@ -134,7 +135,7 @@ export default function HomeScreen() {
 								<View style={[styles.categoryIcon, { backgroundColor: 'rgba(255,235,59,0.3)' }]}>
 									<ThemedText style={styles.categoryIconText}>⚠️</ThemedText>
 								</View>
-								<ThemedText numberOfLines={2} style={[styles.categoryTitle, { color: primary }]}>
+								<ThemedText numberOfLines={2} style={[styles.categoryTitle, { color: titleColor }]}>
 									{t(lang, 'home.unstable_state')}
 								</ThemedText>
 							</LinearGradient>
@@ -142,13 +143,13 @@ export default function HomeScreen() {
 					</View>
 				) : null}
 
-				<ThemedText style={[styles.sectionTitle, { color: primary }]}>{t(lang, 'home.main_features')}</ThemedText>
+				<ThemedText style={[styles.sectionTitle, { color: titleColor }]}>{t(lang, 'home.main_features')}</ThemedText>
 				<View style={styles.functionList}>
 					<FunctionItem
 						surface={surface}
 						mutedBg={mutedBg}
 						textColor={text}
-						primary={primary}
+						primary={titleColor}
 						icon="📍"
 						title={t(lang, 'home.my_request_map')}
 						onPress={() => router.push('/map')}
@@ -159,7 +160,7 @@ export default function HomeScreen() {
 							surface={surface}
 							mutedBg={mutedBg}
 							textColor={text}
-							primary={primary}
+							primary={titleColor}
 							icon="📌"
 							title={t(lang, 'home.my_accepted')}
 							onPress={() => router.push('/volunteer-my')}
@@ -170,7 +171,7 @@ export default function HomeScreen() {
 						surface={surface}
 						mutedBg={mutedBg}
 						textColor={text}
-						primary={primary}
+						primary={titleColor}
 						icon="📋"
 						title={t(lang, 'home.categories')}
 						onPress={() => router.push('/categories')}
@@ -180,7 +181,7 @@ export default function HomeScreen() {
 						surface={surface}
 						mutedBg={mutedBg}
 						textColor={text}
-						primary={primary}
+						primary={titleColor}
 						icon="📹"
 						title={t(lang, 'home.videos')}
 						onPress={() => router.push('/video')}
@@ -190,7 +191,7 @@ export default function HomeScreen() {
 						surface={surface}
 						mutedBg={mutedBg}
 						textColor={text}
-						primary={primary}
+						primary={titleColor}
 						icon="🗺️"
 						title={t(lang, 'home.hospitals_map')}
 						onPress={() => router.push('/hospitals-map')}
@@ -200,7 +201,7 @@ export default function HomeScreen() {
 						surface={surface}
 						mutedBg={mutedBg}
 						textColor={text}
-						primary={primary}
+						primary={titleColor}
 						icon="💬"
 						title={t(lang, 'home.ai_assistant')}
 						onPress={() => router.push('/chat')}
@@ -210,7 +211,7 @@ export default function HomeScreen() {
 						surface={surface}
 						mutedBg={mutedBg}
 						textColor={text}
-						primary={primary}
+						primary={titleColor}
 						icon="⭐"
 						title={t(lang, 'home.volunteer_reviews')}
 						onPress={() => router.push('/reviews')}
@@ -220,7 +221,7 @@ export default function HomeScreen() {
 						surface={surface}
 						mutedBg={mutedBg}
 						textColor={text}
-						primary={primary}
+						primary={titleColor}
 						icon="📄"
 						title={t(lang, 'home.my_requests')}
 						onPress={() => router.push('/my-requests')}
