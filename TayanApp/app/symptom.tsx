@@ -330,6 +330,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 14,
+    // Prevent iPhone Safari from auto-zooming focused inputs on web.
+    fontSize: 16,
   },
   textArea: {
     borderWidth: 1,
@@ -337,6 +339,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 14,
     minHeight: 96,
+    fontSize: 16,
     textAlignVertical: 'top',
   },
 

@@ -472,7 +472,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderWidth: 2,
     borderRadius: 12,
-    fontSize: 14,
+    // Prevent iPhone Safari from auto-zooming focused inputs on web.
+    fontSize: 16,
   },
   sendBtn: {
     paddingVertical: 12,

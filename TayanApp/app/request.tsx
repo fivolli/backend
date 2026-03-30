@@ -630,5 +630,13 @@ const styles = StyleSheet.create({
 	starsRow: { flexDirection: 'row', gap: 6 },
 	starBtn: { paddingVertical: 6, paddingHorizontal: 6 },
 	starText: { fontSize: 20, fontWeight: '800' },
-	textarea: { minHeight: 96, borderWidth: 1, borderRadius: 12, padding: 12, textAlignVertical: 'top' },
+	textarea: {
+		minHeight: 96,
+		borderWidth: 1,
+		borderRadius: 12,
+		padding: 12,
+		// Prevent iPhone Safari from auto-zooming focused inputs on web.
+		fontSize: 16,
+		textAlignVertical: 'top',
+	},
 });

@@ -401,7 +401,17 @@ const styles = StyleSheet.create({
   bubbleText: { fontSize: 14, lineHeight: 20 },
   inputBar: { borderTopWidth: 1, padding: 12 },
   inputRow: { flexDirection: 'row', gap: 10, alignItems: 'flex-end' },
-  input: { flex: 1, minHeight: 44, maxHeight: 120, borderRadius: 14, borderWidth: 1, paddingHorizontal: 12, paddingVertical: 10 },
+  input: {
+    flex: 1,
+    minHeight: 44,
+    maxHeight: 120,
+    borderRadius: 14,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    // Prevent iPhone Safari from auto-zooming focused inputs on web.
+    fontSize: 16,
+  },
   sendBtn: { paddingHorizontal: 14, paddingVertical: 12, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   sendBtnText: { color: '#fff', fontWeight: '800' },
 });

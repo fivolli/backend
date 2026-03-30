@@ -678,7 +678,8 @@ const styles = StyleSheet.create({
 		borderWidth: 2,
 		borderColor: '#e5e5e5',
 		borderRadius: 12,
-		fontSize: 14,
+		// Prevent iPhone Safari from auto-zooming focused inputs on web.
+		fontSize: 16,
 		backgroundColor: 'white',
 	},
 	inputFieldFocused: { borderColor: '#2C2D5F' },
@@ -802,6 +803,7 @@ const styles = StyleSheet.create({
 		borderRadius: 12,
 		paddingHorizontal: 12,
 		paddingVertical: 10,
+		fontSize: 16,
 	},
 	editBtnRow: { flexDirection: 'row', gap: 10, marginTop: 12 },
 	primaryBtn: { flex: 1, paddingVertical: 12, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },

@@ -1581,6 +1581,8 @@ const styles = StyleSheet.create({
 		paddingVertical: 10,
 		paddingHorizontal: 12,
 		minHeight: 90,
+		// Prevent iPhone Safari from auto-zooming focused inputs on web.
+		fontSize: 16,
 		textAlignVertical: 'top',
 	},
 	row: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
