@@ -2,6 +2,7 @@ import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Image } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -13,6 +14,7 @@ import { t } from '@/lib/i18n';
 import { getGeoOrNull } from '@/lib/location';
 import { setLastRequestId } from '@/lib/storage';
 import { useAuth } from '@/providers/auth-provider';
+import { API_BASE } from '@/lib/config';
 
 const DEFAULT_LAT = 42.8746;
 const DEFAULT_LNG = 74.5698;
@@ -29,6 +31,14 @@ export default function HomeScreen() {
 	const colorScheme = useColorScheme();
 	const lightDamageColors = colorScheme === 'dark' ? ['#2B2630', '#3A3127'] as const : Gradients.lightDamage;
 	const unstableColors = colorScheme === 'dark' ? ['#2B2C22', '#3A3928'] as const : Gradients.unstableState;
+	const avatarUri = (() => {
+		const v = String(me?.avatar_url || '').trim();
+		if (!v) return null;
+		if (v.startsWith('data:image/')) return v;
+		if (v.startsWith('https://') || v.startsWith('http://')) return v;
+		if (v.startsWith('/')) return `${API_BASE}${v}`;
+		return null;
+	})();
 
 	const isUser = me?.role === 'user';
 
@@ -95,7 +105,11 @@ export default function HomeScreen() {
 						onPress={() => router.push('/profile')}
 						style={[styles.avatar, { backgroundColor: 'rgba(255,255,255,0.2)' }]}
 					>
-						<ThemedText style={styles.avatarText}>👤</ThemedText>
+						{avatarUri ? (
+							<Image source={{ uri: avatarUri }} style={styles.avatarImage} />
+						) : (
+							<ThemedText style={styles.avatarText}>👤</ThemedText>
+						)}
 					</Pressable>
 				</View>
 
@@ -281,6 +295,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 	avatarText: { fontSize: 18 },
+	avatarImage: { width: '100%', height: '100%', borderRadius: 24 },
 
 	sosWrap: { width: '100%' },
 	sosBtn: {

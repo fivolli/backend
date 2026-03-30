@@ -43,6 +43,7 @@ export default function ProfileScreen() {
 	const avatarUri = useMemo(() => {
 		const v = String(me?.avatar_url || '').trim();
 		if (!v) return null;
+		if (v.startsWith('data:image/')) return v;
 		if (v.startsWith('https://') || v.startsWith('http://')) return v;
 		if (v.startsWith('/')) return `${API_BASE}${v}`;
 		return null;

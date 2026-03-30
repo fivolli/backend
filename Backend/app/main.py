@@ -70,6 +70,7 @@ from .i18n import set_request_language, reset_lang, tr
 import time
 import json
 import uuid
+import base64
 from collections import defaultdict, deque
 
 
@@ -355,6 +356,8 @@ def _public_url(request: Request, url_or_path: str | None) -> str | None:
     if not url_or_path:
         return None
     v = str(url_or_path)
+    if v.startswith("data:"):
+        return v
     if v.startswith("/"):
         return str(request.base_url).rstrip("/") + v
     return v
@@ -1119,8 +1122,9 @@ def update_me(
             avatar_url.startswith("http://")
             or avatar_url.startswith("https://")
             or avatar_url.startswith("/static/")
+            or avatar_url.startswith("data:image/")
         ):
-            raise HTTPException(400, "avatar_url must be http(s) or /static/*")
+            raise HTTPException(400, "avatar_url must be http(s), data:image/*, or /static/*")
         u.avatar_url = avatar_url or None
 
     db.commit()
@@ -1153,32 +1157,18 @@ def upload_my_avatar(
     if not ext:
         raise HTTPException(400, "unsupported image type")
 
-    # Remove previous uploaded avatar if it was stored locally.
-    prev = getattr(u, "avatar_url", None)
-    if isinstance(prev, str) and prev.startswith("/static/avatars/"):
-        try:
-            (AVATARS_DIR / Path(prev).name).unlink(missing_ok=True)
-        except Exception:
-            pass
-
-    filename = f"u{u.id}_{uuid.uuid4().hex}{ext}"
-    dest = AVATARS_DIR / filename
     try:
-        with dest.open("wb") as out:
-            written = 0
-            while True:
-                chunk = file.file.read(1024 * 1024)
-                if not chunk:
-                    break
-                written += len(chunk)
-                if written > MAX_AVATAR_BYTES:
-                    raise HTTPException(413, "avatar file is too large")
-                out.write(chunk)
+        chunks: list[bytes] = []
+        written = 0
+        while True:
+            chunk = file.file.read(1024 * 1024)
+            if not chunk:
+                break
+            written += len(chunk)
+            if written > MAX_AVATAR_BYTES:
+                raise HTTPException(413, "avatar file is too large")
+            chunks.append(chunk)
     except Exception:
-        try:
-            dest.unlink(missing_ok=True)
-        except Exception:
-            pass
         raise
     finally:
         try:
@@ -1186,8 +1176,12 @@ def upload_my_avatar(
         except Exception:
             pass
 
-    rel = f"/static/avatars/{filename}"
-    u.avatar_url = rel
+    raw = b"".join(chunks)
+    if not raw:
+        raise HTTPException(400, "empty avatar file")
+
+    encoded = base64.b64encode(raw).decode("ascii")
+    u.avatar_url = f"data:{ct};base64,{encoded}"
     db.commit()
     db.refresh(u)
 
