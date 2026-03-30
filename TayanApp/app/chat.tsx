@@ -174,6 +174,14 @@ export default function AiChatScreen() {
 
   const [input, setInput] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [typingFrame, setTypingFrame] = useState(0);
+
+  const typingLabel =
+    langKey === 'en'
+      ? 'AI is typing...'
+      : langKey === 'kg'
+        ? 'AI жооп жазып жатат...'
+        : 'AI печатает...';
 
   const canSend = useMemo(() => input.trim().length > 0 && !isSending, [input, isSending]);
 
@@ -183,7 +191,20 @@ export default function AiChatScreen() {
 
   useEffect(() => {
     scrollRef.current?.scrollToEnd({ animated: true });
-  }, [messages.length]);
+  }, [messages.length, isSending]);
+
+  useEffect(() => {
+    if (!isSending) {
+      setTypingFrame(0);
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTypingFrame((prev) => (prev + 1) % 3);
+    }, 420);
+
+    return () => clearInterval(timer);
+  }, [isSending]);
 
   async function pollAiJobUntilDone(jobId: number): Promise<string> {
     const startedAt = Date.now();
@@ -289,7 +310,7 @@ export default function AiChatScreen() {
 
             <View style={{ flex: 1 }}>
               <ThemedText style={styles.headerTitle}>{copy.title}</ThemedText>
-              <ThemedText style={styles.headerSubtitle}>{copy.online}</ThemedText>
+              <ThemedText style={styles.headerSubtitle}>{isSending ? typingLabel : copy.online}</ThemedText>
             </View>
           </View>
         </View>
@@ -334,6 +355,35 @@ export default function AiChatScreen() {
                 </View>
               );
             })}
+
+            {isSending ? (
+              <View style={[styles.bubbleWrap, { alignSelf: 'flex-start', maxWidth: '80%' }]}>
+                <View
+                  style={[
+                    styles.bubble,
+                    styles.typingBubble,
+                    { backgroundColor: surface, borderColor: border, borderWidth: 1 },
+                  ]}
+                >
+                  <View style={styles.typingDotsRow}>
+                    {[0, 1, 2].map((dot) => (
+                      <View
+                        key={dot}
+                        style={[
+                          styles.typingDot,
+                          {
+                            backgroundColor: primary,
+                            opacity: typingFrame === dot ? 1 : 0.28,
+                            transform: [{ scale: typingFrame === dot ? 1.12 : 1 }],
+                          },
+                        ]}
+                      />
+                    ))}
+                  </View>
+                  <ThemedText style={[styles.typingText, { color: textColor }]}>{typingLabel}</ThemedText>
+                </View>
+              </View>
+            ) : null}
           </ScrollView>
 
           <View style={[styles.inputBar, { backgroundColor: surface, borderTopColor: border }]}>
@@ -409,6 +459,10 @@ const styles = StyleSheet.create({
   bubbleWrap: { position: 'relative' },
   bubble: { paddingVertical: 12, paddingHorizontal: 16, borderRadius: 18 },
   bubbleText: { fontSize: 14, lineHeight: 21 },
+  typingBubble: { minWidth: 120 },
+  typingDotsRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 },
+  typingDot: { width: 8, height: 8, borderRadius: 999 },
+  typingText: { fontSize: 12, lineHeight: 16, opacity: 0.7 },
 
   inputBar: { padding: 16, borderTopWidth: 1 },
   inputRow: { flexDirection: 'row', gap: 8, alignItems: 'center' },
