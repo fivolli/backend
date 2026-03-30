@@ -522,7 +522,7 @@ export default function ProfileScreen() {
 							<View style={[styles.card, { backgroundColor: surface }]}>
 								<ThemedText style={[styles.label, { color: titleColor }]}>{t(lang, 'profile.name_label')}</ThemedText>
 								<TextInput
-									style={[styles.input, { backgroundColor: mutedBg, borderColor, color: text }]}
+									style={[styles.input, { backgroundColor: mutedBg, borderColor: border, color: text }]}
 									value={editName}
 									onChangeText={setEditName}
 									placeholder={t(lang, 'profile.name_placeholder')}
@@ -533,7 +533,7 @@ export default function ProfileScreen() {
 
 								<ThemedText style={[styles.label, { color: titleColor }]}>{t(lang, 'profile.email_label')}</ThemedText>
 								<TextInput
-									style={[styles.input, { backgroundColor: mutedBg, borderColor, color: text }]}
+									style={[styles.input, { backgroundColor: mutedBg, borderColor: border, color: text }]}
 									value={editEmail}
 									onChangeText={setEditEmail}
 									placeholder="example@mail.com"
