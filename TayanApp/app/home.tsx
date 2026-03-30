@@ -42,8 +42,44 @@ export default function HomeScreen() {
 
 	const isUser = me?.role === 'user';
 
+	async function createSosRequest() {
+		try {
+			const geo = await getGeoOrNull();
+			const lat = geo?.lat ?? DEFAULT_LAT;
+			const lng = geo?.lng ?? DEFAULT_LNG;
+
+			const created = await api<{ id: number; status: string }>('/requests', {
+				method: 'POST',
+				token,
+				lang,
+				body: {
+					kind: 'sos',
+					lat,
+					lng,
+					address: '',
+					severity: 'critical',
+				},
+			});
+
+			const id = created?.id;
+			if (id) {
+				await setLastRequestId(id);
+				router.push({ pathname: '/map', params: { id: String(id) } });
+			} else {
+				Alert.alert(t(lang, 'common.done'), t(lang, 'home.sos_sent'));
+			}
+		} catch (e: any) {
+			Alert.alert(t(lang, 'home.sos_error_title'), e?.message ? String(e.message) : t(lang, 'home.sos_error_fallback'));
+		}
+	}
+
 	async function sendSos() {
 		if (!token) {
+			if (typeof window !== 'undefined' && Platform.OS === 'web') {
+				const goProfile = window.confirm(`${t(lang, 'home.need_sign_in')}\n\n${t(lang, 'home.sign_in_first')}`);
+				if (goProfile) router.push('/profile');
+				return;
+			}
 			Alert.alert(t(lang, 'home.need_sign_in'), t(lang, 'home.sign_in_first'), [
 				{ text: t(lang, 'common.cancel'), style: 'cancel' },
 				{ text: t(lang, 'common.open_profile'), onPress: () => router.push('/profile') },
@@ -51,44 +87,23 @@ export default function HomeScreen() {
 			return;
 		}
 
+		if (typeof window !== 'undefined' && Platform.OS === 'web') {
+			const confirmed = window.confirm(`${t(lang, 'home.sos_title')}\n\n${t(lang, 'home.sos_confirm')}`);
+			if (!confirmed) return;
+			await createSosRequest();
+			return;
+		}
+
 		Alert.alert(t(lang, 'home.sos_title'), t(lang, 'home.sos_confirm'), [
-				{ text: t(lang, 'common.cancel'), style: 'cancel' },
-				{
-					text: t(lang, 'common.send'),
-					style: 'destructive',
-					onPress: async () => {
-						try {
-							const geo = await getGeoOrNull();
-							const lat = geo?.lat ?? DEFAULT_LAT;
-							const lng = geo?.lng ?? DEFAULT_LNG;
-
-							const created = await api<{ id: number; status: string }>('/requests', {
-								method: 'POST',
-								token,
-								lang,
-								body: {
-									kind: 'sos',
-									lat,
-									lng,
-									address: '',
-									severity: 'critical',
-								},
-							});
-
-							const id = created?.id;
-							if (id) {
-								await setLastRequestId(id);
-								router.push({ pathname: '/map', params: { id: String(id) } });
-							} else {
-								Alert.alert(t(lang, 'common.done'), t(lang, 'home.sos_sent'));
-							}
-						} catch (e: any) {
-							Alert.alert(t(lang, 'home.sos_error_title'), e?.message ? String(e.message) : t(lang, 'home.sos_error_fallback'));
-						}
-					},
+			{ text: t(lang, 'common.cancel'), style: 'cancel' },
+			{
+				text: t(lang, 'common.send'),
+				style: 'destructive',
+				onPress: async () => {
+					await createSosRequest();
 				},
-			]
-		);
+			},
+		]);
 	}
 
 	return (
