@@ -24,28 +24,32 @@ const LOGO = require('@/assets/images/logo2-removebg-preview.png');
 
 const COPY = {
   ru: {
-    welcome: 'Добро пожаловать',
-    name: 'Имя',
-    namePh: 'Введите ваше имя',
+    welcome: '\u0414\u043e\u0431\u0440\u043e \u043f\u043e\u0436\u0430\u043b\u043e\u0432\u0430\u0442\u044c',
+    name: '\u0418\u043c\u044f',
+    namePh: '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0432\u0430\u0448\u0435 \u0438\u043c\u044f',
     email: 'Email',
     emailPh: 'example@mail.com',
-    phone: 'Номер телефона',
+    phone: '\u041d\u043e\u043c\u0435\u0440 \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0430',
     phonePh: '+996 XXX XXX XXX',
-    role: 'Кто вы?',
-    roleUser: 'Пользователь',
-    roleVolunteer: 'Волонтёр',
-    password: 'Пароль',
-    passwordPh: 'Введите пароль',
-    register: 'Зарегистрироваться',
-    haveAccount: 'Уже есть аккаунт?',
-    login: 'Войти',
-    nameRequired: 'Введите имя',
-    emailRequired: 'Введите email',
-    emailInvalid: 'Введите корректный email (должен содержать @)',
-    phoneRequired: 'Введите номер телефона',
-    phoneInvalid: 'Введите корректный номер телефона',
-    passwordRequired: 'Введите пароль',
-    passwordTooShort: 'Пароль должен быть не менее 8 символов',
+    allergies: '\u0410\u043b\u043b\u0435\u0440\u0433\u0438\u0438',
+    allergiesPh: '\u041d\u0430\u043f\u0440\u0438\u043c\u0435\u0440: \u043f\u0435\u043d\u0438\u0446\u0438\u043b\u043b\u0438\u043d, \u043e\u0440\u0435\u0445\u0438',
+    chronic: '\u0425\u0440\u043e\u043d\u0438\u0447\u0435\u0441\u043a\u0438\u0435 \u0437\u0430\u0431\u043e\u043b\u0435\u0432\u0430\u043d\u0438\u044f',
+    chronicPh: '\u041d\u0430\u043f\u0440\u0438\u043c\u0435\u0440: \u0430\u0441\u0442\u043c\u0430, \u0434\u0438\u0430\u0431\u0435\u0442',
+    role: '\u041a\u0442\u043e \u0432\u044b?',
+    roleUser: '\u041f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044c',
+    roleVolunteer: '\u0412\u043e\u043b\u043e\u043d\u0442\u0451\u0440',
+    password: '\u041f\u0430\u0440\u043e\u043b\u044c',
+    passwordPh: '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043f\u0430\u0440\u043e\u043b\u044c',
+    register: '\u0417\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u0442\u044c\u0441\u044f',
+    haveAccount: '\u0423\u0436\u0435 \u0435\u0441\u0442\u044c \u0430\u043a\u043a\u0430\u0443\u043d\u0442?',
+    login: '\u0412\u043e\u0439\u0442\u0438',
+    nameRequired: '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0438\u043c\u044f',
+    emailRequired: '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 email',
+    emailInvalid: '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043a\u043e\u0440\u0440\u0435\u043a\u0442\u043d\u044b\u0439 email (\u0434\u043e\u043b\u0436\u0435\u043d \u0441\u043e\u0434\u0435\u0440\u0436\u0430\u0442\u044c @)',
+    phoneRequired: '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043d\u043e\u043c\u0435\u0440 \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0430',
+    phoneInvalid: '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043a\u043e\u0440\u0440\u0435\u043a\u0442\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0430',
+    passwordRequired: '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043f\u0430\u0440\u043e\u043b\u044c',
+    passwordTooShort: '\u041f\u0430\u0440\u043e\u043b\u044c \u0434\u043e\u043b\u0436\u0435\u043d \u0431\u044b\u0442\u044c \u043d\u0435 \u043c\u0435\u043d\u0435\u0435 8 \u0441\u0438\u043c\u0432\u043e\u043b\u043e\u0432',
   },
   en: {
     welcome: 'Welcome',
@@ -55,6 +59,10 @@ const COPY = {
     emailPh: 'example@mail.com',
     phone: 'Phone number',
     phonePh: '+996 XXX XXX XXX',
+    allergies: 'Allergies',
+    allergiesPh: 'For example: penicillin, nuts',
+    chronic: 'Chronic conditions',
+    chronicPh: 'For example: asthma, diabetes',
     role: 'Who are you?',
     roleUser: 'User',
     roleVolunteer: 'Volunteer',
@@ -72,28 +80,32 @@ const COPY = {
     passwordTooShort: 'Password must be at least 8 characters',
   },
   kg: {
-    welcome: 'Кош келиңиз',
-    name: 'Атыңыз',
-    namePh: 'Атыңызды жазыңыз',
+    welcome: '\u041a\u043e\u0448 \u043a\u0435\u043b\u0438\u04a3\u0438\u0437',
+    name: '\u0410\u0442\u044b\u04a3\u044b\u0437',
+    namePh: '\u0410\u0442\u044b\u04a3\u044b\u0437\u0434\u044b \u0436\u0430\u0437\u044b\u04a3\u044b\u0437',
     email: 'Email',
     emailPh: 'example@mail.com',
-    phone: 'Телефон номери',
+    phone: '\u0422\u0435\u043b\u0435\u0444\u043e\u043d \u043d\u043e\u043c\u0435\u0440\u0438',
     phonePh: '+996 XXX XXX XXX',
-    role: 'Сиз кимсиз?',
-    roleUser: 'Колдонуучу',
-    roleVolunteer: 'Ыктыярчы',
-    password: 'Сыр сөз',
-    passwordPh: 'Сыр сөздү жазыңыз',
-    register: 'Катталуу',
-    haveAccount: 'Аккаунтуңуз барбы?',
-    login: 'Кирүү',
-    nameRequired: 'Атыңызды жазыңыз',
-    emailRequired: 'Email жазыңыз',
-    emailInvalid: 'Туура email жазыңыз (@ болушу керек)',
-    phoneRequired: 'Телефон номерин жазыңыз',
-    phoneInvalid: 'Туура телефон номерин жазыңыз',
-    passwordRequired: 'Сыр сөздү жазыңыз',
-    passwordTooShort: 'Сыр сөз кеминде 8 белгиден турушу керек',
+    allergies: '\u0410\u043b\u043b\u0435\u0440\u0433\u0438\u044f\u043b\u0430\u0440',
+    allergiesPh: '\u041c\u0438\u0441\u0430\u043b\u044b: \u043f\u0435\u043d\u0438\u0446\u0438\u043b\u043b\u0438\u043d, \u0436\u0430\u04a3\u0433\u0430\u043a',
+    chronic: '\u04e8\u043d\u04e9\u043a\u04e9\u0442 \u043e\u043e\u0440\u0443\u043b\u0430\u0440',
+    chronicPh: '\u041c\u0438\u0441\u0430\u043b\u044b: \u0430\u0441\u0442\u043c\u0430, \u0434\u0438\u0430\u0431\u0435\u0442',
+    role: '\u0421\u0438\u0437 \u043a\u0438\u043c\u0441\u0438\u0437?',
+    roleUser: '\u041a\u043e\u043b\u0434\u043e\u043d\u0443\u0443\u0447\u0443',
+    roleVolunteer: '\u042b\u043a\u0442\u044b\u044f\u0440\u0447\u044b',
+    password: '\u0421\u044b\u0440 \u0441\u04e9\u0437',
+    passwordPh: '\u0421\u044b\u0440 \u0441\u04e9\u0437\u0434\u04af \u0436\u0430\u0437\u044b\u04a3\u044b\u0437',
+    register: '\u041a\u0430\u0442\u0442\u0430\u043b\u0443\u0443',
+    haveAccount: '\u0410\u043a\u043a\u0430\u0443\u043d\u0442\u0443\u04a3\u0443\u0437 \u0431\u0430\u0440\u0431\u044b?',
+    login: '\u041a\u0438\u0440\u04af\u04af',
+    nameRequired: '\u0410\u0442\u044b\u04a3\u044b\u0437\u0434\u044b \u0436\u0430\u0437\u044b\u04a3\u044b\u0437',
+    emailRequired: 'Email \u0436\u0430\u0437\u044b\u04a3\u044b\u0437',
+    emailInvalid: '\u0422\u0443\u0443\u0440\u0430 email \u0436\u0430\u0437\u044b\u04a3\u044b\u0437 (@ \u0431\u043e\u043b\u0443\u0448\u0443 \u043a\u0435\u0440\u0435\u043a)',
+    phoneRequired: '\u0422\u0435\u043b\u0435\u0444\u043e\u043d \u043d\u043e\u043c\u0435\u0440\u0438\u043d \u0436\u0430\u0437\u044b\u04a3\u044b\u0437',
+    phoneInvalid: '\u0422\u0443\u0443\u0440\u0430 \u0442\u0435\u043b\u0435\u0444\u043e\u043d \u043d\u043e\u043c\u0435\u0440\u0438\u043d \u0436\u0430\u0437\u044b\u04a3\u044b\u0437',
+    passwordRequired: '\u0421\u044b\u0440 \u0441\u04e9\u0437\u0434\u04af \u0436\u0430\u0437\u044b\u04a3\u044b\u0437',
+    passwordTooShort: '\u0421\u044b\u0440 \u0441\u04e9\u0437 \u043a\u0435\u043c\u0438\u043d\u0434\u0435 8 \u0431\u0435\u043b\u0433\u0438\u0434\u0435\u043d \u0442\u0443\u0440\u0443\u0448\u0443 \u043a\u0435\u0440\u0435\u043a',
   },
 } as const;
 
@@ -126,10 +138,12 @@ export default function RegisterScreen() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [allergies, setAllergies] = useState('');
+  const [chronicConditions, setChronicConditions] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<UserRole>('user');
   const [busy, setBusy] = useState(false);
-  const [focused, setFocused] = useState<'name' | 'email' | 'phone' | 'password' | null>(null);
+  const [focused, setFocused] = useState<'name' | 'email' | 'phone' | 'allergies' | 'chronic' | 'password' | null>(null);
 
   const canSubmit = useMemo(() => {
     if (busy) return false;
@@ -178,7 +192,15 @@ export default function RegisterScreen() {
 
     setBusy(true);
     try {
-      await register({ name: nameTrimmed, email: emailTrimmed, phone: phoneTrimmed, password, role });
+      await register({
+        name: nameTrimmed,
+        email: emailTrimmed,
+        phone: phoneTrimmed,
+        password,
+        role,
+        allergies,
+        chronic_conditions: chronicConditions,
+      });
       router.replace('/home');
       showAlert(t(lang, 'common.done'), t(lang, 'profile.register_success'));
     } catch (e: any) {
@@ -253,6 +275,34 @@ export default function RegisterScreen() {
               autoCapitalize="none"
               style={[styles.inputField, { borderColor: focused === 'phone' ? primary : border, color: text, backgroundColor: surface }]}
               onFocus={() => setFocused('phone')}
+              onBlur={() => setFocused(null)}
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <ThemedText style={[styles.inputLabel, { color: titleColor }]}>{copy.allergies}</ThemedText>
+            <TextInput
+              value={allergies}
+              onChangeText={setAllergies}
+              placeholder={copy.allergiesPh}
+              placeholderTextColor={muted}
+              multiline
+              style={[styles.textAreaField, { borderColor: focused === 'allergies' ? primary : border, color: text, backgroundColor: surface }]}
+              onFocus={() => setFocused('allergies')}
+              onBlur={() => setFocused(null)}
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <ThemedText style={[styles.inputLabel, { color: titleColor }]}>{copy.chronic}</ThemedText>
+            <TextInput
+              value={chronicConditions}
+              onChangeText={setChronicConditions}
+              placeholder={copy.chronicPh}
+              placeholderTextColor={muted}
+              multiline
+              style={[styles.textAreaField, { borderColor: focused === 'chronic' ? primary : border, color: text, backgroundColor: surface }]}
+              onFocus={() => setFocused('chronic')}
               onBlur={() => setFocused(null)}
             />
           </View>
@@ -336,6 +386,16 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 12,
     fontSize: 16,
+  },
+  textAreaField: {
+    width: '100%',
+    minHeight: 92,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderWidth: 2,
+    borderRadius: 12,
+    fontSize: 16,
+    textAlignVertical: 'top',
   },
   roleRow: {
     flexDirection: 'row',
