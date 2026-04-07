@@ -16,6 +16,8 @@ export type Me = {
   avatar_url?: string | null;
   phone: string;
   role: UserRole;
+  allergies?: string | null;
+  chronic_conditions?: string | null;
 };
 
 type AuthContextValue = {
@@ -32,6 +34,8 @@ type AuthContextValue = {
     phone: string;
     password: string;
     role: UserRole;
+    allergies?: string;
+    chronic_conditions?: string;
   }) => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -277,7 +281,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const register = useCallback(
-    async (data: { name: string; email: string; phone: string; password: string; role: UserRole }) => {
+    async (data: { name: string; email: string; phone: string; password: string; role: UserRole; allergies?: string; chronic_conditions?: string }) => {
       try {
         const resp = await api<{ access_token: string; token_type: string }>('/auth/register', {
           method: 'POST',
@@ -287,6 +291,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             phone: data.phone.trim(),
             password: data.password,
             role: data.role,
+            allergies: (data.allergies || '').trim(),
+            chronic_conditions: (data.chronic_conditions || '').trim(),
           },
           lang,
         });

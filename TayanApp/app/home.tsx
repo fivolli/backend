@@ -1,4 +1,4 @@
-import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Alert, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -29,7 +29,6 @@ export default function HomeScreen() {
 	const text = useThemeColor({}, 'text');
 	const titleColor = useThemeColor({ light: primary, dark: '#E7ECF5' }, 'text');
 	const colorScheme = useColorScheme();
-	const lightDamageColors = colorScheme === 'dark' ? ['#2B2630', '#3A3127'] as const : Gradients.lightDamage;
 	const unstableColors = colorScheme === 'dark' ? ['#2B2C22', '#3A3928'] as const : Gradients.unstableState;
 	const avatarUri = (() => {
 		const v = String(me?.avatar_url || '').trim();
@@ -141,39 +140,18 @@ export default function HomeScreen() {
 				) : null}
 
 				{isUser ? (
-					<View style={styles.cardGrid}>
-						<Pressable style={styles.cardItem} onPress={() => router.push({ pathname: '/symptom', params: { severity: 'light' } })}>
-							<LinearGradient
-								colors={[...lightDamageColors]}
-								start={{ x: 0, y: 0 }}
-								end={{ x: 1, y: 1 }}
-								style={styles.categoryCard}
-							>
-								<View style={[styles.categoryIcon, { backgroundColor: colorScheme === 'dark' ? 'rgba(255,183,77,0.18)' : 'rgba(255,152,0,0.2)' }]}>
-									<ThemedText style={styles.categoryIconText}>🩹</ThemedText>
-								</View>
-								<ThemedText numberOfLines={2} style={[styles.categoryTitle, { color: titleColor }]}>
-									{t(lang, 'home.light_damage')}
-								</ThemedText>
-							</LinearGradient>
-						</Pressable>
-
-						<Pressable style={styles.cardItem} onPress={() => router.push({ pathname: '/symptom', params: { severity: 'unstable' } })}>
-							<LinearGradient
-								colors={[...unstableColors]}
-								start={{ x: 0, y: 0 }}
-								end={{ x: 1, y: 1 }}
-								style={styles.categoryCard}
-							>
-								<View style={[styles.categoryIcon, { backgroundColor: colorScheme === 'dark' ? 'rgba(255,235,59,0.18)' : 'rgba(255,235,59,0.3)' }]}>
-									<ThemedText style={styles.categoryIconText}>⚠️</ThemedText>
-								</View>
-								<ThemedText numberOfLines={2} style={[styles.categoryTitle, { color: titleColor }]}>
-									{t(lang, 'home.unstable_state')}
-								</ThemedText>
-							</LinearGradient>
-						</Pressable>
-					</View>
+					<Pressable style={styles.quickActionWrap} onPress={() => router.push('/symptom')}>
+						<LinearGradient
+							colors={[...unstableColors]}
+							start={{ x: 0, y: 0 }}
+							end={{ x: 1, y: 1 }}
+							style={styles.categoryCard}
+						>
+							<ThemedText numberOfLines={2} style={[styles.categoryTitle, { color: titleColor }] }>
+								{t(lang, 'category.call_volunteer')}
+							</ThemedText>
+						</LinearGradient>
+					</Pressable>
 				) : null}
 
 				<ThemedText style={[styles.sectionTitle, { color: titleColor }]}>{t(lang, 'home.main_features')}</ThemedText>
@@ -332,15 +310,19 @@ const styles = StyleSheet.create({
 	content: { padding: 24, paddingBottom: 24 },
 
 	sectionTitle: { fontSize: 18, fontWeight: '700', marginBottom: 16 },
-	cardGrid: { flexDirection: 'row', gap: 16, marginBottom: 24 },
-	cardItem: { flex: 1 },
+	quickActionWrap: {
+		marginBottom: 24,
+		width: '100%',
+		alignSelf: 'stretch',
+	},
 	categoryCard: {
-		flex: 1,
-		padding: 24,
+		width: '100%',
+		paddingHorizontal: 20,
+		paddingVertical: 18,
 		borderRadius: 24,
 		alignItems: 'center',
-		gap: 16,
-		minHeight: 160,
+		justifyContent: 'center',
+		minHeight: 96,
 		shadowColor: '#000',
 		shadowOpacity: 0.1,
 		shadowRadius: 12,
@@ -355,7 +337,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 	categoryIconText: { fontSize: 32, lineHeight: 36, textAlign: 'center' },
-	categoryTitle: { textAlign: 'center', fontWeight: '700' },
+	categoryTitle: { textAlign: 'center', fontWeight: '700', width: '100%' },
 
 	functionList: { gap: 12 },
 	functionItem: {

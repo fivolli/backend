@@ -8,6 +8,7 @@ const LANG_KEY = 'tayan.lang';
 const NOTIFICATIONS_KEY = 'tayan.notifications';
 const AI_PENDING_JOB_KEY = 'tayan.aiPendingJobId';
 const THEME_KEY = 'tayan.theme';
+const ONBOARDING_SEEN_KEY = 'tayan.onboardingSeen';
 
 export type AppLang = 'ru' | 'en' | 'kg';
 export type ThemePreference = 'system' | 'light' | 'dark';
@@ -290,5 +291,29 @@ export async function setThemePreference(theme: ThemePreference): Promise<void> 
     await SecureStore.setItemAsync(THEME_KEY, theme);
   } catch {
 
+  }
+}
+
+export async function getOnboardingSeen(): Promise<boolean> {
+  if (Platform.OS === 'web') {
+    const raw = webGet(ONBOARDING_SEEN_KEY);
+    if (raw === '1' || raw === 'true') return true;
+  }
+  try {
+    const raw = await SecureStore.getItemAsync(ONBOARDING_SEEN_KEY);
+    return raw === '1' || raw === 'true';
+  } catch {
+    return false;
+  }
+}
+
+export async function setOnboardingSeen(value: boolean = true): Promise<void> {
+  const raw = value ? '1' : '0';
+  if (Platform.OS === 'web') {
+    webSet(ONBOARDING_SEEN_KEY, raw);
+  }
+  try {
+    await SecureStore.setItemAsync(ONBOARDING_SEEN_KEY, raw);
+  } catch {
   }
 }
