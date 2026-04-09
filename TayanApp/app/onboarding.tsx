@@ -33,6 +33,15 @@ type CopyPack = {
   login: string;
   continue: string;
   slides: SlideCopy[];
+  roleDemo: {
+    title: string;
+    intro: string;
+    cards: {
+      title: string;
+      desc: string;
+      image: any;
+    }[];
+  };
   levels: {
     title: string;
     desc: string;
@@ -59,6 +68,11 @@ const COPY: Record<AppLang, CopyPack> = {
         cta: 'Начать',
       },
       {
+        title: 'Есть 2 варианта использования приложения:',
+        body: 'Выберите подходящий формат использования на следующем шаге.',
+        cta: 'Дальше',
+      },
+      {
         title: 'Умный подбор помощи',
         body: 'Система сама оценивает серьёзность ситуации и подбирает подходящий уровень помощи без лишних шагов.',
         cta: 'Понятно',
@@ -74,6 +88,22 @@ const COPY: Record<AppLang, CopyPack> = {
         cta: 'Готово',
       },
     ],
+    roleDemo: {
+      title: 'Есть 2 варианта использования приложения:',
+      intro: 'Это не выбор на этом экране, а обзор того, как можно использовать Tayan.',
+      cards: [
+        {
+          title: 'Для пострадавшего',
+          desc: 'Для тех, кому нужна доврачебная помощь. Оформите вызов в один клик и отслеживайте прибытие волонтера.',
+          image: require('../hands-removebg-preview.png'),
+        },
+        {
+          title: 'Для волонтера',
+          desc: 'Медики и студенты-медики помогают рядом. Принимайте заявки и спасайте жизни.',
+          image: require('../volunteer-removebg-preview.png'),
+        },
+      ],
+    },
     levels: [
       {
         title: 'Лёгкие случаи',
@@ -129,6 +159,11 @@ const COPY: Record<AppLang, CopyPack> = {
         cta: 'Start',
       },
       {
+        title: 'There are 2 ways to use the app:',
+        body: 'On the next step you can continue with the flow that fits you.',
+        cta: 'Next',
+      },
+      {
         title: 'Smart help matching',
         body: 'The app estimates urgency automatically and suggests the right level of support right away.',
         cta: 'Got it',
@@ -144,6 +179,22 @@ const COPY: Record<AppLang, CopyPack> = {
         cta: 'Done',
       },
     ],
+    roleDemo: {
+      title: 'There are 2 ways to use the app:',
+      intro: 'This screen is a quick overview, not a role selection yet.',
+      cards: [
+        {
+          title: 'For a patient',
+          desc: 'For people who need first aid. Create a request in one tap and track volunteer arrival.',
+          image: require('../hands-removebg-preview.png'),
+        },
+        {
+          title: 'For a volunteer',
+          desc: 'Medics and medical students can help nearby people by accepting requests quickly.',
+          image: require('../volunteer-removebg-preview.png'),
+        },
+      ],
+    },
     levels: [
       {
         title: 'Light cases',
@@ -199,6 +250,11 @@ const COPY: Record<AppLang, CopyPack> = {
         cta: 'Баштоо',
       },
       {
+        title: 'Тиркемени колдонуунун 2 варианты бар:',
+        body: 'Бул экран тандоо эмес, колдонуу жолдорун кыскача көрсөтөт.',
+        cta: 'Кийинки',
+      },
+      {
         title: 'Акылдуу жардам тандоо',
         body: 'Тиркеме кырдаалдын оордугун өзү баалап, ылайыктуу жардамды тандап берет.',
         cta: 'Түшүндүм',
@@ -214,6 +270,22 @@ const COPY: Record<AppLang, CopyPack> = {
         cta: 'Даяр',
       },
     ],
+    roleDemo: {
+      title: 'Тиркемени колдонуунун 2 варианты бар:',
+      intro: 'Бул экран тандоо эмес, Tayan кандайча колдонуларын көрсөтөт.',
+      cards: [
+        {
+          title: 'Жабыркаган адам үчүн',
+          desc: 'Дарыгерге чейинки жардам керек болгондор үчүн. Бир баскыч менен чакыруу түзүп, волонтердун келүүсүн көзөмөлдөңүз.',
+          image: require('../hands-removebg-preview.png'),
+        },
+        {
+          title: 'Волонтер үчүн',
+          desc: 'Медиктер жана медик-студенттер жакын жерден жардам бере алышат. Сурамдарды кабыл алып, өмүр сактаңыз.',
+          image: require('../volunteer-removebg-preview.png'),
+        },
+      ],
+    },
     levels: [
       {
         title: 'Жеңил учурлар',
@@ -270,6 +342,7 @@ export default function OnboardingScreen() {
   const text = useThemeColor({}, 'text');
   const muted = '#6D7B93';
   const activeDot = '#4AA9E8';
+  const lastIndex = palette.slides.length - 1;
 
   const scrollRef = useRef<ScrollView | null>(null);
   const [index, setIndex] = useState(0);
@@ -290,7 +363,7 @@ export default function OnboardingScreen() {
   };
 
   const goNext = async () => {
-    if (index >= 3) {
+    if (index >= lastIndex) {
       await complete();
       return;
     }
@@ -301,7 +374,7 @@ export default function OnboardingScreen() {
     const safeWidth = Math.max(pageWidth || width, 1);
     const nextIndex = Math.round(x / safeWidth);
     setIndex((current) => {
-      const normalized = Math.max(0, Math.min(3, nextIndex));
+      const normalized = Math.max(0, Math.min(lastIndex, nextIndex));
       return current === normalized ? current : normalized;
     });
   };
@@ -319,7 +392,7 @@ export default function OnboardingScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      {index < 3 ? (
+      {index < lastIndex ? (
         <Pressable
           onPress={() => void complete('/login')}
           style={[styles.skipButton, { top: Math.max(insets.top + 6, 16) }]}>
@@ -348,9 +421,28 @@ export default function OnboardingScreen() {
         </View>
 
         <View style={slideStyle}>
+          <View style={[styles.card, { backgroundColor: surface, minHeight: slideMinHeight }]}> 
+            <Image source={require('../shield-removebg-preview.png')} style={styles.headerImage} resizeMode="contain" />
+            <ThemedText style={[styles.title, styles.roleTitle, { color: primary }]}>{palette.roleDemo.title}</ThemedText>
+            <ThemedText style={[styles.body, styles.roleIntro, { color: muted }]}>{palette.roleDemo.intro}</ThemedText>
+            <View style={styles.roleCardsWrap}>
+              {palette.roleDemo.cards.map((card) => (
+                <View key={card.title} style={styles.roleCard}>
+                  <View style={styles.roleCardHead}>
+                    <Image source={card.image} style={styles.roleCardImage} resizeMode="contain" />
+                    <ThemedText style={[styles.roleCardTitle, { color: primary }]}>{card.title}</ThemedText>
+                  </View>
+                  <ThemedText style={[styles.roleCardDesc, { color: text }]}>{card.desc}</ThemedText>
+                </View>
+              ))}
+            </View>
+          </View>
+        </View>
+
+        <View style={slideStyle}>
           <View style={[styles.card, { backgroundColor: surface, minHeight: slideMinHeight }]}>
             <Image source={require('../shield-removebg-preview.png')} style={styles.headerImage} resizeMode="contain" />
-            <ThemedText style={[styles.title, { color: primary }]}>{palette.slides[1].title}</ThemedText>
+            <ThemedText style={[styles.title, { color: primary }]}>{palette.slides[2].title}</ThemedText>
             <View style={styles.levelsWrap}>
               {palette.levels.map((level, levelIndex) => (
                 <View
@@ -375,7 +467,7 @@ export default function OnboardingScreen() {
         <View style={slideStyle}>
           <View style={[styles.card, { backgroundColor: surface, minHeight: slideMinHeight }]}>
             <Image source={require('../shield-removebg-preview.png')} style={styles.headerImage} resizeMode="contain" />
-            <ThemedText style={[styles.title, { color: primary }]}>{palette.slides[2].title}</ThemedText>
+            <ThemedText style={[styles.title, { color: primary }]}>{palette.slides[3].title}</ThemedText>
             <View style={styles.timelineWrap}>
               {palette.timeline.map((step, stepIndex) => (
                 <View key={step.title} style={styles.timelineRow}>
@@ -407,11 +499,11 @@ export default function OnboardingScreen() {
             contentContainerStyle={[styles.finalSlideScrollContent, { paddingBottom: footerReservedSpace }]}>
             <View style={[styles.card, styles.finalCard, { backgroundColor: surface, minHeight: slideMinHeight }]}>
               <Image source={require('../shield-removebg-preview.png')} style={styles.headerImage} resizeMode="contain" />
-              <ThemedText style={[styles.title, styles.finalTitle, { color: primary }]}>{palette.slides[3].title}</ThemedText>
+              <ThemedText style={[styles.title, styles.finalTitle, { color: primary }]}>{palette.slides[4].title}</ThemedText>
               <LinearGradient colors={['#CFF6F1', '#D6EAFF']} style={styles.finalShieldGlow}>
                 <Image source={require('../shield-removebg-preview.png')} style={styles.finalShieldImage} resizeMode="contain" />
               </LinearGradient>
-              <ThemedText style={[styles.body, styles.finalBody, { color: text }]}>{palette.slides[3].body}</ThemedText>
+              <ThemedText style={[styles.body, styles.finalBody, { color: text }]}>{palette.slides[4].body}</ThemedText>
             </View>
           </ScrollView>
         </View>
@@ -419,7 +511,7 @@ export default function OnboardingScreen() {
 
       <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom + 14, 24) }]}>
         <View style={styles.dotsRow}>
-          {[0, 1, 2, 3].map((dotIndex) => (
+          {Array.from({ length: palette.slides.length }, (_, dotIndex) => (
             <View
               key={dotIndex}
               style={[
@@ -433,7 +525,7 @@ export default function OnboardingScreen() {
           ))}
         </View>
 
-        {index < 3 ? (
+        {index < lastIndex ? (
           <Pressable onPress={() => void goNext()} style={styles.actionWrap}>
             <LinearGradient colors={['#9AF2DE', '#6DE8C3']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.primaryButton}>
               <ThemedText style={styles.primaryButtonText}>{palette.slides[index].cta}</ThemedText>
@@ -506,6 +598,44 @@ const styles = StyleSheet.create({
     fontSize: 17,
     lineHeight: 26,
     textAlign: 'center',
+  },
+  roleTitle: {
+    fontSize: 34,
+    lineHeight: 40,
+    marginBottom: 8,
+  },
+  roleIntro: {
+    marginBottom: 14,
+  },
+  roleCardsWrap: {
+    gap: 12,
+  },
+  roleCard: {
+    borderWidth: 2,
+    borderColor: '#C9E8F5',
+    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    backgroundColor: '#F9FDFF',
+  },
+  roleCardHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 6,
+  },
+  roleCardImage: {
+    width: 28,
+    height: 28,
+  },
+  roleCardTitle: {
+    fontSize: 24,
+    lineHeight: 28,
+    fontWeight: '800',
+  },
+  roleCardDesc: {
+    fontSize: 16,
+    lineHeight: 21,
   },
   levelsWrap: {
     gap: 14,
