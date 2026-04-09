@@ -373,7 +373,7 @@ export default function OnboardingScreen() {
       }).start(() => resolve());
     });
     await setOnboardingSeen(true);
-    router.replace({ pathname: '/subscription', params: { fromOnboarding: '1', next: target } } as any);
+    router.replace({ pathname: target, params: { fromOnboarding: '1' } } as any);
   };
 
   const goNext = async () => {

@@ -63,22 +63,6 @@ function PersistentBottomNav() {
   );
 }
 
-function SubscriptionGate() {
-  const pathname = usePathname();
-  const { loading, token, subscriptionPlan } = useAuth();
-
-  useEffect(() => {
-    if (loading) return;
-    if (!token) return;
-    if (subscriptionPlan) return;
-    if (!pathname) return;
-    if (pathname === '/subscription' || pathname === '/login' || pathname === '/register' || pathname === '/onboarding') return;
-    router.replace('/subscription' as any);
-  }, [loading, token, subscriptionPlan, pathname]);
-
-  return null;
-}
-
 export default function RootLayout() {
   const pathname = usePathname();
   const handledPushKeysRef = useRef<Set<string>>(new Set());
@@ -155,7 +139,6 @@ export default function RootLayout() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <SubscriptionGate />
         <View style={{ flex: 1 }}>
           <View style={{ flex: 1 }}>
             <Stack

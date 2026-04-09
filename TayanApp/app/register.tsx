@@ -38,6 +38,11 @@ const COPY = {
     role: 'Кто вы?',
     roleUser: 'Пользователь',
     roleVolunteer: 'Волонтёр',
+    plan: 'Подписка',
+    planIndividual: 'Индивидуальная',
+    planIndividualDesc: 'Для одного пользователя',
+    planFamily: 'Семейная',
+    planFamilyDesc: 'Для семьи + близкий контакт',
     password: 'Пароль',
     passwordPh: 'Введите пароль',
     register: 'Зарегистрироваться',
@@ -66,6 +71,11 @@ const COPY = {
     role: 'Who are you?',
     roleUser: 'User',
     roleVolunteer: 'Volunteer',
+    plan: 'Subscription',
+    planIndividual: 'Individual',
+    planIndividualDesc: 'For one person',
+    planFamily: 'Family',
+    planFamilyDesc: 'For family + emergency contact',
     password: 'Password',
     passwordPh: 'Enter password',
     register: 'Sign up',
@@ -94,6 +104,11 @@ const COPY = {
     role: 'Сиз кимсиз?',
     roleUser: 'Колдонуучу',
     roleVolunteer: 'Ыктыярчы',
+    plan: 'Жазылуу',
+    planIndividual: 'Жеке',
+    planIndividualDesc: 'Бир колдонуучу үчүн',
+    planFamily: 'Үй-бүлөлүк',
+    planFamilyDesc: 'Үй-бүлө + жакын байланыш',
     password: 'Сыр сөз',
     passwordPh: 'Сыр сөздү жазыңыз',
     register: 'Катталуу',
@@ -125,7 +140,7 @@ export default function RegisterScreen() {
   const headerTitleColor = '#FFFFFF';
   const muted = useThemeColor({ light: '#666', dark: '#C3CCDA' }, 'tabIconDefault');
 
-  const { register, lang } = useAuth();
+  const { register, lang, setSubscriptionPlan } = useAuth();
   const copy = COPY[(lang as keyof typeof COPY) || 'ru'] ?? COPY.ru;
 
   const isCompact = width <= 480;
@@ -143,6 +158,7 @@ export default function RegisterScreen() {
   const [chronicConditions, setChronicConditions] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<UserRole>('user');
+  const [plan, setPlan] = useState<'individual' | 'family'>('individual');
   const [busy, setBusy] = useState(false);
   const [focused, setFocused] = useState<'name' | 'email' | 'phone' | 'allergies' | 'chronic' | 'password' | null>(null);
 
@@ -193,6 +209,7 @@ export default function RegisterScreen() {
 
     setBusy(true);
     try {
+      await setSubscriptionPlan(plan);
       await register({
         name: nameTrimmed,
         email: emailTrimmed,
@@ -331,6 +348,26 @@ export default function RegisterScreen() {
           </View>
 
           <View style={styles.inputGroup}>
+            <ThemedText style={[styles.inputLabel, { color: titleColor }]}>{copy.plan}</ThemedText>
+            <View style={styles.roleRow}>
+              <Pressable
+                onPress={() => setPlan('individual')}
+                style={[styles.planBtn, { borderColor: plan === 'individual' ? primary : border, backgroundColor: surface }]}
+              >
+                <ThemedText style={[styles.roleText, { color: plan === 'individual' ? titleColor : muted }]}>{copy.planIndividual}</ThemedText>
+                <ThemedText style={[styles.planHint, { color: muted }]}>{copy.planIndividualDesc}</ThemedText>
+              </Pressable>
+              <Pressable
+                onPress={() => setPlan('family')}
+                style={[styles.planBtn, { borderColor: plan === 'family' ? primary : border, backgroundColor: surface }]}
+              >
+                <ThemedText style={[styles.roleText, { color: plan === 'family' ? titleColor : muted }]}>{copy.planFamily}</ThemedText>
+                <ThemedText style={[styles.planHint, { color: muted }]}>{copy.planFamilyDesc}</ThemedText>
+              </Pressable>
+            </View>
+          </View>
+
+          <View style={styles.inputGroup}>
             <ThemedText style={[styles.inputLabel, { color: titleColor }]}>{copy.password}</ThemedText>
             <TextInput
               value={password}
@@ -417,6 +454,18 @@ const styles = StyleSheet.create({
   roleText: {
     fontWeight: '600',
     fontSize: 14,
+  },
+  planBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderRadius: 12,
+    borderWidth: 2,
+    gap: 4,
+  },
+  planHint: {
+    fontSize: 12,
+    lineHeight: 16,
   },
   btn: {
     width: '100%',
