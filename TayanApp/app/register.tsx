@@ -39,10 +39,11 @@ const COPY = {
     roleUser: 'Пользователь',
     roleVolunteer: 'Волонтёр',
     plan: 'Подписка',
+    planTrial: 'Первые 6 месяцев пробного пользования бесплатно',
     planIndividual: 'Индивидуальная',
     planIndividualDesc: 'Для одного пользователя',
     planFamily: 'Семейная',
-    planFamilyDesc: 'Для семьи + близкий контакт',
+    planFamilyDesc: 'Для семьи',
     password: 'Пароль',
     passwordPh: 'Введите пароль',
     register: 'Зарегистрироваться',
@@ -72,10 +73,11 @@ const COPY = {
     roleUser: 'User',
     roleVolunteer: 'Volunteer',
     plan: 'Subscription',
+    planTrial: 'First 6 months of trial are free',
     planIndividual: 'Individual',
     planIndividualDesc: 'For one person',
     planFamily: 'Family',
-    planFamilyDesc: 'For family + emergency contact',
+    planFamilyDesc: 'For family',
     password: 'Password',
     passwordPh: 'Enter password',
     register: 'Sign up',
@@ -105,10 +107,11 @@ const COPY = {
     roleUser: 'Колдонуучу',
     roleVolunteer: 'Ыктыярчы',
     plan: 'Жазылуу',
+    planTrial: 'Алгачкы 6 айлык сыноо мөөнөтү акысыз',
     planIndividual: 'Жеке',
     planIndividualDesc: 'Бир колдонуучу үчүн',
     planFamily: 'Үй-бүлөлүк',
-    planFamilyDesc: 'Үй-бүлө + жакын байланыш',
+    planFamilyDesc: 'Үй-бүлө үчүн',
     password: 'Сыр сөз',
     passwordPh: 'Сыр сөздү жазыңыз',
     register: 'Катталуу',
@@ -349,6 +352,7 @@ export default function RegisterScreen() {
 
           <View style={styles.inputGroup}>
             <ThemedText style={[styles.inputLabel, { color: titleColor }]}>{copy.plan}</ThemedText>
+            <ThemedText style={[styles.planTrialText, { color: muted }]}>{copy.planTrial}</ThemedText>
             <View style={styles.roleRow}>
               <Pressable
                 onPress={() => setPlan('individual')}
@@ -466,6 +470,11 @@ const styles = StyleSheet.create({
   planHint: {
     fontSize: 12,
     lineHeight: 16,
+  },
+  planTrialText: {
+    marginBottom: 8,
+    fontSize: 13,
+    fontWeight: '600',
   },
   btn: {
     width: '100%',
