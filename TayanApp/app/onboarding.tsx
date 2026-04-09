@@ -2,6 +2,8 @@
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
+  Animated,
+  Easing,
   Image,
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -345,7 +347,9 @@ export default function OnboardingScreen() {
   const lastIndex = palette.slides.length - 1;
 
   const scrollRef = useRef<ScrollView | null>(null);
+  const fadeAnim = useRef(new Animated.Value(1)).current;
   const [index, setIndex] = useState(0);
+  const [completing, setCompleting] = useState(false);
 
   const slideStyle = useMemo(
     () => ({
@@ -358,6 +362,16 @@ export default function OnboardingScreen() {
   );
 
   const complete = async (target: '/login' | '/register' = '/register') => {
+    if (completing) return;
+    setCompleting(true);
+    await new Promise<void>((resolve) => {
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 260,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }).start(() => resolve());
+    });
     await setOnboardingSeen(true);
     router.replace({ pathname: '/subscription', params: { fromOnboarding: '1', next: target } } as any);
   };
@@ -391,10 +405,12 @@ export default function OnboardingScreen() {
   const slideMinHeight = Math.max(height - insets.top - footerReservedSpace, 460);
 
   return (
-    <ThemedView style={styles.container}>
+    <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
+      <ThemedView style={styles.container}>
       {index < lastIndex ? (
         <Pressable
           onPress={() => void complete('/login')}
+          disabled={completing}
           style={[styles.skipButton, { top: Math.max(insets.top + 6, 16) }]}>
           <ThemedText style={[styles.skipText, { color: muted }]}>{palette.skip}</ThemedText>
         </Pressable>
@@ -525,20 +541,21 @@ export default function OnboardingScreen() {
         </View>
 
         {index < lastIndex ? (
-          <Pressable onPress={() => void goNext()} style={styles.actionWrap}>
+          <Pressable onPress={() => void goNext()} style={styles.actionWrap} disabled={completing}>
             <LinearGradient colors={['#9AF2DE', '#6DE8C3']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.primaryButton}>
               <ThemedText style={styles.primaryButtonText}>{palette.slides[index].cta}</ThemedText>
             </LinearGradient>
           </Pressable>
         ) : (
-          <Pressable onPress={() => void complete()} style={styles.actionWrap}>
+          <Pressable onPress={() => void complete()} style={styles.actionWrap} disabled={completing}>
             <LinearGradient colors={['#13E0C7', '#12C69F']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.primaryButton}>
               <ThemedText style={styles.primaryButtonText}>{palette.continue}</ThemedText>
             </LinearGradient>
           </Pressable>
         )}
       </View>
-    </ThemedView>
+      </ThemedView>
+    </Animated.View>
   );
 }
 
