@@ -1,4 +1,4 @@
-import { Alert, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Alert, Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -9,19 +9,13 @@ import { ThemedView } from '@/components/themed-view';
 import { Gradients } from '@/constants/gradients';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { api } from '@/lib/api';
 import { t } from '@/lib/i18n';
-import { getGeoOrNull } from '@/lib/location';
-import { setLastRequestId } from '@/lib/storage';
 import { useAuth } from '@/providers/auth-provider';
 import { API_BASE } from '@/lib/config';
 import { AppIcon, type AppIconName } from '@/components/app-icon';
 
-const DEFAULT_LAT = 42.8746;
-const DEFAULT_LNG = 74.5698;
-
 export default function HomeScreen() {
-	const { me, token, lang } = useAuth();
+	const { me, lang } = useAuth();
 	const insets = useSafeAreaInsets();
 	const primary = useThemeColor({}, 'primary');
 	const surface = useThemeColor({}, 'surface');
@@ -42,68 +36,12 @@ export default function HomeScreen() {
 
 	const isUser = me?.role === 'user';
 
-	async function createSosRequest() {
+	async function callEmergency103() {
 		try {
-			const geo = await getGeoOrNull();
-			const lat = geo?.lat ?? DEFAULT_LAT;
-			const lng = geo?.lng ?? DEFAULT_LNG;
-
-			const created = await api<{ id: number; status: string }>('/requests', {
-				method: 'POST',
-				token,
-				lang,
-				body: {
-					kind: 'sos',
-					lat,
-					lng,
-					address: '',
-					severity: 'critical',
-				},
-			});
-
-			const id = created?.id;
-			if (id) {
-				await setLastRequestId(id);
-				router.push({ pathname: '/map', params: { id: String(id) } });
-			} else {
-				Alert.alert(t(lang, 'common.done'), t(lang, 'home.sos_sent'));
-			}
-		} catch (e: any) {
-			Alert.alert(t(lang, 'home.sos_error_title'), e?.message ? String(e.message) : t(lang, 'home.sos_error_fallback'));
+			await Linking.openURL('tel:103');
+		} catch {
+			Alert.alert(t(lang, 'common.phone_unavailable_title'), t(lang, 'common.phone_unavailable_text'));
 		}
-	}
-
-	async function sendSos() {
-		if (!token) {
-			if (typeof window !== 'undefined' && Platform.OS === 'web') {
-				const goProfile = window.confirm(`${t(lang, 'home.need_sign_in')}\n\n${t(lang, 'home.sign_in_first')}`);
-				if (goProfile) router.push('/profile');
-				return;
-			}
-			Alert.alert(t(lang, 'home.need_sign_in'), t(lang, 'home.sign_in_first'), [
-				{ text: t(lang, 'common.cancel'), style: 'cancel' },
-				{ text: t(lang, 'common.open_profile'), onPress: () => router.push('/profile') },
-			]);
-			return;
-		}
-
-		if (typeof window !== 'undefined' && Platform.OS === 'web') {
-			const confirmed = window.confirm(`${t(lang, 'home.sos_title')}\n\n${t(lang, 'home.sos_confirm')}`);
-			if (!confirmed) return;
-			await createSosRequest();
-			return;
-		}
-
-		Alert.alert(t(lang, 'home.sos_title'), t(lang, 'home.sos_confirm'), [
-			{ text: t(lang, 'common.cancel'), style: 'cancel' },
-			{
-				text: t(lang, 'common.send'),
-				style: 'destructive',
-				onPress: async () => {
-					await createSosRequest();
-				},
-			},
-		]);
 	}
 
 	return (
@@ -128,7 +66,7 @@ export default function HomeScreen() {
 					</Pressable>
 				</View>
 
-				<Pressable onPress={sendSos} style={styles.sosWrap}>
+				<Pressable onPress={callEmergency103} style={styles.sosWrap}>
 					<LinearGradient colors={[...Gradients.sos]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.sosBtn}>
 						<ThemedText style={[styles.sosText, { color: '#fff' }]}>{t(lang, 'home.sos_button')}</ThemedText>
 					</LinearGradient>
