@@ -10,6 +10,7 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { api } from '@/lib/api';
 import { t } from '@/lib/i18n';
 import { useAuth } from '@/providers/auth-provider';
+import { AppIcon } from '@/components/app-icon';
 
 type ReviewsStats = {
   avg_rating: number;
@@ -212,14 +213,18 @@ export default function ReviewsScreen() {
                   <View style={styles.reviewTopRow}>
                     <View style={styles.userRow}>
                       <View style={[styles.userAvatar, { backgroundColor: 'rgba(44,45,95,0.1)' }]}>
-                        <Text style={styles.userAvatarText}>👤</Text>
+                        <AppIcon name="profile" size={16} color={titleColor} />
                       </View>
                       <View>
                         <ThemedText style={[styles.userName, { color: titleColor }]}>{userName}</ThemedText>
                         <ThemedText style={styles.reviewedAt}>{fmtTimeIso(x.reviewed_at)}</ThemedText>
                       </View>
                     </View>
-                    <Text style={styles.ratingEmoji}>{'⭐'.repeat(Math.max(0, Math.min(5, x.rating || 0)))}</Text>
+                    <View style={styles.ratingEmoji}>
+                      {Array.from({ length: Math.max(0, Math.min(5, x.rating || 0)) }).map((_, idx) => (
+                        <AppIcon key={String(idx)} name="star" size={14} color={primary} />
+                      ))}
+                    </View>
                   </View>
 
                   {x.review_text ? (
@@ -319,7 +324,7 @@ const styles = StyleSheet.create({
   userAvatarText: { fontSize: 20, lineHeight: 24 },
   userName: { fontWeight: '600' },
   reviewedAt: { color: '#999', fontSize: 12, marginTop: 2 },
-  ratingEmoji: { fontSize: 18 },
+  ratingEmoji: { flexDirection: 'row', alignItems: 'center', gap: 2 },
   reviewText: { fontSize: 14, marginBottom: 12, lineHeight: 20 },
 
   volBox: {

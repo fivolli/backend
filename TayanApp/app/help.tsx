@@ -7,6 +7,7 @@ import { ThemedView } from '@/components/themed-view';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { t } from '@/lib/i18n';
 import { useAuth } from '@/providers/auth-provider';
+import { AppIcon, type AppIconName } from '@/components/app-icon';
 
 const FAQ: { qKey: string; aKey: string }[] = [
 	{ qKey: 'help.faq.q1', aKey: 'help.faq.a1' },
@@ -41,7 +42,10 @@ export default function HelpScreen() {
 				<ThemedText style={[styles.sectionTitle, { color: titleColor }]}>{t(lang, 'help.faq')}</ThemedText>
 				{FAQ.map((x, idx) => (
 					<View key={idx} style={[styles.card, { backgroundColor: surface, borderColor: border }]}>
-						<ThemedText style={[styles.q, { color: titleColor }]}>❓ {t(lang, x.qKey)}</ThemedText>
+						<View style={styles.faqRow}>
+							<AppIcon name="help" size={14} color={titleColor} />
+							<ThemedText style={[styles.q, { color: titleColor }]}>{t(lang, x.qKey)}</ThemedText>
+						</View>
 						<ThemedText style={[styles.a, { color: muted }]}>{t(lang, x.aKey)}</ThemedText>
 					</View>
 				))}
@@ -54,7 +58,7 @@ export default function HelpScreen() {
 						mutedBg={mutedBg}
 						titleColor={titleColor}
 						subtitleColor={text}
-						icon="📞"
+						icon="phone"
 						title={t(lang, 'help.phone')}
 						subtitle="+996 555 000 000"
 						onPress={() => Linking.openURL('tel:+996555000000')}
@@ -65,7 +69,7 @@ export default function HelpScreen() {
 						mutedBg={mutedBg}
 						titleColor={titleColor}
 						subtitleColor={text}
-						icon="📧"
+						icon="email"
 						title={t(lang, 'help.email')}
 						subtitle="fiptayan@gmail.com"
 						onPress={() => Linking.openURL('mailto:fiptayan@gmail.com')}
@@ -76,7 +80,7 @@ export default function HelpScreen() {
 						mutedBg={mutedBg}
 						titleColor={titleColor}
 						subtitleColor={text}
-						icon="🌐"
+						icon="globe"
 						title={t(lang, 'help.website')}
 						subtitle="www.tayan.kg"
 						onPress={() => Linking.openURL('https://tayantsi.netlify.app/')}
@@ -93,7 +97,7 @@ function ContactItem(props: {
 	mutedBg: string;
 	titleColor: string;
 	subtitleColor: string;
-	icon: string;
+	icon: AppIconName;
 	title: string;
 	subtitle: string;
 	onPress: () => void;
@@ -101,7 +105,7 @@ function ContactItem(props: {
 	return (
 		<Pressable onPress={props.onPress} style={[styles.row, { backgroundColor: props.surface, borderColor: props.border }]}>
 			<View style={[styles.iconBox, { backgroundColor: props.mutedBg }]}>
-				<ThemedText style={styles.iconText}>{props.icon}</ThemedText>
+				<AppIcon name={props.icon} size={20} color={props.titleColor} />
 			</View>
 			<View style={{ flex: 1 }}>
 				<ThemedText style={[styles.rowTitle, { color: props.titleColor }]}>{props.title}</ThemedText>
@@ -135,6 +139,7 @@ const styles = StyleSheet.create({
 	content: { padding: 24 },
 	sectionTitle: { fontSize: 16, fontWeight: '800', marginBottom: 10 },
 	card: { borderWidth: 1, borderRadius: 16, padding: 14, marginBottom: 12 },
+	faqRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 },
 	q: { fontWeight: '800', marginBottom: 6 },
 	a: { lineHeight: 20 },
 

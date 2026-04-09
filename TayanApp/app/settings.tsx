@@ -8,6 +8,7 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { t } from '@/lib/i18n';
 import { useAuth } from '@/providers/auth-provider';
 import { useAppTheme } from '@/providers/theme-provider';
+import { AppIcon, type AppIconName } from '@/components/app-icon';
 
 function langLabel(code: 'ru' | 'en' | 'kg') {
   if (code === 'ru') return 'Русский';
@@ -90,7 +91,7 @@ export default function SettingsScreen() {
             mutedBg={mutedBg}
             textColor={text}
             primary={titleColor}
-            icon="🔔"
+            icon="notification"
             title={t(lang, 'settings.notifications')}
             subtitle={t(lang, 'settings.notifications_sub')}
             onPress={() => router.push('/notifications')}
@@ -101,7 +102,7 @@ export default function SettingsScreen() {
             mutedBg={mutedBg}
             textColor={text}
             primary={titleColor}
-            icon="🌐"
+            icon="globe"
             title={t(lang, 'settings.language')}
             subtitle={langLabel(lang)}
             onPress={() => router.push('/language')}
@@ -112,7 +113,7 @@ export default function SettingsScreen() {
             mutedBg={mutedBg}
             textColor={text}
             primary={titleColor}
-            icon="🔒"
+            icon="lock"
             title={t(lang, 'settings.privacy')}
             subtitle={t(lang, 'settings.privacy_sub')}
             onPress={() => router.push('/privacy')}
@@ -123,7 +124,7 @@ export default function SettingsScreen() {
             mutedBg={mutedBg}
             textColor={text}
             primary={titleColor}
-            icon="❓"
+            icon="help"
             title={t(lang, 'settings.help')}
             subtitle={t(lang, 'settings.help_sub')}
             onPress={() => router.push('/help')}
@@ -175,7 +176,7 @@ function ThemeItem(props: {
   return (
     <View style={[styles.functionItem, { backgroundColor: props.surface }]}>
       <View style={[styles.functionIconBox, { backgroundColor: props.mutedBg }]}>
-        <ThemedText style={styles.functionIconText}>🌙</ThemedText>
+        <AppIcon name="clock" size={22} color={props.primary} />
       </View>
 
       <View style={{ flex: 1 }}>
@@ -204,7 +205,7 @@ function SettingsItem(props: {
   mutedBg: string;
   textColor: string;
   primary: string;
-  icon: string;
+  icon: AppIconName;
   title: string;
   subtitle: string;
   onPress: () => void;
@@ -212,7 +213,7 @@ function SettingsItem(props: {
   return (
     <Pressable onPress={props.onPress} style={[styles.functionItem, { backgroundColor: props.surface }]}>
       <View style={[styles.functionIconBox, { backgroundColor: props.mutedBg }]}>
-        <ThemedText style={styles.functionIconText}>{props.icon}</ThemedText>
+        <AppIcon name={props.icon} size={22} color={props.primary} />
       </View>
       <View style={{ flex: 1 }}>
         <ThemedText style={[styles.functionTitle, { color: props.primary }]}>{props.title}</ThemedText>

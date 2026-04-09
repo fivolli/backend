@@ -13,6 +13,7 @@ import { loadNearbyHospitals, type HospitalItem } from '@/lib/hospitals';
 import { t } from '@/lib/i18n';
 import { open2GisPoint, open2GisRoute } from '@/lib/two-gis';
 import { useAuth } from '@/providers/auth-provider';
+import { AppIcon } from '@/components/app-icon';
 
 const DEFAULT_LAT = 42.8746;
 const DEFAULT_LNG = 74.5698;
@@ -258,17 +259,23 @@ export default function HospitalsMapScreen() {
             { backgroundColor: bg, borderColor: isSelected ? primary : border },
           ]}
         >
-          <ThemedText style={[styles.hTitle, { color: titleColor }]}>🏥 {h.name}</ThemedText>
+          <ThemedText style={[styles.hTitle, { color: titleColor }]}>{h.name}</ThemedText>
           {h.address ? (
-            <ThemedText style={styles.hAddr}>📍 {h.address}</ThemedText>
+            <View style={styles.hMetaRow}>
+              <AppIcon name="mapPin" size={14} color={titleColor} />
+              <ThemedText style={styles.hAddr}>{h.address}</ThemedText>
+            </View>
           ) : null}
-          <ThemedText style={styles.hDist}>📏 {t(lang, 'hospitals_map.distance_km', { km: String(h.distance_km) })}</ThemedText>
+          <View style={styles.hMetaRow}>
+            <AppIcon name="map" size={14} color={titleColor} />
+            <ThemedText style={styles.hDist}>{t(lang, 'hospitals_map.distance_km', { km: String(h.distance_km) })}</ThemedText>
+          </View>
           <View style={styles.hActions}>
             <Pressable onPress={() => openRoute(h)} style={[styles.btnOutline, { borderColor: primary }]}>
-              <ThemedText style={[styles.btnOutlineText, { color: titleColor }]}>🧭 {t(lang, 'common.route')}</ThemedText>
+              <ThemedText style={[styles.btnOutlineText, { color: titleColor }]}>{t(lang, 'common.route')}</ThemedText>
             </Pressable>
             <Pressable onPress={() => focusOnMap(h)} style={[styles.btnPrimary, { backgroundColor: primary }]}>
-              <ThemedText style={styles.btnPrimaryText}>📌 {t(lang, 'hospitals_map.on_map')}</ThemedText>
+              <ThemedText style={styles.btnPrimaryText}>{t(lang, 'hospitals_map.on_map')}</ThemedText>
             </Pressable>
           </View>
         </View>
@@ -330,6 +337,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   hTitle: { fontWeight: '700' },
+  hMetaRow: { marginTop: 4, flexDirection: 'row', alignItems: 'center', gap: 6 },
   hAddr: { marginTop: 4, fontSize: 14, opacity: 0.85 },
   hDist: { marginTop: 6, fontSize: 13, opacity: 0.7 },
   hActions: { flexDirection: 'row', gap: 8, marginTop: 10 },

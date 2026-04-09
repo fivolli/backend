@@ -9,6 +9,7 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { api } from '@/lib/api';
 import { t } from '@/lib/i18n';
 import { useAuth } from '@/providers/auth-provider';
+import { AppIcon, type AppIconName } from '@/components/app-icon';
 
 type MyRequestItem = {
   id: number;
@@ -32,11 +33,11 @@ function kindLabel(lang: 'ru' | 'en' | 'kg', kind: string) {
   return kind;
 }
 
-function itemIcon(kind: string, status: string) {
-  if (status === 'completed') return '✅';
-  if (status === 'canceled') return '❌';
-  if (kind === 'sos') return '🚨';
-  return '🩹';
+function itemIcon(kind: string, status: string): AppIconName {
+  if (status === 'completed') return 'check';
+  if (status === 'canceled') return 'bullhorn';
+  if (kind === 'sos') return 'sos';
+  return 'firstAid';
 }
 
 function fmtTimeIso(iso: string) {
@@ -120,7 +121,7 @@ export default function MyRequestsScreen() {
                   ]}
                 >
                   <View style={[styles.functionIconBox, { backgroundColor: bg }]}>
-                    <ThemedText style={styles.functionIconText}>{itemIcon(x.kind, x.status)}</ThemedText>
+                    <AppIcon name={itemIcon(x.kind, x.status)} size={22} color={titleColor} />
                   </View>
                   <View style={{ flex: 1 }}>
                     <ThemedText style={[styles.rowTitle, { color: titleColor }]}>

@@ -12,6 +12,7 @@ import { t, type AppLang } from '@/lib/i18n';
 import { getGeoOrNull } from '@/lib/location';
 import { clearLastRequestId, clearReviewLater, getLastRequestId, getReviewLater, setLastRequestId, setReviewLater } from '@/lib/storage';
 import { useAuth } from '@/providers/auth-provider';
+import { AppIcon, type AppIconName } from '@/components/app-icon';
 
 type TrackDetail = {
 	id: number;
@@ -103,7 +104,7 @@ type VolunteerRequestDetail = {
 type GeoPoint = { lat: number; lng: number };
 
 function kindIcon(kind: string) {
-	return kind === 'sos' ? '🚨' : '🩹';
+	return kind === 'sos' ? 'sos' : 'firstAid';
 }
 
 function requestKindTitle(lang: AppLang, kind: string, severity?: string | null) {
@@ -998,19 +999,19 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 									return (
 									<View key={String(x.id)} style={[styles.openItem, { backgroundColor: surface, borderColor: border }]}>
 										<View style={[styles.openIconBox, { backgroundColor: bg }]}>
-											<ThemedText style={styles.openIconText}>{kindIcon(x.kind)}</ThemedText>
+											<AppIcon name={kindIcon(x.kind)} size={20} color={titleColor} />
 										</View>
 										<Pressable
 											onPress={() => focusOpenRequestOnMap(x)}
 											style={({ pressed }) => [{ flex: 1, opacity: pressed ? 0.95 : 1 }]}
 										>
 											<ThemedText style={[styles.openTitle, { color: titleColor }]}>{requestKindTitle(lang, x.kind, x.severity)}</ThemedText>
-											{x.user_name ? <ThemedText style={styles.openSub}>👤 {x.user_name}</ThemedText> : null}
-											{age ? <ThemedText style={styles.openSub}>🕒 {age}</ThemedText> : null}
-											{d ? <ThemedText style={styles.openSub}>📏 {d}</ThemedText> : null}
-											{x.address ? <ThemedText style={styles.openSub}>📍 {x.address}</ThemedText> : null}
-											{x.symptoms ? <ThemedText style={styles.openSub} numberOfLines={2}>🩹 {x.symptoms}</ThemedText> : null}
-									{x.comments ? <ThemedText style={styles.openSub} numberOfLines={2}>💬 {x.comments}</ThemedText> : null}
+													{x.user_name ? <ThemedText style={styles.openSub}>{x.user_name}</ThemedText> : null}
+													{age ? <ThemedText style={styles.openSub}>{age}</ThemedText> : null}
+													{d ? <ThemedText style={styles.openSub}>{d}</ThemedText> : null}
+													{x.address ? <ThemedText style={styles.openSub}>{x.address}</ThemedText> : null}
+													{x.symptoms ? <ThemedText style={styles.openSub} numberOfLines={2}>{x.symptoms}</ThemedText> : null}
+											{x.comments ? <ThemedText style={styles.openSub} numberOfLines={2}>{x.comments}</ThemedText> : null}
 										</Pressable>
 										<Pressable
 											onPress={() => acceptRequest(x.id)}
@@ -1079,11 +1080,11 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 									{nearbyVolunteers.map((v) => (
 										<View key={String(v.id)} style={[styles.openItem, { backgroundColor: surface, borderColor: border }]}>
 											<View style={[styles.openIconBox, { backgroundColor: bg }]}>
-												<ThemedText style={styles.openIconText}>🧑‍⚕️</ThemedText>
+													<AppIcon name="nurse" size={20} color={titleColor} />
 											</View>
 											<View style={{ flex: 1 }}>
 														<ThemedText style={[styles.openTitle, { color: titleColor }]}>{v.name}</ThemedText>
-														<ThemedText style={styles.openSub}>📏 {t(lang, 'common.distance_km', { km: v.distance_km })}</ThemedText>
+														<ThemedText style={styles.openSub}>{t(lang, 'common.distance_km', { km: v.distance_km })}</ThemedText>
 												<ThemedText style={styles.openSub}>{t(lang, 'map.online_ago', { minutes: v.online_minutes_ago })}</ThemedText>
 											</View>
 										</View>
@@ -1145,13 +1146,13 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 
 						<View style={[styles.card, { backgroundColor: surface, borderColor: border }]}>
 							<ThemedText style={[styles.rowTitle, { color: titleColor }]}>{requestKindTitle(lang, volDetail.kind, volDetail.severity)}</ThemedText>
-							{newReqDistance ? <ThemedText style={[styles.rowValue, { color: text }]}>📏 {newReqDistance}</ThemedText> : null}
+							{newReqDistance ? <ThemedText style={[styles.rowValue, { color: text }]}>{newReqDistance}</ThemedText> : null}
 							{!volDetail.address && newReqPoint ? (
-								<ThemedText style={[styles.rowValue, { color: text }]}>📍 {newReqPoint.latitude.toFixed(6)}, {newReqPoint.longitude.toFixed(6)}</ThemedText>
+								<ThemedText style={[styles.rowValue, { color: text }]}>{newReqPoint.latitude.toFixed(6)}, {newReqPoint.longitude.toFixed(6)}</ThemedText>
 							) : null}
-							{volDetail.address ? <ThemedText style={[styles.rowValue, { color: text }]}>📍 {volDetail.address}</ThemedText> : null}
-							{volDetail.symptoms ? <ThemedText style={[styles.rowValue, { color: text }]}>🩹 {volDetail.symptoms}</ThemedText> : null}
-							{volDetail.comments ? <ThemedText style={[styles.rowValue, { color: text }]}>💬 {volDetail.comments}</ThemedText> : null}
+							{volDetail.address ? <ThemedText style={[styles.rowValue, { color: text }]}>{volDetail.address}</ThemedText> : null}
+							{volDetail.symptoms ? <ThemedText style={[styles.rowValue, { color: text }]}>{volDetail.symptoms}</ThemedText> : null}
+							{volDetail.comments ? <ThemedText style={[styles.rowValue, { color: text }]}>{volDetail.comments}</ThemedText> : null}
 
 							<Pressable
 								onPress={() => acceptRequest(requestId)}
@@ -1180,7 +1181,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 						{me?.role === 'user' && data.status === 'completed' && reviewOpen ? (
 							<View style={[styles.card, { backgroundColor: surface, borderColor: border }]}>
 								<ThemedText style={[styles.rowTitle, { color: titleColor }]}>{t(lang, 'map.review_title')}</ThemedText>
-								{volunteerName ? <ThemedText style={[styles.rowValue, { color: text }]}>🧑‍⚕️ {volunteerName}</ThemedText> : null}
+								{volunteerName ? <ThemedText style={[styles.rowValue, { color: text }]}>{volunteerName}</ThemedText> : null}
 
 								<View style={styles.starsRow}>
 									{[1, 2, 3, 4, 5].map((n) => (
@@ -1267,7 +1268,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 
 						<View style={[styles.card, { backgroundColor: surface, borderColor: border }]}>
 							<View style={styles.row}>
-								<ThemedText style={styles.rowIcon}>📌</ThemedText>
+								<AppIcon name="pasteTick" size={18} color={titleColor} />
 								<View style={{ flex: 1 }}>
 									<ThemedText style={[styles.rowTitle, { color: titleColor }]}>{t(lang, 'map.status')}</ThemedText>
 									<ThemedText style={[styles.rowValue, { color: text }]}>{t(lang, `request.status.${data.status}`)}</ThemedText>
@@ -1279,7 +1280,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 							) : null}
 							{data.address ? (
 								<View style={styles.row}>
-									<ThemedText style={styles.rowIcon}>📍</ThemedText>
+									<AppIcon name="mapPin" size={18} color={titleColor} />
 									<View style={{ flex: 1 }}>
 										<ThemedText style={[styles.rowTitle, { color: titleColor }]}>{t(lang, 'map.address')}</ThemedText>
 										<ThemedText style={[styles.rowValue, { color: text }]}>{data.address}</ThemedText>
@@ -1292,7 +1293,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 							) : null}
 							{data.symptoms ? (
 								<View style={styles.row}>
-									<ThemedText style={styles.rowIcon}>🩹</ThemedText>
+									<AppIcon name="firstAid" size={18} color={titleColor} />
 									<View style={{ flex: 1 }}>
 										<ThemedText style={[styles.rowTitle, { color: titleColor }]}>{t(lang, 'map.symptoms')}</ThemedText>
 										<ThemedText style={[styles.rowValue, { color: text }]}>{data.symptoms}</ThemedText>
@@ -1305,7 +1306,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 							) : null}
 							{data.comments ? (
 								<View style={styles.row}>
-									<ThemedText style={styles.rowIcon}>💬</ThemedText>
+									<AppIcon name="chat" size={18} color={titleColor} />
 									<View style={{ flex: 1 }}>
 										<ThemedText style={[styles.rowTitle, { color: titleColor }]}>{t(lang, 'map.comment')}</ThemedText>
 										<ThemedText style={[styles.rowValue, { color: text }]}>{data.comments}</ThemedText>
@@ -1317,8 +1318,8 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 						{me?.role === 'user' && data.accepted_by && (volunteerName || data.volunteer_phone) ? (
 							<View style={[styles.card, { backgroundColor: surface, borderColor: border }]}>
 								<ThemedText style={[styles.rowTitle, { color: titleColor }]}>{t(lang, 'common.volunteer')}</ThemedText>
-								{volunteerName ? <ThemedText style={[styles.rowValue, { color: text }]}>👤 {volunteerName}</ThemedText> : null}
-								{data.volunteer_phone ? <ThemedText style={[styles.rowValue, { color: text }]}>📞 {data.volunteer_phone}</ThemedText> : null}
+								{volunteerName ? <ThemedText style={[styles.rowValue, { color: text }]}>{volunteerName}</ThemedText> : null}
+								{data.volunteer_phone ? <ThemedText style={[styles.rowValue, { color: text }]}>{data.volunteer_phone}</ThemedText> : null}
 								{data.volunteer_phone ? (
 									<Pressable
 										onPress={async () => {
@@ -1330,7 +1331,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 										}}
 										style={({ pressed }) => [styles.callBtn, { backgroundColor: primary, opacity: pressed ? 0.9 : 1 }]}
 									>
-										<ThemedText style={styles.callBtnText}>📞 {t(lang, 'common.call')}</ThemedText>
+										<ThemedText style={styles.callBtnText}>{t(lang, 'common.call')}</ThemedText>
 									</Pressable>
 								) : null}
 								<Pressable
@@ -1347,7 +1348,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 								}
 									style={({ pressed }) => [styles.callBtn, { backgroundColor: primary, opacity: pressed ? 0.9 : 1 }]}
 								>
-									<ThemedText style={styles.callBtnText}>💬 {t(lang, 'common.chat')}</ThemedText>
+									<ThemedText style={styles.callBtnText}>{t(lang, 'common.chat')}</ThemedText>
 								</Pressable>
 							</View>
 						) : null}
@@ -1355,8 +1356,8 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 							{me?.role === 'volunteer' && (userName || userPhone) ? (
 								<View style={[styles.card, { backgroundColor: surface, borderColor: border }]}>
 									<ThemedText style={[styles.rowTitle, { color: titleColor }]}>{t(lang, 'map.user_card')}</ThemedText>
-									{userName ? <ThemedText style={[styles.rowValue, { color: text }]}>👤 {userName}</ThemedText> : null}
-									{userPhone ? <ThemedText style={[styles.rowValue, { color: text }]}>📞 {userPhone}</ThemedText> : null}
+									{userName ? <ThemedText style={[styles.rowValue, { color: text }]}>{userName}</ThemedText> : null}
+									{userPhone ? <ThemedText style={[styles.rowValue, { color: text }]}>{userPhone}</ThemedText> : null}
 									{userPhone ? (
 										<Pressable
 											onPress={async () => {
@@ -1385,7 +1386,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 									}
 									style={({ pressed }) => [styles.callBtn, { backgroundColor: primary, opacity: pressed ? 0.9 : 1 }]}
 								>
-									<ThemedText style={styles.callBtnText}>💬 {t(lang, 'common.chat')}</ThemedText>
+									<ThemedText style={styles.callBtnText}>{t(lang, 'common.chat')}</ThemedText>
 								</Pressable>
 								</View>
 							) : null}

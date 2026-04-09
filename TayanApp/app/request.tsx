@@ -75,7 +75,7 @@ function requestStatusLabel(lang: 'ru' | 'en' | 'kg', status?: string | null) {
 }
 
 function iconFor(kind: string) {
-	return kind === 'sos' ? '🚨' : '🩹';
+	return kind === 'sos' ? 'SOS' : '';
 }
 
 function computeReactionMinutes(createdAt?: string, acceptedAt?: string | null) {
@@ -348,15 +348,15 @@ export default function RequestScreen() {
 					<>
 						<View style={[styles.card, { backgroundColor: surface, borderColor: border }]}>
 							<ThemedText style={[styles.h3, { color: titleColor }]}>
-								{iconFor(data.kind)} {requestKindLabel(lang, data.kind)} • {requestStatusLabel(lang, data.status)}
+								{requestKindLabel(lang, data.kind)} • {requestStatusLabel(lang, data.status)}
 							</ThemedText>
 							<ThemedText style={mutedTextStyle}>{fmtTimeIso(data.created_at)}</ThemedText>
 
 							{!isVolunteer && (data.status === 'accepted' || data.status === 'in_progress' || data.status === 'completed') && (data.volunteer_name || data.volunteer_phone) ? (
 								<View style={[styles.alertBox, { backgroundColor: bg, borderColor: border }]}>
 									<ThemedText style={[styles.alertTitle, { color: titleColor }]}>{t(lang, 'request.volunteer_accepted')}</ThemedText>
-									{data.volunteer_name ? <ThemedText style={[styles.alertLine, { color: text }]}>👤 {data.volunteer_name}</ThemedText> : null}
-									{data.volunteer_phone ? <ThemedText style={[styles.alertLine, { color: text }]}>📞 {data.volunteer_phone}</ThemedText> : null}
+									{data.volunteer_name ? <ThemedText style={[styles.alertLine, { color: text }]}>{data.volunteer_name}</ThemedText> : null}
+									{data.volunteer_phone ? <ThemedText style={[styles.alertLine, { color: text }]}>{data.volunteer_phone}</ThemedText> : null}
 									{vRating ? (
 										<ThemedText style={[styles.alertSmall, { color: text }]}>
 											{t(lang, 'request.volunteer_rating_label')}{' '}
@@ -406,13 +406,13 @@ export default function RequestScreen() {
 									{data.user_phone ? (
 										<View style={[styles.alertBox, { backgroundColor: bg, borderColor: border }]}>
 											<ThemedText style={[styles.alertTitle, { color: titleColor }]}>{t(lang, 'request.user_contact')}</ThemedText>
-											{data.user_name ? <ThemedText style={[styles.alertLine, { color: text }]}>👤 {data.user_name}</ThemedText> : null}
-											<ThemedText style={[styles.alertLine, { color: text }]}>📞 {data.user_phone}</ThemedText>
+											{data.user_name ? <ThemedText style={[styles.alertLine, { color: text }]}>{data.user_name}</ThemedText> : null}
+											<ThemedText style={[styles.alertLine, { color: text }]}>{data.user_phone}</ThemedText>
 											<Pressable
 												onPress={() => void callPhone(data.user_phone)}
 												style={({ pressed }) => [styles.btnPrimary, { backgroundColor: primary }, pressed ? { opacity: 0.9 } : null]}
 											>
-													<ThemedText style={styles.btnPrimaryText}>📞 {t(lang, 'common.call')}</ThemedText>
+													<ThemedText style={styles.btnPrimaryText}>{t(lang, 'common.call')}</ThemedText>
 											</Pressable>
 											<Pressable
 												onPress={() =>
@@ -428,7 +428,7 @@ export default function RequestScreen() {
 												}
 												style={({ pressed }) => [styles.btnPrimary, { backgroundColor: primary }, pressed ? { opacity: 0.9 } : null]}
 											>
-												<ThemedText style={styles.btnPrimaryText}>💬 {t(lang, 'common.chat')}</ThemedText>
+												<ThemedText style={styles.btnPrimaryText}>{t(lang, 'common.chat')}</ThemedText>
 											</Pressable>
 										</View>
 									) : null}
@@ -458,7 +458,7 @@ export default function RequestScreen() {
 													onPress={() => void callPhone(data.volunteer_phone)}
 													style={({ pressed }) => [styles.btnPrimary, { backgroundColor: primary }, pressed ? { opacity: 0.9 } : null]}
 												>
-													<ThemedText style={styles.btnPrimaryText}>📞 {t(lang, 'common.call')}</ThemedText>
+													<ThemedText style={styles.btnPrimaryText}>{t(lang, 'common.call')}</ThemedText>
 												</Pressable>
 											) : null}
 											{data.accepted_by ? (
@@ -476,7 +476,7 @@ export default function RequestScreen() {
 												}
 												style={({ pressed }) => [styles.btnPrimary, { backgroundColor: primary }, pressed ? { opacity: 0.9 } : null]}
 											>
-												<ThemedText style={styles.btnPrimaryText}>💬 {t(lang, 'common.chat')}</ThemedText>
+												<ThemedText style={styles.btnPrimaryText}>{t(lang, 'common.chat')}</ThemedText>
 											</Pressable>
 										) : null}
 										</>
@@ -563,7 +563,7 @@ export default function RequestScreen() {
 						{!isVolunteer && data.status === 'completed' && data.rating != null ? (
 							<View style={[styles.alertBox, { backgroundColor: bg, borderColor: border }]}>
 								<ThemedText style={[styles.alertLine, { color: text }]}>{t(lang, 'request.review_yours', { rating: String(data.rating) })}</ThemedText>
-								{data.review_text ? <ThemedText style={[styles.alertLine, { color: text }]}>💬 {data.review_text}</ThemedText> : null}
+								{data.review_text ? <ThemedText style={[styles.alertLine, { color: text }]}>{data.review_text}</ThemedText> : null}
 							</View>
 						) : null}
 

@@ -9,6 +9,7 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { api } from '@/lib/api';
 import { t } from '@/lib/i18n';
 import { useAuth } from '@/providers/auth-provider';
+import { AppIcon } from '@/components/app-icon';
 
 type VolunteerMyItem = {
   id: number;
@@ -152,7 +153,7 @@ export default function VolunteerMyScreen() {
                 ]}
               >
                 <View style={[styles.functionIconBox, { backgroundColor: bg }]}>
-                  <ThemedText style={styles.functionIconText}>{x.kind === 'sos' ? '🚨' : '🩹'}</ThemedText>
+                  <AppIcon name={x.kind === 'sos' ? 'sos' : 'firstAid'} size={22} color={themed.titleColor} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <ThemedText style={[styles.rowTitle, { color: themed.titleColor }]}>

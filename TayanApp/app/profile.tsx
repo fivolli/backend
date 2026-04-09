@@ -11,6 +11,7 @@ import { api } from '@/lib/api';
 import { API_BASE } from '@/lib/config';
 import { t } from '@/lib/i18n';
 import { useAuth } from '@/providers/auth-provider';
+import { AppIcon } from '@/components/app-icon';
 
 export default function ProfileScreen() {
 	const { loading, me, signIn, register, signOut, lang, token, refreshMe } = useAuth();
@@ -484,7 +485,7 @@ export default function ProfileScreen() {
 							</Pressable>
 							<ThemedText style={styles.profileHeaderTitle}>{t(lang, 'profile.title')}</ThemedText>
 							<Pressable onPress={() => router.push('/settings')} style={styles.headerIconBtn}>
-								<ThemedText style={styles.headerIconText}>⚙️</ThemedText>
+								<AppIcon name="lock" size={18} color="#fff" />
 							</Pressable>
 						</View>
 
@@ -505,7 +506,7 @@ export default function ProfileScreen() {
 										onError={() => setAvatarFailed(true)}
 									/>
 								) : (
-									<Text style={styles.profileAvatarText}>👤</Text>
+										<AppIcon name="profile" size={30} color="#fff" />
 								)}
 							</Pressable>
 							<ThemedText style={styles.profileName}>{me.name || t(lang, 'common.user')}</ThemedText>
@@ -581,7 +582,7 @@ export default function ProfileScreen() {
 						<View style={[styles.infoCard, { backgroundColor: surface }]}>
 							<View style={styles.infoRow}>
 								<View style={[styles.infoIcon, { backgroundColor: mutedBg }]}>
-									<Text style={styles.infoIconText}>📧</Text>
+									<AppIcon name="email" size={18} color={titleColor} />
 								</View>
 								<View style={{ flex: 1 }}>
 									<ThemedText style={styles.infoLabel}>{t(lang, 'profile.email_label')}</ThemedText>
@@ -595,7 +596,7 @@ export default function ProfileScreen() {
 						<View style={[styles.infoCard, { backgroundColor: surface }]}>
 							<View style={styles.infoRow}>
 								<View style={[styles.infoIcon, { backgroundColor: mutedBg }]}>
-									<Text style={styles.infoIconText}>📱</Text>
+									<AppIcon name="phone" size={18} color={titleColor} />
 								</View>
 								<View style={{ flex: 1 }}>
 									<ThemedText style={styles.infoLabel}>{t(lang, 'profile.phone_label')}</ThemedText>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Image,
   KeyboardAvoidingView,
@@ -10,7 +10,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { router } from 'expo-router';
+import { type Href, router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
@@ -21,6 +21,7 @@ import { t } from '@/lib/i18n';
 import { useAuth } from '@/providers/auth-provider';
 
 const LOGO = require('@/assets/images/tayan_logo.jpg');
+const ONBOARDING_ROUTE = '/onboarding' as Href;
 
 const COPY = {
   ru: {
@@ -65,6 +66,7 @@ const COPY = {
 } as const;
 
 export default function LoginScreen() {
+  const params = useLocalSearchParams<{ fromOnboarding?: string }>();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const primary = useThemeColor({}, 'primary');
@@ -76,7 +78,7 @@ export default function LoginScreen() {
   const titleColor = useThemeColor({ light: primary, dark: '#E7ECF5' }, 'text');
   const muted = useThemeColor({ light: '#666', dark: '#C3CCDA' }, 'tabIconDefault');
 
-  const { signIn, lang } = useAuth();
+  const { signIn, lang, token } = useAuth();
   const copy = COPY[(lang as keyof typeof COPY) || 'ru'] ?? COPY.ru;
 
   const isCompact = width <= 480;
@@ -92,6 +94,16 @@ export default function LoginScreen() {
   const [focused, setFocused] = useState<'email' | 'password' | null>(null);
 
   const canSubmit = useMemo(() => !!email.trim() && !!password && !busy, [email, password, busy]);
+
+  useEffect(() => {
+    if (!token && params.fromOnboarding !== '1') {
+      router.replace(ONBOARDING_ROUTE);
+    }
+  }, [params.fromOnboarding, token]);
+
+  if (!token && params.fromOnboarding !== '1') {
+    return <ThemedView style={{ flex: 1 }} />;
+  }
 
   async function onSubmit() {
     const emailTrimmed = email.trim();

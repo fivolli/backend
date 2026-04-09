@@ -11,6 +11,7 @@ import { t } from '@/lib/i18n';
 import { registerForPushNotificationsAsync } from '@/lib/push-notifications';
 import { getNotificationPrefs, NotificationPrefs, setNotificationPrefs } from '@/lib/storage';
 import { useAuth } from '@/providers/auth-provider';
+import { AppIcon, type AppIconName } from '@/components/app-icon';
 
 export default function NotificationsScreen() {
 	const insets = useSafeAreaInsets();
@@ -135,7 +136,7 @@ export default function NotificationsScreen() {
 						border={border}
 						titleColor={titleColor}
 						subtitleColor={muted}
-						icon="🚨"
+						icon="sos"
 						title={t(lang, 'notifications.sos_title')}
 						subtitle={t(lang, 'notifications.sos_sub')}
 						enabled={!!prefs?.sos}
@@ -147,7 +148,7 @@ export default function NotificationsScreen() {
 						border={border}
 						titleColor={titleColor}
 						subtitleColor={muted}
-						icon="👥"
+						icon="users"
 						title={t(lang, 'notifications.volunteers_title')}
 						subtitle={t(lang, 'notifications.volunteers_sub')}
 						enabled={!!prefs?.volunteers}
@@ -159,7 +160,7 @@ export default function NotificationsScreen() {
 						border={border}
 						titleColor={titleColor}
 						subtitleColor={muted}
-						icon="📢"
+						icon="bullhorn"
 						title={t(lang, 'notifications.updates_title')}
 						subtitle={t(lang, 'notifications.updates_sub')}
 						enabled={!!prefs?.updates}
@@ -192,7 +193,7 @@ function NotifItem(props: {
 	border: string;
 	titleColor: string;
 	subtitleColor: string;
-	icon: string;
+	icon: AppIconName;
 	title: string;
 	subtitle: string;
 	enabled: boolean;
@@ -201,7 +202,7 @@ function NotifItem(props: {
 	return (
 		<Pressable onPress={props.onPress} style={[styles.item, { backgroundColor: props.surface, borderColor: props.border }]}>
 			<View style={[styles.iconBox, { backgroundColor: props.mutedBg }]}>
-				<ThemedText style={styles.iconText}>{props.icon}</ThemedText>
+				<AppIcon name={props.icon} size={20} color={props.titleColor} />
 			</View>
 			<View style={{ flex: 1 }}>
 				<ThemedText style={[styles.title, { color: props.titleColor }]}>{props.title}</ThemedText>

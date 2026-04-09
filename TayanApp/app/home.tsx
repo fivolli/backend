@@ -15,6 +15,7 @@ import { getGeoOrNull } from '@/lib/location';
 import { setLastRequestId } from '@/lib/storage';
 import { useAuth } from '@/providers/auth-provider';
 import { API_BASE } from '@/lib/config';
+import { AppIcon, type AppIconName } from '@/components/app-icon';
 
 const DEFAULT_LAT = 42.8746;
 const DEFAULT_LNG = 74.5698;
@@ -122,7 +123,7 @@ export default function HomeScreen() {
 						{avatarUri ? (
 							<Image source={{ uri: avatarUri }} style={styles.avatarImage} />
 						) : (
-							<ThemedText style={styles.avatarText}>👤</ThemedText>
+							<AppIcon name="profile" size={22} color="#fff" />
 						)}
 					</Pressable>
 				</View>
@@ -161,7 +162,7 @@ export default function HomeScreen() {
 						mutedBg={mutedBg}
 						textColor={text}
 						primary={titleColor}
-						icon="📍"
+						icon="mapPin"
 						title={t(lang, 'home.my_request_map')}
 						onPress={() => router.push('/map')}
 					/>
@@ -172,7 +173,7 @@ export default function HomeScreen() {
 							mutedBg={mutedBg}
 							textColor={text}
 							primary={titleColor}
-							icon="📌"
+							icon="pasteTick"
 							title={t(lang, 'home.my_accepted')}
 							onPress={() => router.push('/volunteer-my')}
 						/>
@@ -183,7 +184,7 @@ export default function HomeScreen() {
 						mutedBg={mutedBg}
 						textColor={text}
 						primary={titleColor}
-						icon="📋"
+						icon="clipboard"
 						title={t(lang, 'home.categories')}
 						onPress={() => router.push('/categories')}
 					/>
@@ -193,7 +194,7 @@ export default function HomeScreen() {
 						mutedBg={mutedBg}
 						textColor={text}
 						primary={titleColor}
-						icon="📹"
+						icon="video"
 						title={t(lang, 'home.videos')}
 						onPress={() => router.push('/video')}
 					/>
@@ -203,7 +204,7 @@ export default function HomeScreen() {
 						mutedBg={mutedBg}
 						textColor={text}
 						primary={titleColor}
-						icon="🗺️"
+						icon="map"
 						title={t(lang, 'home.hospitals_map')}
 						onPress={() => router.push('/hospitals-map')}
 					/>
@@ -213,7 +214,7 @@ export default function HomeScreen() {
 						mutedBg={mutedBg}
 						textColor={text}
 						primary={titleColor}
-						icon="💬"
+						icon="chat"
 						title={t(lang, 'home.ai_assistant')}
 						onPress={() => router.push('/chat')}
 					/>
@@ -223,7 +224,7 @@ export default function HomeScreen() {
 						mutedBg={mutedBg}
 						textColor={text}
 						primary={titleColor}
-						icon="⭐"
+						icon="star"
 						title={t(lang, 'home.volunteer_reviews')}
 						onPress={() => router.push('/reviews')}
 					/>
@@ -233,7 +234,7 @@ export default function HomeScreen() {
 						mutedBg={mutedBg}
 						textColor={text}
 						primary={titleColor}
-						icon="📄"
+						icon="news"
 						title={t(lang, 'home.my_requests')}
 						onPress={() => router.push('/my-requests')}
 					/>
@@ -248,7 +249,7 @@ function FunctionItem(props: {
 	mutedBg: string;
 	textColor: string;
 	primary: string;
-	icon: string;
+	icon: AppIconName;
 	title: string;
 	onPress: () => void;
 }) {
@@ -256,7 +257,7 @@ function FunctionItem(props: {
 		<Pressable onPress={props.onPress} style={[styles.functionItem, { backgroundColor: props.surface }]}>
 			<View style={[styles.functionIconBox, { backgroundColor: props.mutedBg }]}
 			>
-				<ThemedText style={styles.functionIconText}>{props.icon}</ThemedText>
+				<AppIcon name={props.icon} size={22} color={props.primary} />
 			</View>
 			<ThemedText style={[styles.functionTitle, { color: props.primary }]}>{props.title}</ThemedText>
 			<ThemedText style={[styles.functionChevron, { color: props.textColor }]}>›</ThemedText>

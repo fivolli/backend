@@ -8,6 +8,7 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { api } from '@/lib/api';
 import { t } from '@/lib/i18n';
 import { useAuth } from '@/providers/auth-provider';
+import { AppIcon, type AppIconName } from '@/components/app-icon';
 
 export default function PrivacyScreen() {
 	const insets = useSafeAreaInsets();
@@ -84,7 +85,7 @@ export default function PrivacyScreen() {
 						mutedBg={mutedBg}
 						titleColor={titleColor}
 						subtitleColor={text}
-						icon="📍"
+						icon="mapPin"
 						title={t(lang, 'privacy.location_title')}
 						subtitle={t(lang, 'privacy.location_sub')}
 						onPress={openAppSettings}
@@ -95,7 +96,7 @@ export default function PrivacyScreen() {
 						mutedBg={mutedBg}
 						titleColor={titleColor}
 						subtitleColor={text}
-						icon="📊"
+						icon="chart"
 						title={t(lang, 'privacy.analytics_title')}
 						subtitle={t(lang, 'privacy.analytics_sub')}
 						onPress={() => router.push('/policy')}
@@ -109,7 +110,7 @@ export default function PrivacyScreen() {
 						border={border}
 						mutedBg={mutedBg}
 						titleColor={titleColor}
-						icon="📄"
+						icon="news"
 						title={t(lang, 'privacy.policy')}
 						onPress={() => openDoc('policy')}
 					/>
@@ -118,7 +119,7 @@ export default function PrivacyScreen() {
 						border={border}
 						mutedBg={mutedBg}
 						titleColor={titleColor}
-						icon="📋"
+						icon="clipboard"
 						title={t(lang, 'privacy.terms')}
 						onPress={() => openDoc('terms')}
 					/>
@@ -142,7 +143,7 @@ function RowItem(props: {
 	mutedBg: string;
 	titleColor: string;
 	subtitleColor: string;
-	icon: string;
+	icon: AppIconName;
 	title: string;
 	subtitle: string;
 	onPress?: () => void;
@@ -150,7 +151,7 @@ function RowItem(props: {
 	const content = (
 		<>
 			<View style={[styles.iconBox, { backgroundColor: props.mutedBg }]}>
-				<ThemedText style={styles.iconText}>{props.icon}</ThemedText>
+				<AppIcon name={props.icon} size={20} color={props.titleColor} />
 			</View>
 			<View style={{ flex: 1 }}>
 				<ThemedText style={[styles.rowTitle, { color: props.titleColor }]}>{props.title}</ThemedText>
@@ -174,14 +175,14 @@ function LinkRow(props: {
 	border: string;
 	mutedBg: string;
 	titleColor: string;
-	icon: string;
+	icon: AppIconName;
 	title: string;
 	onPress: () => void;
 }) {
 	return (
 		<Pressable onPress={props.onPress} style={[styles.row, { backgroundColor: props.surface, borderColor: props.border }]}>
 			<View style={[styles.iconBox, { backgroundColor: props.mutedBg }]}>
-				<ThemedText style={styles.iconText}>{props.icon}</ThemedText>
+				<AppIcon name={props.icon} size={20} color={props.titleColor} />
 			</View>
 			<ThemedText style={[styles.rowTitle, { flex: 1, color: props.titleColor }]}>{props.title}</ThemedText>
 			<ThemedText style={{ opacity: 0.7 }}>›</ThemedText>

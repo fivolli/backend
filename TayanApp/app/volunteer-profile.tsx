@@ -10,6 +10,7 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { t } from '@/lib/i18n';
 import { api } from '@/lib/api';
 import { useAuth } from '@/providers/auth-provider';
+import { AppIcon } from '@/components/app-icon';
 
 type VolunteerRating = {
   volunteer_id: number;
@@ -123,7 +124,7 @@ export default function VolunteerProfileScreen() {
             <View style={[styles.volHeaderCard, { backgroundColor: surface, borderColor: border }]}>
               <View style={styles.volHeaderRow}>
                 <View style={[styles.volAvatar, { backgroundColor: 'rgba(44,45,95,0.1)' }]}>
-                  <Text style={styles.volAvatarText}>👤</Text>
+                  <AppIcon name="profile" size={20} color={titleColor} />
                 </View>
 
                 <View style={styles.volMain}>
@@ -152,10 +153,10 @@ export default function VolunteerProfileScreen() {
 
                   <View style={styles.actions}>
                     <Pressable style={[styles.iconBtn, styles.iconBtnOutline, { borderColor: border }]} onPress={() => {}}>
-                      <Text style={styles.iconBtnText}>💬</Text>
+                      <AppIcon name="chat" size={18} color={titleColor} />
                     </Pressable>
                     <Pressable style={[styles.iconBtn, { backgroundColor: primary }]} onPress={() => {}}>
-                      <Text style={styles.iconBtnText}>🔗</Text>
+                      <AppIcon name="mapPin" size={18} color="#fff" />
                     </Pressable>
                   </View>
                 </View>

@@ -1,7 +1,8 @@
-import { useMemo, useRef, useState } from 'react';
+﻿import { useMemo, useRef, useState } from 'react';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
+  Image,
   NativeScrollEvent,
   NativeSyntheticEvent,
   Pressable,
@@ -11,7 +12,6 @@ import {
   View,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -32,8 +32,17 @@ type CopyPack = {
   create: string;
   login: string;
   slides: SlideCopy[];
-  levels: { title: string; desc: string; color: string; icon: keyof typeof MaterialCommunityIcons.glyphMap }[];
-  timeline: { title: string; desc: string; icon: keyof typeof MaterialCommunityIcons.glyphMap }[];
+  levels: {
+    title: string;
+    desc: string;
+    color: string;
+    image: any;
+  }[];
+  timeline: {
+    title: string;
+    desc: string;
+    image: any;
+  }[];
 };
 
 const COPY: Record<AppLang, CopyPack> = {
@@ -68,26 +77,42 @@ const COPY: Record<AppLang, CopyPack> = {
         title: 'Лёгкие случаи',
         desc: 'Порезы, ушибы, недомогание. Помогут студенты-медики рядом.',
         color: '#31C46C',
-        icon: 'doctor',
+        image: require('../student-removebg-preview.png'),
       },
       {
         title: 'Средние случаи',
-        desc: 'Температура, сильная боль, ухудшение самочувствия. Подключаются специалисты.',
+        desc: 'Высокая температура, сильная боль, ухудшение состояния. Подключаются специалисты.',
         color: '#F2C94C',
-        icon: 'stethoscope',
+        image: require('../medic-removebg-preview.png'),
       },
       {
         title: 'Экстренные случаи',
         desc: 'Потеря сознания, ДТП, тяжёлое состояние. Сразу рекомендуем скорую помощь.',
         color: '#F05D5E',
-        icon: 'ambulance',
+        image: require('../emergency-removebg-preview.png'),
       },
     ],
     timeline: [
-      { title: 'Нажми кнопку', desc: 'Система мгновенно определит твои координаты.', icon: 'gesture-tap-button' },
-      { title: 'Подбор медика', desc: 'Алгоритм найдёт ближайшего верифицированного специалиста.', icon: 'account-search' },
-      { title: 'Отслеживай путь', desc: 'На карте будет видно, как помощь приближается.', icon: 'map-marker-path' },
-      { title: 'Оценка и отзыв', desc: 'После помощи можно оставить оценку и комментарий.', icon: 'star-check-outline' },
+      {
+        title: 'Нажми кнопку',
+        desc: 'Система мгновенно определит твои координаты.',
+        image: require('../button-removebg-preview.png'),
+      },
+      {
+        title: 'Подбор медика',
+        desc: 'Алгоритм найдёт ближайшего верифицированного специалиста.',
+        image: require('../volunteer-removebg-preview.png'),
+      },
+      {
+        title: 'Отслеживай путь',
+        desc: 'На карте будет видно, как помощь приближается.',
+        image: require('../map-removebg-preview.png'),
+      },
+      {
+        title: 'Оценка и отзыв',
+        desc: 'После помощи можно оставить оценку и комментарий.',
+        image: require('../score-removebg-preview.png'),
+      },
     ],
   },
   en: {
@@ -121,26 +146,42 @@ const COPY: Record<AppLang, CopyPack> = {
         title: 'Light cases',
         desc: 'Cuts, bruises, mild discomfort. Nearby medic students can help quickly.',
         color: '#31C46C',
-        icon: 'doctor',
+        image: require('../student-removebg-preview.png'),
       },
       {
         title: 'Medium cases',
         desc: 'Fever, stronger pain, worsening condition. We connect trained clinicians.',
         color: '#F2C94C',
-        icon: 'stethoscope',
+        image: require('../medic-removebg-preview.png'),
       },
       {
         title: 'Emergency cases',
         desc: 'Loss of consciousness, accidents, critical symptoms. Ambulance is the right choice.',
         color: '#F05D5E',
-        icon: 'ambulance',
+        image: require('../emergency-removebg-preview.png'),
       },
     ],
     timeline: [
-      { title: 'Tap once', desc: 'Your location is detected instantly.', icon: 'gesture-tap-button' },
-      { title: 'Match a medic', desc: 'We find the nearest verified specialist.', icon: 'account-search' },
-      { title: 'Track the route', desc: 'Watch help move toward you on the map.', icon: 'map-marker-path' },
-      { title: 'Rate the result', desc: 'Leave a rating and short feedback after support.', icon: 'star-check-outline' },
+      {
+        title: 'Tap once',
+        desc: 'Your location is detected instantly.',
+        image: require('../button-removebg-preview.png'),
+      },
+      {
+        title: 'Match a medic',
+        desc: 'We find the nearest verified specialist.',
+        image: require('../volunteer-removebg-preview.png'),
+      },
+      {
+        title: 'Track the route',
+        desc: 'Watch help move toward you on the map.',
+        image: require('../map-removebg-preview.png'),
+      },
+      {
+        title: 'Rate the result',
+        desc: 'Leave a rating and short feedback after support.',
+        image: require('../score-removebg-preview.png'),
+      },
     ],
   },
   kg: {
@@ -156,16 +197,16 @@ const COPY: Record<AppLang, CopyPack> = {
       {
         title: 'Акылдуу жардам тандоо',
         body: 'Тиркеме кырдаалдын оордугун өзү баалап, ылайыктуу жардамды тандап берет.',
-        cta: 'Түшүнүктүү',
+        cta: 'Түшүндүм',
       },
       {
-        title: 'Жардам алуу үчүн 4 эле кадам',
+        title: 'Жардам алууга 4 эле кадам',
         body: 'Бир басуу, тез тандоо, картадан көзөмөлдөө жана жардамдан кийин баалоо.',
         cta: 'Сонун',
       },
       {
         title: 'Коопсуздугуң биз үчүн маанилүү',
-        body: 'Бардык медиктер текшерилген, ал эми сенин маалыматтарың корголот. Ким бара жатканын дайыма көрөсүң.',
+        body: 'Бардык медиктер текшерилген, ал эми сенин маалыматың корголот. Ким бара жатканын дайыма көрөсүң.',
         cta: 'Даяр',
       },
     ],
@@ -174,42 +215,48 @@ const COPY: Record<AppLang, CopyPack> = {
         title: 'Жеңил учурлар',
         desc: 'Кесик, көгөрүү, жеңил алсыроо. Жакынкы медик-студенттер жардам берет.',
         color: '#31C46C',
-        icon: 'doctor',
+        image: require('../student-removebg-preview.png'),
       },
       {
         title: 'Орто учурлар',
-        desc: 'Дене табы, катуу оору, абалдын начарлашы. Адистер кошулат.',
+        desc: 'Жогорку температура, катуу оору, абалдын начарлашы. Адистер кошулат.',
         color: '#F2C94C',
-        icon: 'stethoscope',
+        image: require('../medic-removebg-preview.png'),
       },
       {
         title: 'Шашылыш учурлар',
         desc: 'Эсин жоготуу, жол кырсыгы, оор белгилер. Дароо тез жардам сунушталат.',
         color: '#F05D5E',
-        icon: 'ambulance',
+        image: require('../emergency-removebg-preview.png'),
       },
     ],
     timeline: [
-      { title: 'Баскычты бас', desc: 'Система жайгашкан жериңди дароо аныктайт.', icon: 'gesture-tap-button' },
-      { title: 'Медик тандалат', desc: 'Алгоритм эң жакын текшерилген адисти табат.', icon: 'account-search' },
-      { title: 'Жолду көзөмөлдө', desc: 'Жардам жакындап жатканын картадан көрөсүң.', icon: 'map-marker-path' },
-      { title: 'Баалоо жана пикир', desc: 'Жардамдан кийин баа берип, пикир калтырасың.', icon: 'star-check-outline' },
+      {
+        title: 'Баскычты бас',
+        desc: 'Система жайгашкан жериңди дароо аныктайт.',
+        image: require('../button-removebg-preview.png'),
+      },
+      {
+        title: 'Медик тандалат',
+        desc: 'Алгоритм эң жакын текшерилген адисти табат.',
+        image: require('../volunteer-removebg-preview.png'),
+      },
+      {
+        title: 'Жолду көзөмөлдө',
+        desc: 'Жардам жакындап жатканын картадан көрөсүң.',
+        image: require('../map-removebg-preview.png'),
+      },
+      {
+        title: 'Баалоо жана пикир',
+        desc: 'Жардамдан кийин баа берип, пикир калтырасың.',
+        image: require('../score-removebg-preview.png'),
+      },
     ],
   },
 };
 
-function HandIllustration() {
-  return (
-    <View style={styles.handWrap}>
-      <LinearGradient colors={['#93F0DD', '#5DB8E2']} style={styles.handCircle}>
-        <MaterialCommunityIcons name="handshake-outline" size={112} color="#FFFFFF" />
-      </LinearGradient>
-    </View>
-  );
-}
-
 export default function OnboardingScreen() {
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const { lang } = useAuth();
   const palette = COPY[(lang as AppLang) || 'ru'] ?? COPY.ru;
@@ -235,7 +282,7 @@ export default function OnboardingScreen() {
 
   const complete = async (target: '/login' | '/register') => {
     await setOnboardingSeen(true);
-    router.replace(target);
+    router.replace({ pathname: target, params: { fromOnboarding: '1' } });
   };
 
   const goNext = async () => {
@@ -244,13 +291,27 @@ export default function OnboardingScreen() {
       return;
     }
     scrollRef.current?.scrollTo({ x: (index + 1) * width, animated: true });
-    setIndex((current) => Math.min(current + 1, 3));
+  };
+
+  const syncIndex = (x: number, pageWidth: number) => {
+    const safeWidth = Math.max(pageWidth || width, 1);
+    const nextIndex = Math.round(x / safeWidth);
+    setIndex((current) => {
+      const normalized = Math.max(0, Math.min(3, nextIndex));
+      return current === normalized ? current : normalized;
+    });
+  };
+
+  const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    syncIndex(event.nativeEvent.contentOffset.x, event.nativeEvent.layoutMeasurement.width);
   };
 
   const onScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const nextIndex = Math.round(event.nativeEvent.contentOffset.x / width);
-    setIndex(Math.max(0, Math.min(3, nextIndex)));
+    syncIndex(event.nativeEvent.contentOffset.x, event.nativeEvent.layoutMeasurement.width);
   };
+
+  const footerReservedSpace = Math.max(insets.bottom + 160, 190);
+  const slideMinHeight = Math.max(height - insets.top - footerReservedSpace, 460);
 
   return (
     <ThemedView style={styles.container}>
@@ -264,23 +325,27 @@ export default function OnboardingScreen() {
 
       <ScrollView
         ref={scrollRef}
+        style={styles.pager}
         horizontal
         pagingEnabled
         bounces={false}
+        onScrollEndDrag={onScrollEnd}
         showsHorizontalScrollIndicator={false}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
         onMomentumScrollEnd={onScrollEnd}>
         <View style={slideStyle}>
-          <View style={[styles.card, { backgroundColor: surface }]}>
-            <MaterialCommunityIcons name="shield-star-outline" size={28} color="#7CBDEB" style={styles.headerIcon} />
-            <HandIllustration />
+          <View style={[styles.card, { backgroundColor: surface, minHeight: slideMinHeight }]}>
+            <Image source={require('../shield-removebg-preview.png')} style={styles.headerImage} resizeMode="contain" />
+            <Image source={require('../hands-removebg-preview.png')} style={styles.heroImage} resizeMode="contain" />
             <ThemedText style={[styles.title, { color: primary }]}>{palette.slides[0].title}</ThemedText>
             <ThemedText style={[styles.body, { color: text }]}>{palette.slides[0].body}</ThemedText>
           </View>
         </View>
 
         <View style={slideStyle}>
-          <View style={[styles.card, { backgroundColor: surface }]}>
-            <MaterialCommunityIcons name="shield-star-outline" size={28} color="#7CBDEB" style={styles.headerIcon} />
+          <View style={[styles.card, { backgroundColor: surface, minHeight: slideMinHeight }]}>
+            <Image source={require('../shield-removebg-preview.png')} style={styles.headerImage} resizeMode="contain" />
             <ThemedText style={[styles.title, { color: primary }]}>{palette.slides[1].title}</ThemedText>
             <View style={styles.levelsWrap}>
               {palette.levels.map((level, levelIndex) => (
@@ -288,7 +353,7 @@ export default function OnboardingScreen() {
                   key={level.title}
                   style={[styles.levelRow, levelIndex < palette.levels.length - 1 ? styles.levelDivider : null]}>
                   <View style={[styles.levelIcon, { backgroundColor: `${level.color}22` }]}>
-                    <MaterialCommunityIcons name={level.icon} size={30} color={level.color} />
+                    <Image source={level.image} style={styles.levelImage} resizeMode="contain" />
                   </View>
                   <View style={styles.levelTextWrap}>
                     <View style={styles.levelHeading}>
@@ -304,15 +369,15 @@ export default function OnboardingScreen() {
         </View>
 
         <View style={slideStyle}>
-          <View style={[styles.card, { backgroundColor: surface }]}>
-            <MaterialCommunityIcons name="shield-star-outline" size={28} color="#7CBDEB" style={styles.headerIcon} />
+          <View style={[styles.card, { backgroundColor: surface, minHeight: slideMinHeight }]}>
+            <Image source={require('../shield-removebg-preview.png')} style={styles.headerImage} resizeMode="contain" />
             <ThemedText style={[styles.title, { color: primary }]}>{palette.slides[2].title}</ThemedText>
             <View style={styles.timelineWrap}>
               {palette.timeline.map((step, stepIndex) => (
                 <View key={step.title} style={styles.timelineRow}>
                   <View style={styles.timelineLeft}>
                     <View style={styles.timelineIconWrap}>
-                      <MaterialCommunityIcons name={step.icon} size={28} color="#4A95D2" />
+                      <Image source={step.image} style={styles.timelineImage} resizeMode="contain" />
                     </View>
                   </View>
                   <View style={styles.timelineMiddle}>
@@ -332,17 +397,19 @@ export default function OnboardingScreen() {
         </View>
 
         <View style={slideStyle}>
-          <View style={[styles.card, styles.finalCard, { backgroundColor: surface }]}>
-            <MaterialCommunityIcons name="shield-star-outline" size={28} color="#7CBDEB" style={styles.headerIcon} />
-            <ThemedText style={[styles.title, styles.finalTitle, { color: primary }]}>{palette.slides[3].title}</ThemedText>
-            <LinearGradient colors={['#CFF6F1', '#D6EAFF']} style={styles.finalShieldGlow}>
-              <MaterialCommunityIcons name="shield-check-outline" size={124} color="#4A95D2" />
-              <View style={styles.lockBadge}>
-                <Ionicons name="lock-closed-outline" size={22} color="#4A95D2" />
-              </View>
-            </LinearGradient>
-            <ThemedText style={[styles.body, styles.finalBody, { color: text }]}>{palette.slides[3].body}</ThemedText>
-          </View>
+          <ScrollView
+            nestedScrollEnabled
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={[styles.finalSlideScrollContent, { paddingBottom: footerReservedSpace }]}>
+            <View style={[styles.card, styles.finalCard, { backgroundColor: surface, minHeight: slideMinHeight }]}>
+              <Image source={require('../shield-removebg-preview.png')} style={styles.headerImage} resizeMode="contain" />
+              <ThemedText style={[styles.title, styles.finalTitle, { color: primary }]}>{palette.slides[3].title}</ThemedText>
+              <LinearGradient colors={['#CFF6F1', '#D6EAFF']} style={styles.finalShieldGlow}>
+                <Image source={require('../shield-removebg-preview.png')} style={styles.finalShieldImage} resizeMode="contain" />
+              </LinearGradient>
+              <ThemedText style={[styles.body, styles.finalBody, { color: text }]}>{palette.slides[3].body}</ThemedText>
+            </View>
+          </ScrollView>
         </View>
       </ScrollView>
 
@@ -390,6 +457,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F8FDFF',
   },
+  pager: {
+    flex: 1,
+  },
   skipButton: {
     position: 'absolute',
     right: 20,
@@ -402,7 +472,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   card: {
-    flex: 1,
     borderRadius: 34,
     borderWidth: 2,
     borderColor: '#B8F0EA',
@@ -415,20 +484,17 @@ const styles = StyleSheet.create({
     elevation: 6,
     justifyContent: 'center',
   },
-  headerIcon: {
+  headerImage: {
+    width: 30,
+    height: 30,
     alignSelf: 'center',
     marginBottom: 18,
   },
-  handWrap: {
-    alignItems: 'center',
-    marginBottom: 18,
-  },
-  handCircle: {
+  heroImage: {
     width: 220,
     height: 220,
-    borderRadius: 110,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignSelf: 'center',
+    marginBottom: 18,
   },
   title: {
     fontSize: 28,
@@ -461,6 +527,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  levelImage: {
+    width: 44,
+    height: 44,
   },
   levelTextWrap: {
     flex: 1,
@@ -504,6 +574,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  timelineImage: {
+    width: 34,
+    height: 34,
+  },
   timelineMiddle: {
     width: 34,
     alignItems: 'center',
@@ -543,8 +617,12 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 22,
   },
+  finalSlideScrollContent: {
+    flexGrow: 1,
+  },
   finalCard: {
     alignItems: 'center',
+    justifyContent: 'flex-start',
   },
   finalTitle: {
     maxWidth: 300,
@@ -556,18 +634,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
-    position: 'relative',
   },
-  lockBadge: {
-    position: 'absolute',
-    right: 30,
-    bottom: 40,
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
+  finalShieldImage: {
+    width: 132,
+    height: 132,
   },
   finalBody: {
     maxWidth: 320,

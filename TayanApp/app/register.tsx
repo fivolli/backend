@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Image,
   KeyboardAvoidingView,
@@ -10,7 +10,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { router } from 'expo-router';
+import { type Href, router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
@@ -20,7 +20,8 @@ import { showAlert } from '@/lib/alerts';
 import { t } from '@/lib/i18n';
 import { useAuth, type UserRole } from '@/providers/auth-provider';
 
-const LOGO = require('@/assets/images/logo2-removebg-preview.png');
+const LOGO = require('@/assets/images/tayan_logo.jpg');
+const ONBOARDING_ROUTE = '/onboarding' as Href;
 
 const COPY = {
   ru: {
@@ -112,6 +113,7 @@ const COPY = {
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export default function RegisterScreen() {
+  const params = useLocalSearchParams<{ fromOnboarding?: string }>();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
 
@@ -125,7 +127,7 @@ export default function RegisterScreen() {
   const headerTitleColor = '#FFFFFF';
   const muted = useThemeColor({ light: '#666', dark: '#C3CCDA' }, 'tabIconDefault');
 
-  const { register, lang } = useAuth();
+  const { register, lang, token } = useAuth();
   const copy = COPY[(lang as keyof typeof COPY) || 'ru'] ?? COPY.ru;
 
   const isCompact = width <= 480;
@@ -154,6 +156,16 @@ export default function RegisterScreen() {
     if (!password) return false;
     return true;
   }, [busy, name, email, phone, password]);
+
+  useEffect(() => {
+    if (!token && params.fromOnboarding !== '1') {
+      router.replace(ONBOARDING_ROUTE);
+    }
+  }, [params.fromOnboarding, token]);
+
+  if (!token && params.fromOnboarding !== '1') {
+    return <ThemedView style={{ flex: 1 }} />;
+  }
 
   async function onSubmit() {
     const nameTrimmed = name.trim();
@@ -211,6 +223,10 @@ export default function RegisterScreen() {
     }
   }
 
+  const imageSize = Math.min(260, Math.max(150, width - 2 * headerHPad));
+  const imageRadius = Math.round(imageSize * 0.2);
+
+
   return (
     <ThemedView style={[styles.container, { backgroundColor: background }]}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
@@ -232,7 +248,7 @@ export default function RegisterScreen() {
               },
             ]}
           >
-            <Image source={LOGO} style={{ width: 130, height: 150, resizeMode: 'contain' }} />
+            <Image source={LOGO} style={{ width: imageSize, height: imageSize, borderRadius: imageRadius, resizeMode: 'cover' }} />
             <ThemedText style={[styles.welcomeTitle, { color: headerTitleColor }]}>{copy.welcome}</ThemedText>
           </View>
 
