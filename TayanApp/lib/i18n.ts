@@ -75,7 +75,7 @@ const RU: Dict = {
   'category.warning_text': '⚠️ Внимание: При серьезных случаях немедленно вызывайте скорую помощь (103 или 112)!',
   'category.step_by_step': 'Пошаговая инструкция',
   'category.call_ambulance_103': '📞 Вызвать скорую помощь (103)',
-  'category.call_volunteer': '🚑 Вызвать волонтера',
+  'category.call_volunteer': 'Вызвать волонтера',
 
   'video.title': 'Видео-инструкции',
   'video.loading': 'Загружаем видео…',
@@ -438,7 +438,7 @@ const EN: Dict = {
   'category.warning_text': '⚠️ Attention: In serious cases, call an ambulance immediately (103 or 112)!',
   'category.step_by_step': 'Step-by-step instructions',
   'category.call_ambulance_103': '📞 Call an ambulance (103)',
-  'category.call_volunteer': '🚑 Call a volunteer',
+  'category.call_volunteer': 'Call a volunteer',
 
   'video.title': 'Video guides',
   'video.loading': 'Loading videos…',
@@ -801,7 +801,7 @@ const KG: Dict = {
   'category.warning_text': '⚠️ Эскертүү: Оор учурларда дароо тез жардам чакырыңыз (103 же 112)!',
   'category.step_by_step': 'Кадам-кадам нускама',
   'category.call_ambulance_103': '📞 Тез жардам чакыруу (103)',
-  'category.call_volunteer': '🚑 Ыктыярчыны чакыруу',
+  'category.call_volunteer': 'Ыктыярчыны чакыруу',
 
   'video.title': 'Видео-нускама',
   'video.loading': 'Видео жүктөлүүдө…',

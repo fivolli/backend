@@ -22,6 +22,7 @@ export type AppIconName =
   | 'bullhorn'
   | 'check'
   | 'comments'
+  | 'phoneVolume'
   | 'nurse'
   | 'clock'
   | 'pasteTick';
@@ -48,6 +49,7 @@ const ICONS: Record<AppIconName, any> = {
   bullhorn: require('@/assets/images/bullhorn-solid.png'),
   check: require('@/assets/images/Check.png'),
   comments: require('@/assets/images/Comment Dots.png'),
+  phoneVolume: require('@/assets/images/phone-volume-solid.png'),
   nurse: require('@/assets/images/user-nurse-solid.png'),
   clock: require('@/assets/images/Clock.png'),
   pasteTick: require('@/assets/images/paste-tick.png'),

@@ -582,7 +582,7 @@ export default function ProfileScreen() {
 						<View style={[styles.infoCard, { backgroundColor: surface }]}>
 							<View style={styles.infoRow}>
 								<View style={[styles.infoIcon, { backgroundColor: mutedBg }]}>
-									<AppIcon name="email" size={18} color={titleColor} />
+									<AppIcon name="email" size={22} color={titleColor} />
 								</View>
 								<View style={{ flex: 1 }}>
 									<ThemedText style={styles.infoLabel}>{t(lang, 'profile.email_label')}</ThemedText>
@@ -596,7 +596,7 @@ export default function ProfileScreen() {
 						<View style={[styles.infoCard, { backgroundColor: surface }]}>
 							<View style={styles.infoRow}>
 								<View style={[styles.infoIcon, { backgroundColor: mutedBg }]}>
-									<AppIcon name="phone" size={18} color={titleColor} />
+									<AppIcon name="phone" size={22} color={titleColor} />
 								</View>
 								<View style={{ flex: 1 }}>
 									<ThemedText style={styles.infoLabel}>{t(lang, 'profile.phone_label')}</ThemedText>

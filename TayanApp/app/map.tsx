@@ -1331,7 +1331,10 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 										}}
 										style={({ pressed }) => [styles.callBtn, { backgroundColor: primary, opacity: pressed ? 0.9 : 1 }]}
 									>
-										<ThemedText style={styles.callBtnText}>{t(lang, 'common.call')}</ThemedText>
+										<View style={styles.callBtnContent}>
+											<AppIcon name="phoneVolume" size={18} color="#fff" />
+											<ThemedText style={styles.callBtnText}>{t(lang, 'common.call')}</ThemedText>
+										</View>
 									</Pressable>
 								) : null}
 								<Pressable
@@ -1348,7 +1351,10 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 								}
 									style={({ pressed }) => [styles.callBtn, { backgroundColor: primary, opacity: pressed ? 0.9 : 1 }]}
 								>
-									<ThemedText style={styles.callBtnText}>{t(lang, 'common.chat')}</ThemedText>
+									<View style={styles.callBtnContent}>
+										<AppIcon name="comments" size={18} color="#fff" />
+										<ThemedText style={styles.callBtnText}>{t(lang, 'common.chat')}</ThemedText>
+									</View>
 								</Pressable>
 							</View>
 						) : null}
@@ -1369,7 +1375,10 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 										}}
 											style={({ pressed }) => [styles.callBtn, { backgroundColor: primary, opacity: pressed ? 0.9 : 1 }]}
 										>
-											<ThemedText style={styles.callBtnText}>{t(lang, 'map.call_user')}</ThemedText>
+											<View style={styles.callBtnContent}>
+												<AppIcon name="phoneVolume" size={18} color="#fff" />
+												<ThemedText style={styles.callBtnText}>{t(lang, 'map.call_user')}</ThemedText>
+											</View>
 										</Pressable>
 									) : null}
 									<Pressable
@@ -1386,13 +1395,19 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 									}
 									style={({ pressed }) => [styles.callBtn, { backgroundColor: primary, opacity: pressed ? 0.9 : 1 }]}
 								>
-									<ThemedText style={styles.callBtnText}>{t(lang, 'common.chat')}</ThemedText>
+									<View style={styles.callBtnContent}>
+										<AppIcon name="comments" size={18} color="#fff" />
+										<ThemedText style={styles.callBtnText}>{t(lang, 'common.chat')}</ThemedText>
+									</View>
 								</Pressable>
 								</View>
 							) : null}
 
 							<View style={[styles.card, { backgroundColor: surface, borderColor: border }]}>
-								<ThemedText style={[styles.rowTitle, { color: titleColor }]}>{t(lang, 'map.timeline')}</ThemedText>
+								<View style={styles.timelineTitleRow}>
+									<AppIcon name="clock" size={18} color={titleColor} />
+									<ThemedText style={[styles.rowTitle, { color: titleColor }]}>{t(lang, 'map.timeline')}</ThemedText>
+								</View>
 								<ThemedText style={[styles.rowValue, { color: text }]}>{t(lang, 'request.created', { time: fmtTimeIso(data.created_at) })}</ThemedText>
 								{data.accepted_at ? <ThemedText style={[styles.rowValue, { color: text }]}>{t(lang, 'request.accepted', { time: fmtTimeIso(data.accepted_at) })}</ThemedText> : null}
 								{data.in_progress_at ? <ThemedText style={[styles.rowValue, { color: text }]}>{t(lang, 'request.in_progress', { time: fmtTimeIso(data.in_progress_at) })}</ThemedText> : null}
@@ -1587,10 +1602,12 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		textAlignVertical: 'top',
 	},
-	row: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
+	row: { flexDirection: 'row', gap: 10, alignItems: 'center' },
 	rowIcon: { width: 22, flex: 0 as any },
 	rowTitle: { fontWeight: '700', marginBottom: 2 },
 	rowValue: { lineHeight: 20 },
+	timelineTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 2 },
+	callBtnContent: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
 	sep: { borderTopWidth: 1, marginVertical: 10 },
 });
 

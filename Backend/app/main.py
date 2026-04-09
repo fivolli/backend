@@ -1024,6 +1024,8 @@ def register(data: RegisterRequest, request: Request, db: Session = Depends(get_
         email=email,
         phone=phone,
         password_hash=hash_password(password),
+        allergies=((data.allergies or "").strip() or None),
+        chronic_conditions=((data.chronic_conditions or "").strip() or None),
         role=role,
     )
     db.add(u)
@@ -1091,6 +1093,8 @@ def me(
         "avatar_url": _public_url(request, getattr(u, "avatar_url", None)),
         "phone": u.phone,
         "role": u.role,
+        "allergies": getattr(u, "allergies", None),
+        "chronic_conditions": getattr(u, "chronic_conditions", None),
     }
 
 
@@ -1127,6 +1131,12 @@ def update_me(
             raise HTTPException(400, "avatar_url must be http(s), data:image/*, or /static/*")
         u.avatar_url = avatar_url or None
 
+    if data.allergies is not None:
+        u.allergies = (data.allergies or "").strip() or None
+
+    if data.chronic_conditions is not None:
+        u.chronic_conditions = (data.chronic_conditions or "").strip() or None
+
     db.commit()
     db.refresh(u)
 
@@ -1137,6 +1147,8 @@ def update_me(
         "avatar_url": _public_url(request, getattr(u, "avatar_url", None)),
         "phone": u.phone,
         "role": u.role,
+        "allergies": getattr(u, "allergies", None),
+        "chronic_conditions": getattr(u, "chronic_conditions", None),
     }
 
 

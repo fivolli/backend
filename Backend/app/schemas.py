@@ -10,6 +10,8 @@ class RegisterRequest(BaseModel):
     phone: str
     password: str
     role: str = "user"
+    allergies: Optional[str] = None
+    chronic_conditions: Optional[str] = None
 
 
 class LoginRequest(BaseModel):
@@ -45,12 +47,16 @@ class MeResponse(BaseModel):
     avatar_url: Optional[str] = None
     phone: str
     role: str
+    allergies: Optional[str] = None
+    chronic_conditions: Optional[str] = None
 
 
 class UpdateMeRequest(BaseModel):
     name: Optional[str] = None
     email: Optional[str] = None
     avatar_url: Optional[str] = None
+    allergies: Optional[str] = None
+    chronic_conditions: Optional[str] = None
 
 
 class CreateHelpRequest(BaseModel):

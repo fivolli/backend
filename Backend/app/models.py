@@ -10,6 +10,8 @@ class User(Base):
     avatar_url = Column(String, nullable=True)
     phone = Column(String, unique=True, index=True, nullable=False)
     password_hash = Column(String, nullable=False)
+    allergies = Column(Text, nullable=True)
+    chronic_conditions = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     role = Column(String, nullable=False, default="user")
     

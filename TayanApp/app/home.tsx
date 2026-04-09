@@ -148,9 +148,12 @@ export default function HomeScreen() {
 							end={{ x: 1, y: 1 }}
 							style={styles.categoryCard}
 						>
-							<ThemedText numberOfLines={2} style={[styles.categoryTitle, { color: titleColor }] }>
-								{t(lang, 'category.call_volunteer')}
-							</ThemedText>
+							<View style={styles.categoryTitleRow}>
+								<AppIcon name="sos" size={24} color={titleColor} />
+								<ThemedText numberOfLines={2} style={[styles.categoryTitle, { color: titleColor }] }>
+									{t(lang, 'category.call_volunteer')}
+								</ThemedText>
+							</View>
 						</LinearGradient>
 					</Pressable>
 				) : null}
@@ -338,7 +341,8 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 	categoryIconText: { fontSize: 32, lineHeight: 36, textAlign: 'center' },
-	categoryTitle: { textAlign: 'center', fontWeight: '700', width: '100%' },
+	categoryTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 },
+	categoryTitle: { textAlign: 'center', fontWeight: '700' },
 
 	functionList: { gap: 12 },
 	functionItem: {
