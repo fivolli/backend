@@ -351,4 +351,45 @@ class AiJobStatusOut(BaseModel):
     completed_at: Optional[datetime] = None
 
 
+class ContactSearchItem(BaseModel):
+    id: int
+    name: str
+    phone: str
+    avatar_url: Optional[str] = None
+    relation_status: Optional[Literal["none", "pending_out", "pending_in", "connected"]] = "none"
+
+
+class SendContactRequestIn(BaseModel):
+    target_user_id: int
+
+
+class ContactRequestItem(BaseModel):
+    id: int
+    sender_id: int
+    sender_name: str
+    sender_phone: str
+    sender_avatar_url: Optional[str] = None
+    status: str
+    created_at: datetime
+
+
+class ContactRequestActionIn(BaseModel):
+    action: Literal["accept", "reject"]
+
+
+class ContactRequestActionOut(BaseModel):
+    ok: bool = True
+    status: Literal["accepted", "rejected"]
+
+
+class CloseContactItem(BaseModel):
+    id: int
+    user_id: int
+    contact_user_id: int
+    name: str
+    phone: str
+    avatar_url: Optional[str] = None
+    created_at: datetime
+
+
 

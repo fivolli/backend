@@ -26,7 +26,7 @@ from .schemas import CreateReview, VolunteerRating
 from sqlalchemy.orm import Session, aliased
 from fastapi import Query
 from .schemas import ReviewFeedItem, VolunteerReviewItem, ReviewsStats, LocationIn, LocationUpdateResponse, HospitalItem, VolunteerGeoUpdate, NearbyVolunteer, NearbyRequest, GeoSearchParams, VideoItem
-from sqlalchemy import func
+from sqlalchemy import func, or_, and_
 from sqlalchemy import text
 import httpx
 
@@ -38,7 +38,7 @@ load_dotenv(dotenv_path=_BASE_DIR / ".env", override=False)
 
 
 from .db import Base, engine, get_db, init_db, SessionLocal
-from .models import User, HelpRequest, PushToken, NotificationPrefs, ChatMessage, AiJob
+from .models import User, HelpRequest, PushToken, NotificationPrefs, ChatMessage, AiJob, CloseContactRequest, CloseContact
 from .schemas import (
     RegisterRequest,
     LoginRequest,
@@ -56,6 +56,12 @@ from .schemas import (
     AiTriageOut,
     AiJobCreateOut,
     AiJobStatusOut,
+    ContactSearchItem,
+    SendContactRequestIn,
+    ContactRequestItem,
+    ContactRequestActionIn,
+    ContactRequestActionOut,
+    CloseContactItem,
 )
 from .security import (
     hash_password,
@@ -361,6 +367,51 @@ def _public_url(request: Request, url_or_path: str | None) -> str | None:
     if v.startswith("/"):
         return str(request.base_url).rstrip("/") + v
     return v
+
+
+def _ensure_close_contact_pair(db: Session, user_a: int, user_b: int) -> None:
+    if user_a == user_b:
+        return
+
+    rows = db.query(CloseContact).filter(
+        or_(
+            and_(CloseContact.user_id == user_a, CloseContact.contact_user_id == user_b),
+            and_(CloseContact.user_id == user_b, CloseContact.contact_user_id == user_a),
+        )
+    ).all()
+    existing = {(int(r.user_id), int(r.contact_user_id)) for r in rows}
+
+    if (user_a, user_b) not in existing:
+        db.add(CloseContact(user_id=user_a, contact_user_id=user_b))
+    if (user_b, user_a) not in existing:
+        db.add(CloseContact(user_id=user_b, contact_user_id=user_a))
+
+
+def _relation_status(db: Session, me_id: int, other_id: int) -> str:
+    linked = db.query(CloseContact).filter(
+        CloseContact.user_id == me_id,
+        CloseContact.contact_user_id == other_id,
+    ).first()
+    if linked:
+        return "connected"
+
+    out_req = db.query(CloseContactRequest).filter(
+        CloseContactRequest.sender_id == me_id,
+        CloseContactRequest.receiver_id == other_id,
+        CloseContactRequest.status == "pending",
+    ).first()
+    if out_req:
+        return "pending_out"
+
+    in_req = db.query(CloseContactRequest).filter(
+        CloseContactRequest.sender_id == other_id,
+        CloseContactRequest.receiver_id == me_id,
+        CloseContactRequest.status == "pending",
+    ).first()
+    if in_req:
+        return "pending_in"
+
+    return "none"
 
 
 @app.get("/videos", response_model=List[VideoItem])
@@ -1226,6 +1277,14 @@ def delete_me(
     # Delete notification prefs row.
     db.query(NotificationPrefs).filter(NotificationPrefs.user_id == u.id).delete(synchronize_session=False)
 
+    # Delete close contact rows and requests involving this user.
+    db.query(CloseContact).filter(
+        or_(CloseContact.user_id == u.id, CloseContact.contact_user_id == u.id)
+    ).delete(synchronize_session=False)
+    db.query(CloseContactRequest).filter(
+        or_(CloseContactRequest.sender_id == u.id, CloseContactRequest.receiver_id == u.id)
+    ).delete(synchronize_session=False)
+
     # If user is a volunteer, scrub references in other users' requests.
     db.query(HelpRequest).filter(HelpRequest.accepted_by == u.id).update(
         {
@@ -1343,6 +1402,257 @@ def test_push_to_me(
         return r.json()
     except Exception:
         return {"status": "unknown", "raw": r.text}
+
+
+@app.get("/contacts/search", response_model=List[ContactSearchItem])
+def search_contacts(
+    q: str = Query(..., min_length=2, max_length=64),
+    limit: int = Query(10, ge=1, le=25),
+    request: Request = None,
+    creds: HTTPAuthorizationCredentials = Depends(bearer),
+    db: Session = Depends(get_db),
+):
+    token = creds.credentials
+    me = get_current_user(db, token)
+    if not me:
+        raise HTTPException(401, tr("auth.unauthorized"))
+
+    needle = (q or "").strip()
+    if not needle:
+        return []
+
+    rows = (
+        db.query(User)
+        .filter(User.id != me.id)
+        .filter(
+            or_(
+                User.phone.ilike(f"%{needle}%"),
+                User.name.ilike(f"%{needle}%"),
+                func.lower(User.email).ilike(f"%{needle.lower()}%"),
+            )
+        )
+        .order_by(User.name.asc())
+        .limit(int(limit))
+        .all()
+    )
+
+    out: list[ContactSearchItem] = []
+    for u in rows:
+        out.append(
+            ContactSearchItem(
+                id=int(u.id),
+                name=str(u.name or ""),
+                phone=str(u.phone or ""),
+                avatar_url=_public_url(request, getattr(u, "avatar_url", None)),
+                relation_status=_relation_status(db, int(me.id), int(u.id)),
+            )
+        )
+    return out
+
+
+@app.post("/contacts/requests", response_model=ContactRequestItem)
+def send_contact_request(
+    data: SendContactRequestIn,
+    request: Request,
+    creds: HTTPAuthorizationCredentials = Depends(bearer),
+    db: Session = Depends(get_db),
+):
+    token = creds.credentials
+    me = get_current_user(db, token)
+    if not me:
+        raise HTTPException(401, tr("auth.unauthorized"))
+
+    target_id = int(data.target_user_id)
+    if target_id == int(me.id):
+        raise HTTPException(400, "cannot add yourself")
+
+    target = db.query(User).filter(User.id == target_id).first()
+    if not target:
+        raise HTTPException(404, "user not found")
+
+    if _relation_status(db, int(me.id), target_id) == "connected":
+        raise HTTPException(400, "already connected")
+
+    already_pending = db.query(CloseContactRequest).filter(
+        CloseContactRequest.sender_id == int(me.id),
+        CloseContactRequest.receiver_id == target_id,
+        CloseContactRequest.status == "pending",
+    ).first()
+    if already_pending:
+        return ContactRequestItem(
+            id=int(already_pending.id),
+            sender_id=int(me.id),
+            sender_name=str(me.name or ""),
+            sender_phone=str(me.phone or ""),
+            sender_avatar_url=_public_url(request, getattr(me, "avatar_url", None)),
+            status=str(already_pending.status),
+            created_at=already_pending.created_at,
+        )
+
+    inbound = db.query(CloseContactRequest).filter(
+        CloseContactRequest.sender_id == target_id,
+        CloseContactRequest.receiver_id == int(me.id),
+        CloseContactRequest.status == "pending",
+    ).first()
+    if inbound:
+        _ensure_close_contact_pair(db, int(me.id), target_id)
+        inbound.status = "accepted"
+        inbound.responded_at = datetime.now(timezone.utc)
+        db.commit()
+        db.refresh(inbound)
+        return ContactRequestItem(
+            id=int(inbound.id),
+            sender_id=int(inbound.sender_id),
+            sender_name=str(target.name or ""),
+            sender_phone=str(target.phone or ""),
+            sender_avatar_url=_public_url(request, getattr(target, "avatar_url", None)),
+            status=str(inbound.status),
+            created_at=inbound.created_at,
+        )
+
+    row = CloseContactRequest(
+        sender_id=int(me.id),
+        receiver_id=target_id,
+        status="pending",
+    )
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+    return ContactRequestItem(
+        id=int(row.id),
+        sender_id=int(me.id),
+        sender_name=str(me.name or ""),
+        sender_phone=str(me.phone or ""),
+        sender_avatar_url=_public_url(request, getattr(me, "avatar_url", None)),
+        status=str(row.status),
+        created_at=row.created_at,
+    )
+
+
+@app.get("/contacts/requests/incoming", response_model=List[ContactRequestItem])
+def list_incoming_contact_requests(
+    request: Request,
+    creds: HTTPAuthorizationCredentials = Depends(bearer),
+    db: Session = Depends(get_db),
+):
+    token = creds.credentials
+    me = get_current_user(db, token)
+    if not me:
+        raise HTTPException(401, tr("auth.unauthorized"))
+
+    rows = (
+        db.query(CloseContactRequest, User)
+        .join(User, User.id == CloseContactRequest.sender_id)
+        .filter(CloseContactRequest.receiver_id == int(me.id), CloseContactRequest.status == "pending")
+        .order_by(CloseContactRequest.created_at.desc())
+        .all()
+    )
+
+    return [
+        ContactRequestItem(
+            id=int(r.id),
+            sender_id=int(u.id),
+            sender_name=str(u.name or ""),
+            sender_phone=str(u.phone or ""),
+            sender_avatar_url=_public_url(request, getattr(u, "avatar_url", None)),
+            status=str(r.status),
+            created_at=r.created_at,
+        )
+        for (r, u) in rows
+    ]
+
+
+@app.post("/contacts/requests/{request_id}/respond", response_model=ContactRequestActionOut)
+def respond_contact_request(
+    request_id: int,
+    data: ContactRequestActionIn,
+    creds: HTTPAuthorizationCredentials = Depends(bearer),
+    db: Session = Depends(get_db),
+):
+    token = creds.credentials
+    me = get_current_user(db, token)
+    if not me:
+        raise HTTPException(401, tr("auth.unauthorized"))
+
+    row = db.query(CloseContactRequest).filter(CloseContactRequest.id == request_id).first()
+    if not row:
+        raise HTTPException(404, "request not found")
+    if int(row.receiver_id) != int(me.id):
+        raise HTTPException(403, tr("auth.forbidden"))
+    if row.status != "pending":
+        raise HTTPException(400, "request already processed")
+
+    if data.action == "accept":
+        _ensure_close_contact_pair(db, int(row.sender_id), int(row.receiver_id))
+        row.status = "accepted"
+    else:
+        row.status = "rejected"
+    row.responded_at = datetime.now(timezone.utc)
+
+    db.commit()
+    return {"ok": True, "status": "accepted" if data.action == "accept" else "rejected"}
+
+
+@app.get("/contacts", response_model=List[CloseContactItem])
+def list_close_contacts(
+    request: Request,
+    creds: HTTPAuthorizationCredentials = Depends(bearer),
+    db: Session = Depends(get_db),
+):
+    token = creds.credentials
+    me = get_current_user(db, token)
+    if not me:
+        raise HTTPException(401, tr("auth.unauthorized"))
+
+    rows = (
+        db.query(CloseContact, User)
+        .join(User, User.id == CloseContact.contact_user_id)
+        .filter(CloseContact.user_id == int(me.id))
+        .order_by(CloseContact.created_at.desc())
+        .all()
+    )
+
+    return [
+        CloseContactItem(
+            id=int(link.id),
+            user_id=int(link.user_id),
+            contact_user_id=int(link.contact_user_id),
+            name=str(u.name or ""),
+            phone=str(u.phone or ""),
+            avatar_url=_public_url(request, getattr(u, "avatar_url", None)),
+            created_at=link.created_at,
+        )
+        for (link, u) in rows
+    ]
+
+
+@app.delete("/contacts/{contact_user_id}")
+def remove_close_contact(
+    contact_user_id: int,
+    creds: HTTPAuthorizationCredentials = Depends(bearer),
+    db: Session = Depends(get_db),
+):
+    token = creds.credentials
+    me = get_current_user(db, token)
+    if not me:
+        raise HTTPException(401, tr("auth.unauthorized"))
+
+    db.query(CloseContact).filter(
+        or_(
+            and_(CloseContact.user_id == int(me.id), CloseContact.contact_user_id == int(contact_user_id)),
+            and_(CloseContact.user_id == int(contact_user_id), CloseContact.contact_user_id == int(me.id)),
+        )
+    ).delete(synchronize_session=False)
+
+    db.query(CloseContactRequest).filter(
+        or_(
+            and_(CloseContactRequest.sender_id == int(me.id), CloseContactRequest.receiver_id == int(contact_user_id)),
+            and_(CloseContactRequest.sender_id == int(contact_user_id), CloseContactRequest.receiver_id == int(me.id)),
+        )
+    ).delete(synchronize_session=False)
+
+    db.commit()
+    return {"ok": True}
 
 
 @app.post("/requests", response_model=HelpRequestResponse)

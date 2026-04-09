@@ -13,6 +13,33 @@ import { t } from '@/lib/i18n';
 import { useAuth } from '@/providers/auth-provider';
 import { AppIcon } from '@/components/app-icon';
 
+type FoundContact = {
+	id: number;
+	name: string;
+	phone: string;
+	avatar_url?: string | null;
+	relation_status?: 'none' | 'pending_out' | 'pending_in' | 'connected';
+};
+
+type IncomingContactRequest = {
+	id: number;
+	sender_id: number;
+	sender_name: string;
+	sender_phone: string;
+	status: string;
+	created_at: string;
+};
+
+type CloseContactItem = {
+	id: number;
+	user_id: number;
+	contact_user_id: number;
+	name: string;
+	phone: string;
+	avatar_url?: string | null;
+	created_at: string;
+};
+
 export default function ProfileScreen() {
 	const {
 		loading,
@@ -53,6 +80,13 @@ export default function ProfileScreen() {
 	const [editEmail, setEditEmail] = useState('');
 	const [editFamilyPhone, setEditFamilyPhone] = useState('');
 	const [avatarFailed, setAvatarFailed] = useState(false);
+	const [contactQuery, setContactQuery] = useState('');
+	const [searchBusy, setSearchBusy] = useState(false);
+	const [searchResult, setSearchResult] = useState<FoundContact[]>([]);
+	const [incomingRequests, setIncomingRequests] = useState<IncomingContactRequest[]>([]);
+	const [contacts, setContacts] = useState<CloseContactItem[]>([]);
+	const [contactsBusy, setContactsBusy] = useState(false);
+	const [requestBusyId, setRequestBusyId] = useState<number | null>(null);
 
 	const avatarUri = useMemo(() => {
 		const v = String(me?.avatar_url || '').trim();
@@ -87,11 +121,169 @@ export default function ProfileScreen() {
 		setEditFamilyPhone(String(familyContactPhone || ''));
 	}, [me, editing, familyContactPhone]);
 
+	useEffect(() => {
+		if (!token || !me) return;
+		void loadContactsData();
+	}, [token, me?.id]);
+
 	const canSubmit = useMemo(() => {
 		if (!email.trim() || !password) return false;
 		if (mode === 'register' && !name.trim()) return false;
 		return true;
 	}, [mode, email, password, name]);
+
+	const contactsCopy = useMemo(() => {
+		if (lang === 'en') {
+			return {
+				title: 'Close contacts',
+				searchPlaceholder: 'Phone, name or email',
+				searchButton: 'Search',
+				noResults: 'No users found',
+				sendRequest: 'Send request',
+				pendingOut: 'Request sent',
+				pendingIn: 'Incoming request',
+				connected: 'Already connected',
+				incoming: 'Incoming requests',
+				accept: 'Accept',
+				reject: 'Reject',
+				myContacts: 'My contacts',
+				remove: 'Remove',
+			};
+		}
+		if (lang === 'kg') {
+			return {
+				title: 'Жакын байланыштар',
+				searchPlaceholder: 'Телефон, ат же email',
+				searchButton: 'Издөө',
+				noResults: 'Колдонуучу табылган жок',
+				sendRequest: 'Сурам жөнөтүү',
+				pendingOut: 'Сурам жөнөтүлдү',
+				pendingIn: 'Кирген сурам',
+				connected: 'Байланыш бар',
+				incoming: 'Кирген сурамдар',
+				accept: 'Кабыл алуу',
+				reject: 'Четке кагуу',
+				myContacts: 'Менин байланыштарым',
+				remove: 'Өчүрүү',
+			};
+		}
+		return {
+			title: 'Близкие контакты',
+			searchPlaceholder: 'Телефон, имя или email',
+			searchButton: 'Найти',
+			noResults: 'Пользователи не найдены',
+			sendRequest: 'Отправить запрос',
+			pendingOut: 'Запрос отправлен',
+			pendingIn: 'Входящий запрос',
+			connected: 'Уже в контактах',
+			incoming: 'Входящие запросы',
+			accept: 'Принять',
+			reject: 'Отклонить',
+			myContacts: 'Мои контакты',
+			remove: 'Удалить',
+		};
+	}, [lang]);
+
+	async function loadContactsData() {
+		if (!token) return;
+		setContactsBusy(true);
+		try {
+			const [reqs, list] = await Promise.all([
+				api<IncomingContactRequest[]>('/contacts/requests/incoming', { method: 'GET', token, lang }),
+				api<CloseContactItem[]>('/contacts', { method: 'GET', token, lang }),
+			]);
+			setIncomingRequests(Array.isArray(reqs) ? reqs : []);
+			setContacts(Array.isArray(list) ? list : []);
+		} catch (e: any) {
+			Alert.alert(t(lang, 'common.error'), e?.message ? String(e.message) : t(lang, 'profile.operation_failed'));
+		} finally {
+			setContactsBusy(false);
+		}
+	}
+
+	async function onSearchContacts() {
+		if (!token) return;
+		const q = contactQuery.trim();
+		if (q.length < 2) {
+			setSearchResult([]);
+			return;
+		}
+
+		setSearchBusy(true);
+		try {
+			const encoded = encodeURIComponent(q);
+			const rows = await api<FoundContact[]>(`/contacts/search?q=${encoded}`, {
+				method: 'GET',
+				token,
+				lang,
+			});
+			setSearchResult(Array.isArray(rows) ? rows : []);
+		} catch (e: any) {
+			Alert.alert(t(lang, 'common.error'), e?.message ? String(e.message) : t(lang, 'profile.operation_failed'));
+		} finally {
+			setSearchBusy(false);
+		}
+	}
+
+	async function onSendContactRequest(targetUserId: number) {
+		if (!token) return;
+		setRequestBusyId(targetUserId);
+		try {
+			await api('/contacts/requests', {
+				method: 'POST',
+				token,
+				lang,
+				body: { target_user_id: targetUserId },
+			});
+			await onSearchContacts();
+			await loadContactsData();
+		} catch (e: any) {
+			Alert.alert(t(lang, 'common.error'), e?.message ? String(e.message) : t(lang, 'profile.operation_failed'));
+		} finally {
+			setRequestBusyId(null);
+		}
+	}
+
+	async function onRespondContactRequest(requestId: number, action: 'accept' | 'reject') {
+		if (!token) return;
+		setRequestBusyId(requestId);
+		try {
+			await api(`/contacts/requests/${requestId}/respond`, {
+				method: 'POST',
+				token,
+				lang,
+				body: { action },
+			});
+			await loadContactsData();
+			if (searchResult.length > 0) {
+				await onSearchContacts();
+			}
+		} catch (e: any) {
+			Alert.alert(t(lang, 'common.error'), e?.message ? String(e.message) : t(lang, 'profile.operation_failed'));
+		} finally {
+			setRequestBusyId(null);
+		}
+	}
+
+	async function onRemoveContact(contactUserId: number) {
+		if (!token) return;
+		setRequestBusyId(contactUserId);
+		try {
+			await api(`/contacts/${contactUserId}`, {
+				method: 'DELETE',
+				token,
+				lang,
+			});
+			await loadContactsData();
+			if (searchResult.length > 0) {
+				await onSearchContacts();
+			}
+		} catch (e: any) {
+			Alert.alert(t(lang, 'common.error'), e?.message ? String(e.message) : t(lang, 'profile.operation_failed'));
+		} finally {
+			setRequestBusyId(null);
+		}
+	}
 
 	async function onSubmit() {
 		if (!canSubmit || busy) return;
@@ -664,6 +856,126 @@ export default function ProfileScreen() {
 						) : null}
 
 						<View style={[styles.infoCard, { backgroundColor: surface }]}>
+							<ThemedText style={[styles.contactsTitle, { color: titleColor }]}>{contactsCopy.title}</ThemedText>
+
+							<View style={styles.contactsSearchRow}>
+								<TextInput
+									style={[styles.contactsSearchInput, { backgroundColor: mutedBg, borderColor: border, color: text }]}
+									value={contactQuery}
+									onChangeText={setContactQuery}
+									placeholder={contactsCopy.searchPlaceholder}
+									placeholderTextColor="#999"
+									autoCapitalize="none"
+								/>
+								<Pressable
+									onPress={onSearchContacts}
+									disabled={searchBusy}
+									style={({ pressed }) => [
+										styles.contactsSearchBtn,
+										{ backgroundColor: primary, opacity: searchBusy ? 0.7 : pressed ? 0.9 : 1 },
+									]}
+								>
+									<ThemedText style={styles.contactsSearchBtnText}>{contactsCopy.searchButton}</ThemedText>
+								</Pressable>
+							</View>
+
+							{contactQuery.trim().length >= 2 && searchResult.length === 0 && !searchBusy ? (
+								<ThemedText style={styles.contactsMuted}>{contactsCopy.noResults}</ThemedText>
+							) : null}
+
+							{searchResult.map((u) => (
+								<View key={`search-${u.id}`} style={styles.contactsRow}>
+									<View style={{ flex: 1 }}>
+										<ThemedText style={[styles.contactsName, { color: titleColor }]}>{u.name}</ThemedText>
+										<ThemedText style={styles.contactsPhone}>{u.phone}</ThemedText>
+									</View>
+									{u.relation_status === 'none' ? (
+										<Pressable
+											onPress={() => void onSendContactRequest(u.id)}
+											disabled={requestBusyId === u.id}
+											style={({ pressed }) => [
+												styles.contactsActionBtn,
+												{ backgroundColor: primary, opacity: requestBusyId === u.id ? 0.7 : pressed ? 0.9 : 1 },
+											]}
+										>
+											<ThemedText style={styles.contactsActionBtnText}>{contactsCopy.sendRequest}</ThemedText>
+										</Pressable>
+									) : (
+										<ThemedText style={styles.contactsStatusText}>
+											{u.relation_status === 'pending_out'
+												? contactsCopy.pendingOut
+												: u.relation_status === 'pending_in'
+													? contactsCopy.pendingIn
+													: contactsCopy.connected}
+										</ThemedText>
+									)}
+								</View>
+							))}
+
+							<ThemedText style={[styles.contactsSectionTitle, { color: titleColor }]}>{contactsCopy.incoming}</ThemedText>
+							{incomingRequests.length === 0 ? (
+								<ThemedText style={styles.contactsMuted}>-</ThemedText>
+							) : (
+								incomingRequests.map((r) => (
+									<View key={`incoming-${r.id}`} style={styles.contactsRow}>
+										<View style={{ flex: 1 }}>
+											<ThemedText style={[styles.contactsName, { color: titleColor }]}>{r.sender_name}</ThemedText>
+											<ThemedText style={styles.contactsPhone}>{r.sender_phone}</ThemedText>
+										</View>
+										<View style={styles.contactsMiniBtnRow}>
+											<Pressable
+												onPress={() => void onRespondContactRequest(r.id, 'accept')}
+												disabled={requestBusyId === r.id}
+												style={({ pressed }) => [
+													styles.contactsMiniBtn,
+													{ backgroundColor: primary, opacity: requestBusyId === r.id ? 0.7 : pressed ? 0.9 : 1 },
+												]}
+											>
+												<ThemedText style={styles.contactsMiniBtnText}>{contactsCopy.accept}</ThemedText>
+											</Pressable>
+											<Pressable
+												onPress={() => void onRespondContactRequest(r.id, 'reject')}
+												disabled={requestBusyId === r.id}
+												style={({ pressed }) => [
+													styles.contactsMiniBtn,
+													{ backgroundColor: '#B91717', opacity: requestBusyId === r.id ? 0.7 : pressed ? 0.9 : 1 },
+												]}
+											>
+												<ThemedText style={styles.contactsMiniBtnText}>{contactsCopy.reject}</ThemedText>
+											</Pressable>
+										</View>
+									</View>
+								))
+							)}
+
+							<ThemedText style={[styles.contactsSectionTitle, { color: titleColor }]}>{contactsCopy.myContacts}</ThemedText>
+							{contactsBusy ? (
+								<ThemedText style={styles.contactsMuted}>{t(lang, 'common.loading')}</ThemedText>
+							) : contacts.length === 0 ? (
+								<ThemedText style={styles.contactsMuted}>-</ThemedText>
+							) : (
+								contacts.map((c) => (
+									<View key={`contact-${c.id}`} style={styles.contactsRow}>
+										<View style={{ flex: 1 }}>
+											<ThemedText style={[styles.contactsName, { color: titleColor }]}>{c.name}</ThemedText>
+											<ThemedText style={styles.contactsPhone}>{c.phone}</ThemedText>
+										</View>
+										<Pressable
+											onPress={() => void onRemoveContact(c.contact_user_id)}
+											disabled={requestBusyId === c.contact_user_id}
+											style={({ pressed }) => [
+												styles.contactsActionBtn,
+												{ backgroundColor: '#B91717', opacity: requestBusyId === c.contact_user_id ? 0.7 : pressed ? 0.9 : 1 },
+											]}
+										>
+											<ThemedText style={styles.contactsActionBtnText}>{contactsCopy.remove}</ThemedText>
+										</Pressable>
+									</View>
+								))
+							)}
+						</View>
+
+						<View style={[styles.infoCard, { backgroundColor: surface }]}>
 							<View style={styles.infoRow}>
 								<View style={[styles.infoIcon, { backgroundColor: mutedBg }]}>
 									<AppIcon name="phone" size={22} color={titleColor} />
@@ -866,6 +1178,50 @@ const styles = StyleSheet.create({
 		paddingVertical: 6,
 	},
 	planSwitchBtnText: { fontWeight: '700', fontSize: 12 },
+	contactsTitle: { fontWeight: '800', fontSize: 16, marginBottom: 10 },
+	contactsSearchRow: { flexDirection: 'row', gap: 8, marginBottom: 8 },
+	contactsSearchInput: {
+		flex: 1,
+		borderWidth: 1,
+		borderColor: '#e5e5e5',
+		borderRadius: 10,
+		paddingHorizontal: 12,
+		paddingVertical: 10,
+		fontSize: 14,
+	},
+	contactsSearchBtn: {
+		paddingHorizontal: 12,
+		borderRadius: 10,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	contactsSearchBtnText: { color: '#fff', fontWeight: '700', fontSize: 13 },
+	contactsSectionTitle: { fontWeight: '700', fontSize: 13, marginTop: 8, marginBottom: 6, opacity: 0.85 },
+	contactsRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 8,
+		paddingVertical: 8,
+		borderBottomWidth: 1,
+		borderBottomColor: '#F0F2F5',
+	},
+	contactsName: { fontWeight: '700', fontSize: 14 },
+	contactsPhone: { fontSize: 12, opacity: 0.75, marginTop: 2 },
+	contactsActionBtn: {
+		paddingHorizontal: 10,
+		paddingVertical: 8,
+		borderRadius: 9,
+	},
+	contactsActionBtnText: { color: '#fff', fontWeight: '700', fontSize: 12 },
+	contactsStatusText: { fontSize: 12, opacity: 0.8, fontWeight: '600' },
+	contactsMiniBtnRow: { flexDirection: 'row', gap: 6 },
+	contactsMiniBtn: {
+		paddingHorizontal: 10,
+		paddingVertical: 8,
+		borderRadius: 9,
+	},
+	contactsMiniBtnText: { color: '#fff', fontWeight: '700', fontSize: 12 },
+	contactsMuted: { fontSize: 12, opacity: 0.65, marginBottom: 4 },
 	logoutOutline: {
 		marginTop: 12,
 		width: '100%',

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Float, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Float, Boolean, UniqueConstraint
 from sqlalchemy.sql import func
 from .db import Base
 
@@ -95,6 +95,28 @@ class AiJob(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     completed_at = Column(DateTime(timezone=True), nullable=True)
+
+
+class CloseContactRequest(Base):
+    __tablename__ = "close_contact_requests"
+    id = Column(Integer, primary_key=True, index=True)
+    sender_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    receiver_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    status = Column(String, nullable=False, default="pending", index=True)  # pending|accepted|rejected|canceled
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)
+    responded_at = Column(DateTime(timezone=True), nullable=True)
+
+
+class CloseContact(Base):
+    __tablename__ = "close_contacts"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    contact_user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "contact_user_id", name="uq_close_contacts_user_contact"),
+    )
 
 
 
