@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { AppIcon } from '@/components/app-icon';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { api } from '@/lib/api';
 import { t } from '@/lib/i18n';
@@ -354,7 +355,10 @@ export default function RequestScreen() {
 
 							{!isVolunteer && (data.status === 'accepted' || data.status === 'in_progress' || data.status === 'completed') && (data.volunteer_name || data.volunteer_phone) ? (
 								<View style={[styles.alertBox, { backgroundColor: bg, borderColor: border }]}>
-									<ThemedText style={[styles.alertTitle, { color: titleColor }]}>{t(lang, 'request.volunteer_accepted')}</ThemedText>
+									<View style={styles.alertTitleRow}>
+										<AppIcon name="check" size={26} />
+										<ThemedText style={[styles.alertTitle, { color: titleColor }]}>{t(lang, 'request.volunteer_accepted')}</ThemedText>
+									</View>
 									{data.volunteer_name ? <ThemedText style={[styles.alertLine, { color: text }]}>{data.volunteer_name}</ThemedText> : null}
 									{data.volunteer_phone ? <ThemedText style={[styles.alertLine, { color: text }]}>{data.volunteer_phone}</ThemedText> : null}
 									{vRating ? (
@@ -615,6 +619,7 @@ const styles = StyleSheet.create({
 	h3: { fontWeight: '800', fontSize: 16 },
 	muted: { opacity: 0.75, fontSize: 13 },
 	alertBox: { borderWidth: 1, borderRadius: 12, padding: 12, gap: 6 },
+	alertTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
 	alertTitle: { fontWeight: '800' },
 	alertLine: { lineHeight: 20 },
 	alertSmall: { fontSize: 13, lineHeight: 18 },
