@@ -424,7 +424,6 @@ export default function OnboardingScreen() {
           <View style={[styles.card, { backgroundColor: surface, minHeight: slideMinHeight }]}> 
             <Image source={require('../shield-removebg-preview.png')} style={styles.headerImage} resizeMode="contain" />
             <ThemedText style={[styles.title, styles.roleTitle, { color: primary }]}>{palette.roleDemo.title}</ThemedText>
-            <ThemedText style={[styles.body, styles.roleIntro, { color: muted }]}>{palette.roleDemo.intro}</ThemedText>
             <View style={styles.roleCardsWrap}>
               {palette.roleDemo.cards.map((card) => (
                 <View key={card.title} style={styles.roleCard}>
