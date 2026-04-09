@@ -1173,9 +1173,12 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 				) : data ? (
 					<>
 						<View style={[styles.alertBox, { backgroundColor: bg, borderColor: border }]}>
+							<View style={styles.statusBannerRow}>
+								{data.status === 'accepted' ? <AppIcon name="check" size={30} /> : null}
 								<ThemedText style={[styles.alertText, { color: titleColor }]}>
-								{statusText(lang, data.status, me?.role)}
-							</ThemedText>
+									{statusText(lang, data.status, me?.role)}
+								</ThemedText>
+							</View>
 						</View>
 
 						{me?.role === 'user' && data.status === 'completed' && reviewOpen ? (
@@ -1504,6 +1507,7 @@ const styles = StyleSheet.create({
 		borderRadius: 16,
 		padding: 14,
 	},
+	statusBannerRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
 	alertText: { lineHeight: 20, fontWeight: '600' },
 	mapWrap: {
 		height: 360,
