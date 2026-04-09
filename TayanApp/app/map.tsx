@@ -1268,7 +1268,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 
 						<View style={[styles.card, { backgroundColor: surface, borderColor: border }]}>
 							<View style={styles.row}>
-								<AppIcon name="pasteTick" size={18} color={titleColor} />
+								<AppIcon name="check" size={22} color={titleColor} />
 								<View style={{ flex: 1 }}>
 									<ThemedText style={[styles.rowTitle, { color: titleColor }]}>{t(lang, 'map.status')}</ThemedText>
 									<ThemedText style={[styles.rowValue, { color: text }]}>{t(lang, `request.status.${data.status}`)}</ThemedText>
@@ -1280,7 +1280,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 							) : null}
 							{data.address ? (
 								<View style={styles.row}>
-									<AppIcon name="mapPin" size={18} color={titleColor} />
+									<AppIcon name="mapPin" size={22} color={titleColor} />
 									<View style={{ flex: 1 }}>
 										<ThemedText style={[styles.rowTitle, { color: titleColor }]}>{t(lang, 'map.address')}</ThemedText>
 										<ThemedText style={[styles.rowValue, { color: text }]}>{data.address}</ThemedText>
@@ -1293,7 +1293,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 							) : null}
 							{data.symptoms ? (
 								<View style={styles.row}>
-									<AppIcon name="firstAid" size={18} color={titleColor} />
+									<AppIcon name="firstAid" size={22} color={titleColor} />
 									<View style={{ flex: 1 }}>
 										<ThemedText style={[styles.rowTitle, { color: titleColor }]}>{t(lang, 'map.symptoms')}</ThemedText>
 										<ThemedText style={[styles.rowValue, { color: text }]}>{data.symptoms}</ThemedText>
@@ -1306,7 +1306,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 							) : null}
 							{data.comments ? (
 								<View style={styles.row}>
-									<AppIcon name="chat" size={18} color={titleColor} />
+									<AppIcon name="chat" size={22} color={titleColor} />
 									<View style={{ flex: 1 }}>
 										<ThemedText style={[styles.rowTitle, { color: titleColor }]}>{t(lang, 'map.comment')}</ThemedText>
 										<ThemedText style={[styles.rowValue, { color: text }]}>{data.comments}</ThemedText>
@@ -1405,7 +1405,7 @@ async function setVolunteerStatus(status: 'in_progress' | 'completed' | 'cancele
 
 							<View style={[styles.card, { backgroundColor: surface, borderColor: border }]}>
 								<View style={styles.timelineTitleRow}>
-									<AppIcon name="clock" size={18} color={titleColor} />
+									<AppIcon name="clock" size={26} color={titleColor} />
 									<ThemedText style={[styles.rowTitle, { color: titleColor }]}>{t(lang, 'map.timeline')}</ThemedText>
 								</View>
 								<ThemedText style={[styles.rowValue, { color: text }]}>{t(lang, 'request.created', { time: fmtTimeIso(data.created_at) })}</ThemedText>

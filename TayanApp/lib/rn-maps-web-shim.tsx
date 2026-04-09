@@ -1,5 +1,5 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
 declare global {
   interface Window {
@@ -368,11 +368,12 @@ const MapView = forwardRef<any, MapViewProps>(function MapView({ style, initialR
       const L = window.L;
       if (!L) return;
       const map = L.map(mapHostRef.current, {
-        zoomControl: true,
+        zoomControl: false,
         attributionControl: true,
       });
       // Keep OSM attribution but remove the default Leaflet prefix/logo.
       map.attributionControl.setPrefix(false);
+
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
       }).addTo(map);
@@ -459,6 +460,32 @@ const MapView = forwardRef<any, MapViewProps>(function MapView({ style, initialR
     return (
       <View style={[styles.map, style]}>
         <View ref={mapHostRef} collapsable={false} style={styles.host} />
+        <View pointerEvents="box-none" style={styles.zoomControlsWrap}>
+          <Pressable
+            onPress={() => {
+              try {
+                leafletMapRef.current?.zoomIn?.();
+              } catch {
+                // ignore
+              }
+            }}
+            style={({ pressed }) => [styles.zoomBtn, pressed ? { opacity: 0.85 } : null]}
+          >
+            <Image source={require('@/assets/images/Zoom In.png')} style={styles.zoomIcon} />
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              try {
+                leafletMapRef.current?.zoomOut?.();
+              } catch {
+                // ignore
+              }
+            }}
+            style={({ pressed }) => [styles.zoomBtn, pressed ? { opacity: 0.85 } : null]}
+          >
+            <Image source={require('@/assets/images/Zoom Out.png')} style={styles.zoomIcon} />
+          </Pressable>
+        </View>
       </View>
     );
   }
@@ -584,6 +611,30 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 10,
     fontWeight: '700',
+  },
+  zoomControlsWrap: {
+    position: 'absolute',
+    left: 12,
+    top: 12,
+    gap: 6,
+  },
+  zoomBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  zoomIcon: {
+    width: 24,
+    height: 24,
+    resizeMode: 'contain',
   },
 });
 
