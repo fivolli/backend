@@ -9,9 +9,12 @@ const NOTIFICATIONS_KEY = 'tayan.notifications';
 const AI_PENDING_JOB_KEY = 'tayan.aiPendingJobId';
 const THEME_KEY = 'tayan.theme';
 const ONBOARDING_SEEN_KEY = 'tayan.onboardingSeen';
+const SUBSCRIPTION_PLAN_KEY = 'tayan.subscriptionPlan';
+const FAMILY_CONTACT_PHONE_KEY = 'tayan.familyContactPhone';
 
 export type AppLang = 'ru' | 'en' | 'kg';
 export type ThemePreference = 'system' | 'light' | 'dark';
+export type SubscriptionPlan = 'individual' | 'family';
 
 export type NotificationPrefs = {
   sos: boolean;
@@ -314,6 +317,64 @@ export async function setOnboardingSeen(value: boolean = true): Promise<void> {
   }
   try {
     await SecureStore.setItemAsync(ONBOARDING_SEEN_KEY, raw);
+  } catch {
+  }
+}
+
+export async function getSubscriptionPlan(): Promise<SubscriptionPlan | null> {
+  if (Platform.OS === 'web') {
+    const v = webGet(SUBSCRIPTION_PLAN_KEY);
+    if (v === 'individual' || v === 'family') return v;
+  }
+  try {
+    const v = await SecureStore.getItemAsync(SUBSCRIPTION_PLAN_KEY);
+    if (v === 'individual' || v === 'family') return v;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export async function setSubscriptionPlan(plan: SubscriptionPlan): Promise<void> {
+  if (Platform.OS === 'web') {
+    webSet(SUBSCRIPTION_PLAN_KEY, plan);
+  }
+  try {
+    await SecureStore.setItemAsync(SUBSCRIPTION_PLAN_KEY, plan);
+  } catch {
+  }
+}
+
+export async function clearSubscriptionPlan(): Promise<void> {
+  if (Platform.OS === 'web') {
+    webDelete(SUBSCRIPTION_PLAN_KEY);
+  }
+  try {
+    await SecureStore.deleteItemAsync(SUBSCRIPTION_PLAN_KEY);
+  } catch {
+  }
+}
+
+export async function getFamilyContactPhone(): Promise<string> {
+  if (Platform.OS === 'web') {
+    return (webGet(FAMILY_CONTACT_PHONE_KEY) || '').trim();
+  }
+  try {
+    return String((await SecureStore.getItemAsync(FAMILY_CONTACT_PHONE_KEY)) || '').trim();
+  } catch {
+    return '';
+  }
+}
+
+export async function setFamilyContactPhone(phone: string): Promise<void> {
+  const v = String(phone || '').trim();
+  if (Platform.OS === 'web') {
+    if (v) webSet(FAMILY_CONTACT_PHONE_KEY, v);
+    else webDelete(FAMILY_CONTACT_PHONE_KEY);
+  }
+  try {
+    if (v) await SecureStore.setItemAsync(FAMILY_CONTACT_PHONE_KEY, v);
+    else await SecureStore.deleteItemAsync(FAMILY_CONTACT_PHONE_KEY);
   } catch {
   }
 }

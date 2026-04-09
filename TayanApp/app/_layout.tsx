@@ -35,7 +35,7 @@ function PersistentBottomNav() {
 
   
   if (!token) return null;
-  if (!pathname || pathname === '/' || pathname === '/login' || pathname === '/register') return null;
+  if (!pathname || pathname === '/' || pathname === '/login' || pathname === '/register' || pathname === '/subscription') return null;
 
   const isHome = pathname === '/home';
   const isSettings = pathname === '/settings';
@@ -61,6 +61,22 @@ function PersistentBottomNav() {
       </Pressable>
     </View>
   );
+}
+
+function SubscriptionGate() {
+  const pathname = usePathname();
+  const { loading, token, subscriptionPlan } = useAuth();
+
+  useEffect(() => {
+    if (loading) return;
+    if (!token) return;
+    if (subscriptionPlan) return;
+    if (!pathname) return;
+    if (pathname === '/subscription' || pathname === '/login' || pathname === '/register' || pathname === '/onboarding') return;
+    router.replace('/subscription' as any);
+  }, [loading, token, subscriptionPlan, pathname]);
+
+  return null;
 }
 
 export default function RootLayout() {
@@ -139,6 +155,7 @@ export default function RootLayout() {
   return (
     <ThemeProvider>
       <AuthProvider>
+        <SubscriptionGate />
         <View style={{ flex: 1 }}>
           <View style={{ flex: 1 }}>
             <Stack
@@ -148,6 +165,7 @@ export default function RootLayout() {
             >
               <Stack.Screen name="index" />
               <Stack.Screen name="onboarding" />
+              <Stack.Screen name="subscription" />
               <Stack.Screen name="home" />
               <Stack.Screen name="categories" />
               <Stack.Screen name="category" />

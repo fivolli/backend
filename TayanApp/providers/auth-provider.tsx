@@ -5,7 +5,20 @@ import { DEFAULT_LANG } from '@/lib/config';
 import { api } from '@/lib/api';
 import { getGeoOrNull } from '@/lib/location';
 import { registerForPushNotificationsAsync } from '@/lib/push-notifications';
-import { clearLastRequestId, clearToken, getAppLang, getNotificationPrefs, getToken, setAppLang, setToken } from '@/lib/storage';
+import {
+  clearLastRequestId,
+  clearToken,
+  getAppLang,
+  getFamilyContactPhone,
+  getNotificationPrefs,
+  getSubscriptionPlan,
+  getToken,
+  setAppLang,
+  setFamilyContactPhone as setFamilyContactPhoneStored,
+  setSubscriptionPlan as setSubscriptionPlanStored,
+  setToken,
+  type SubscriptionPlan,
+} from '@/lib/storage';
 
 export type UserRole = 'user' | 'volunteer';
 
@@ -24,6 +37,10 @@ type AuthContextValue = {
   loading: boolean;
   token: string | null;
   me: Me | null;
+  subscriptionPlan: SubscriptionPlan | null;
+  setSubscriptionPlan: (plan: SubscriptionPlan) => Promise<void>;
+  familyContactPhone: string;
+  setFamilyContactPhone: (phone: string) => Promise<void>;
   lang: 'ru' | 'en' | 'kg';
   setLang: (lang: 'ru' | 'en' | 'kg') => void;
   refreshMe: () => Promise<void>;
@@ -121,11 +138,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [token, setTokenState] = useState<string | null>(null);
   const [me, setMe] = useState<Me | null>(null);
+  const [subscriptionPlan, setSubscriptionPlanState] = useState<SubscriptionPlan | null>(null);
+  const [familyContactPhone, setFamilyContactPhoneState] = useState('');
   const [lang, setLang] = useState<'ru' | 'en' | 'kg'>(DEFAULT_LANG);
 
   const setLangPersisted = useCallback((next: 'ru' | 'en' | 'kg') => {
     setLang(next);
     void setAppLang(next);
+  }, []);
+
+  const setSubscriptionPlanPersisted = useCallback(async (plan: SubscriptionPlan) => {
+    setSubscriptionPlanState(plan);
+    await setSubscriptionPlanStored(plan);
+  }, []);
+
+  const setFamilyContactPhonePersisted = useCallback(async (phone: string) => {
+    const v = String(phone || '').trim();
+    setFamilyContactPhoneState(v);
+    await setFamilyContactPhoneStored(v);
   }, []);
 
   const refreshMe = useCallback(async () => {
@@ -171,9 +201,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let alive = true;
     (async () => {
       try {
-        const [savedToken, savedLang] = await Promise.all([getToken(), getAppLang()]);
+        const [savedToken, savedLang, savedPlan, savedFamilyPhone] = await Promise.all([
+          getToken(),
+          getAppLang(),
+          getSubscriptionPlan(),
+          getFamilyContactPhone(),
+        ]);
         if (!alive) return;
         if (savedLang) setLang(savedLang);
+        setSubscriptionPlanState(savedPlan || null);
+        setFamilyContactPhoneState(savedFamilyPhone || '');
         if (!savedToken) {
           setTokenState(null);
           setMe(null);
@@ -325,6 +362,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       loading,
       token,
       me,
+      subscriptionPlan,
+      setSubscriptionPlan: setSubscriptionPlanPersisted,
+      familyContactPhone,
+      setFamilyContactPhone: setFamilyContactPhonePersisted,
       lang,
       setLang: setLangPersisted,
       refreshMe,
@@ -332,7 +373,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       register,
       signOut,
     }),
-    [loading, token, me, lang, setLangPersisted, refreshMe, signIn, register, signOut]
+    [
+      loading,
+      token,
+      me,
+      subscriptionPlan,
+      setSubscriptionPlanPersisted,
+      familyContactPhone,
+      setFamilyContactPhonePersisted,
+      lang,
+      setLangPersisted,
+      refreshMe,
+      signIn,
+      register,
+      signOut,
+    ]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

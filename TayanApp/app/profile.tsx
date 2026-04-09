@@ -14,7 +14,19 @@ import { useAuth } from '@/providers/auth-provider';
 import { AppIcon } from '@/components/app-icon';
 
 export default function ProfileScreen() {
-	const { loading, me, signIn, register, signOut, lang, token, refreshMe } = useAuth();
+	const {
+		loading,
+		me,
+		signIn,
+		register,
+		signOut,
+		lang,
+		token,
+		refreshMe,
+		subscriptionPlan,
+		familyContactPhone,
+		setFamilyContactPhone,
+	} = useAuth();
 	const insets = useSafeAreaInsets();
 	const primary = useThemeColor({}, 'primary');
 	const danger = useThemeColor({}, 'danger');
@@ -39,6 +51,7 @@ export default function ProfileScreen() {
 	const [editing, setEditing] = useState(false);
 	const [editName, setEditName] = useState('');
 	const [editEmail, setEditEmail] = useState('');
+	const [editFamilyPhone, setEditFamilyPhone] = useState('');
 	const [avatarFailed, setAvatarFailed] = useState(false);
 
 	const avatarUri = useMemo(() => {
@@ -71,7 +84,8 @@ export default function ProfileScreen() {
 		if (editing) return;
 		setEditName(me.name || '');
 		setEditEmail(String(me.email || ''));
-	}, [me, editing]);
+		setEditFamilyPhone(String(familyContactPhone || ''));
+	}, [me, editing, familyContactPhone]);
 
 	const canSubmit = useMemo(() => {
 		if (!email.trim() || !password) return false;
@@ -129,6 +143,9 @@ export default function ProfileScreen() {
 					email: editEmail,
 				},
 			});
+			if (subscriptionPlan === 'family') {
+				await setFamilyContactPhone(editFamilyPhone);
+			}
 			await refreshMe();
 			setEditing(false);
 			Alert.alert(t(lang, 'common.done'), t(lang, 'profile.profile_saved'));
@@ -240,6 +257,7 @@ export default function ProfileScreen() {
 		setEditing(false);
 		setEditName(me.name || '');
 		setEditEmail(String(me.email || ''));
+		setEditFamilyPhone(String(familyContactPhone || ''));
 	}
 
 	if (!me) {
@@ -544,6 +562,22 @@ export default function ProfileScreen() {
 									editable={!saveBusy}
 								/>
 
+								{subscriptionPlan === 'family' ? (
+									<>
+										<ThemedText style={[styles.label, { color: titleColor }]}>Номер близкого</ThemedText>
+										<TextInput
+											style={[styles.input, { backgroundColor: mutedBg, borderColor: border, color: text }]}
+											value={editFamilyPhone}
+											onChangeText={setEditFamilyPhone}
+											placeholder="+996 XXX XXX XXX"
+											placeholderTextColor="#999"
+											keyboardType="phone-pad"
+											autoCapitalize="none"
+											editable={!saveBusy}
+										/>
+									</>
+								) : null}
+
 								<View style={styles.editBtnRow}>
 									<Pressable
 										style={({ pressed }) => [
@@ -582,6 +616,26 @@ export default function ProfileScreen() {
 						<View style={[styles.infoCard, { backgroundColor: surface }]}>
 							<View style={styles.infoRow}>
 								<View style={[styles.infoIcon, { backgroundColor: mutedBg }]}>
+									<AppIcon name="clipboard" size={20} color={titleColor} />
+								</View>
+								<View style={{ flex: 1 }}>
+									<ThemedText style={styles.infoLabel}>Подписка</ThemedText>
+									<ThemedText style={[styles.infoValue, { color: titleColor }]}>
+										{subscriptionPlan === 'family' ? 'Семейная' : 'Индивидуальная'}
+									</ThemedText>
+								</View>
+								<Pressable
+									onPress={() => router.push('/subscription')}
+									style={({ pressed }) => [styles.planSwitchBtn, { borderColor: primary, opacity: pressed ? 0.9 : 1 }]}
+								>
+									<ThemedText style={[styles.planSwitchBtnText, { color: titleColor }]}>Сменить</ThemedText>
+								</Pressable>
+							</View>
+						</View>
+
+						<View style={[styles.infoCard, { backgroundColor: surface }]}>
+							<View style={styles.infoRow}>
+								<View style={[styles.infoIcon, { backgroundColor: mutedBg }]}>
 									<AppIcon name="email" size={22} color={titleColor} />
 								</View>
 								<View style={{ flex: 1 }}>
@@ -592,6 +646,22 @@ export default function ProfileScreen() {
 								</View>
 							</View>
 						</View>
+
+						{subscriptionPlan === 'family' ? (
+							<View style={[styles.infoCard, { backgroundColor: surface }]}>
+								<View style={styles.infoRow}>
+									<View style={[styles.infoIcon, { backgroundColor: mutedBg }]}>
+										<AppIcon name="phoneVolume" size={22} color={titleColor} />
+									</View>
+									<View style={{ flex: 1 }}>
+										<ThemedText style={styles.infoLabel}>Номер близкого</ThemedText>
+										<ThemedText style={[styles.infoValue, { color: titleColor }]}>
+											{familyContactPhone || 'Не указан'}
+										</ThemedText>
+									</View>
+								</View>
+							</View>
+						) : null}
 
 						<View style={[styles.infoCard, { backgroundColor: surface }]}>
 							<View style={styles.infoRow}>
@@ -789,6 +859,13 @@ const styles = StyleSheet.create({
 	infoIconText: { fontSize: 18 },
 	infoLabel: { opacity: 0.75, fontSize: 12 },
 	infoValue: { fontWeight: '700', marginTop: 2 },
+	planSwitchBtn: {
+		borderWidth: 1,
+		borderRadius: 10,
+		paddingHorizontal: 10,
+		paddingVertical: 6,
+	},
+	planSwitchBtnText: { fontWeight: '700', fontSize: 12 },
 	logoutOutline: {
 		marginTop: 12,
 		width: '100%',

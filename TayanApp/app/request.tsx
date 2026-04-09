@@ -111,7 +111,7 @@ async function osrmEta(volLat: number, volLng: number, userLat: number, userLng:
 export default function RequestScreen() {
 	const params = useLocalSearchParams<{ id?: string }>();
 	const id = params.id ? Number(params.id) : 0;
-	const { token, lang, me } = useAuth();
+	const { token, lang, me, subscriptionPlan, familyContactPhone } = useAuth();
 	const insets = useSafeAreaInsets();
 	const primary = useThemeColor({}, 'primary');
 	const surface = useThemeColor({}, 'surface');
@@ -125,6 +125,7 @@ export default function RequestScreen() {
 	const [data, setData] = useState<RequestDetail | null>(null);
 	const [loadError, setLoadError] = useState<string>('');
 	const [vRating, setVRating] = useState<VolunteerRating | null>(null);
+	const [notifyBusy, setNotifyBusy] = useState(false);
 	const [eta, setEta] = useState<EtaInfo | null>(null);
 	const [etaLoading, setEtaLoading] = useState(false);
 	const [reviewRating, setReviewRating] = useState<number>(5);
@@ -137,6 +138,7 @@ export default function RequestScreen() {
 	}, [me?.role, id]);
 
 	const isVolunteer = me?.role === 'volunteer';
+	const canNotifyFamily = subscriptionPlan === 'family' && Boolean(String(familyContactPhone || '').trim());
 	const reactionMinutes = useMemo(() => {
 		const fromBackend = data?.reaction_minutes;
 		if (fromBackend != null && Number.isFinite(Number(fromBackend))) return Number(fromBackend);
@@ -311,6 +313,26 @@ export default function RequestScreen() {
 		}
 	}
 
+	async function notifyFamilyContact() {
+		if (!canNotifyFamily || notifyBusy) return;
+		const phone = String(familyContactPhone || '').trim();
+		if (!phone) return;
+		setNotifyBusy(true);
+		try {
+			const who = (me?.name || t(lang, 'common.user')).trim();
+			const msg = lang === 'en'
+				? `${who} requested volunteer help.`
+				: lang === 'kg'
+					? `${who} ыктыярчыны чакырды.`
+					: `${who} вызвал(а) волонтёра.`;
+			await Linking.openURL(`sms:${phone}?body=${encodeURIComponent(msg)}`);
+		} catch {
+			Alert.alert(t(lang, 'common.phone_unavailable_title'), t(lang, 'common.phone_unavailable_text'));
+		} finally {
+			setNotifyBusy(false);
+		}
+	}
+
 	return (
 		<ThemedView style={styles.container}>
 			<View style={[styles.header, { backgroundColor: primary, paddingTop: 24 + insets.top }]}>
@@ -385,6 +407,16 @@ export default function RequestScreen() {
 									>
 											<ThemedText style={styles.btnPrimaryText}>{t(lang, 'request.volunteer_profile')}</ThemedText>
 									</Pressable>
+									) : null}
+									{canNotifyFamily ? (
+										<Pressable
+											onPress={() => void notifyFamilyContact()}
+											style={({ pressed }) => [styles.btnOutline, { borderColor: border }, pressed ? { opacity: 0.9 } : null]}
+										>
+											<ThemedText style={[styles.btnOutlineText, { color: titleColor }]}>
+												{notifyBusy ? t(lang, 'profile.please_wait') : (lang === 'en' ? 'Notify family contact' : lang === 'kg' ? 'Жакын байланышты билдирүү' : 'Сообщить близкому')}
+											</ThemedText>
+										</Pressable>
 									) : null}
 								</View>
 							) : null}
