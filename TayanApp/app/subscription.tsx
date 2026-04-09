@@ -113,7 +113,6 @@ export default function SubscriptionScreen() {
         showsVerticalScrollIndicator={false}
       >
         <ThemedText style={[styles.title, { color: primary }]}>{copy.title}</ThemedText>
-        <ThemedText style={[styles.subtitle, { color: text }]}>{copy.subtitle}</ThemedText>
 
         <View style={[styles.trial, { borderColor: `${primary}66`, backgroundColor: `${primary}10` }]}>
           <ThemedText style={[styles.trialText, { color: primary }]}>{copy.trial}</ThemedText>
