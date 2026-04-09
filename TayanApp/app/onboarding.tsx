@@ -31,6 +31,7 @@ type CopyPack = {
   skip: string;
   create: string;
   login: string;
+  continue: string;
   slides: SlideCopy[];
   levels: {
     title: string;
@@ -50,6 +51,7 @@ const COPY: Record<AppLang, CopyPack> = {
     skip: 'Пропустить',
     create: 'Создать аккаунт',
     login: 'Войти',
+    continue: 'Продолжить',
     slides: [
       {
         title: 'Tayan рядом, когда нужна помощь',
@@ -119,6 +121,7 @@ const COPY: Record<AppLang, CopyPack> = {
     skip: 'Skip',
     create: 'Create account',
     login: 'Log in',
+    continue: 'Continue',
     slides: [
       {
         title: 'Tayan is close when help matters',
@@ -188,6 +191,7 @@ const COPY: Record<AppLang, CopyPack> = {
     skip: 'Өткөрүү',
     create: 'Аккаунт түзүү',
     login: 'Кирүү',
+    continue: 'Улантуу',
     slides: [
       {
         title: 'Tayan жардам керек учурда жаныңда',
@@ -280,14 +284,14 @@ export default function OnboardingScreen() {
     [insets.top, width]
   );
 
-  const complete = async (target: '/login' | '/register') => {
+  const complete = async (target: '/login' | '/register' = '/register') => {
     await setOnboardingSeen(true);
-    router.replace({ pathname: target, params: { fromOnboarding: '1' } });
+    router.replace({ pathname: '/subscription', params: { fromOnboarding: '1', next: target } } as any);
   };
 
   const goNext = async () => {
     if (index >= 3) {
-      await complete('/register');
+      await complete();
       return;
     }
     scrollRef.current?.scrollTo({ x: (index + 1) * width, animated: true });
@@ -436,16 +440,11 @@ export default function OnboardingScreen() {
             </LinearGradient>
           </Pressable>
         ) : (
-          <View style={styles.finalActions}>
-            <Pressable onPress={() => void complete('/register')} style={styles.actionWrap}>
-              <LinearGradient colors={['#13E0C7', '#12C69F']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.primaryButton}>
-                <ThemedText style={styles.primaryButtonText}>{palette.create}</ThemedText>
-              </LinearGradient>
-            </Pressable>
-            <Pressable onPress={() => void complete('/login')} style={styles.secondaryButton}>
-              <ThemedText style={styles.secondaryButtonText}>{palette.login}</ThemedText>
-            </Pressable>
-          </View>
+          <Pressable onPress={() => void complete()} style={styles.actionWrap}>
+            <LinearGradient colors={['#13E0C7', '#12C69F']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.primaryButton}>
+              <ThemedText style={styles.primaryButtonText}>{palette.continue}</ThemedText>
+            </LinearGradient>
+          </Pressable>
         )}
       </View>
     </ThemedView>

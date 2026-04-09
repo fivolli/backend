@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
@@ -42,6 +43,7 @@ const COPY = {
 
 export default function SubscriptionScreen() {
   const { token, lang, subscriptionPlan, setSubscriptionPlan } = useAuth();
+  const params = useLocalSearchParams<{ next?: string; fromOnboarding?: string }>();
   const insets = useSafeAreaInsets();
 
   const primary = useThemeColor({}, 'primary');
@@ -52,12 +54,17 @@ export default function SubscriptionScreen() {
 
   const copy = COPY[(lang as keyof typeof COPY) || 'ru'] ?? COPY.ru;
 
-  if (!token) {
-    router.replace('/onboarding' as any);
-    return <ThemedView style={{ flex: 1 }} />;
-  }
-
   const current = subscriptionPlan || 'individual';
+
+  const onContinue = () => {
+    if (token) {
+      router.replace('/home');
+      return;
+    }
+
+    const nextRoute = params.next === '/login' ? '/login' : '/register';
+    router.replace({ pathname: nextRoute, params: { fromOnboarding: '1' } } as any);
+  };
 
   return (
     <ThemedView style={[styles.container, { backgroundColor: bg }]}> 
@@ -100,7 +107,7 @@ export default function SubscriptionScreen() {
         </Pressable>
 
         <Pressable
-          onPress={() => router.replace('/home')}
+          onPress={onContinue}
           style={({ pressed }) => [
             styles.continueBtn,
             { backgroundColor: primary, opacity: pressed ? 0.9 : 1 },
