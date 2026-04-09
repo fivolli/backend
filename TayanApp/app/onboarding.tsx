@@ -421,7 +421,7 @@ export default function OnboardingScreen() {
         </View>
 
         <View style={slideStyle}>
-          <View style={[styles.card, { backgroundColor: surface, minHeight: slideMinHeight }]}> 
+          <View style={[styles.card, styles.roleDemoCard, { backgroundColor: surface }]}> 
             <Image source={require('../shield-removebg-preview.png')} style={styles.headerImage} resizeMode="contain" />
             <ThemedText style={[styles.title, styles.roleTitle, { color: primary }]}>{palette.roleDemo.title}</ThemedText>
             <View style={styles.roleCardsWrap}>
@@ -601,13 +601,17 @@ const styles = StyleSheet.create({
   roleTitle: {
     fontSize: 34,
     lineHeight: 40,
-    marginBottom: 8,
+    marginBottom: 22,
+  },
+  roleDemoCard: {
+    justifyContent: 'flex-start',
+    paddingBottom: 14,
   },
   roleIntro: {
     marginBottom: 14,
   },
   roleCardsWrap: {
-    gap: 12,
+    gap: 18,
   },
   roleCard: {
     borderWidth: 2,
