@@ -1,6 +1,8 @@
 import { Image, type ImageStyle, type StyleProp } from 'react-native';
 
 export type AppIconName =
+  | 'home'
+  | 'settings'
   | 'profile'
   | 'notification'
   | 'news'
@@ -28,6 +30,8 @@ export type AppIconName =
   | 'pasteTick';
 
 const ICONS: Record<AppIconName, any> = {
+  home: require('@/assets/images/Home.png'),
+  settings: require('@/assets/images/Settings.png'),
   profile: require('@/assets/images/Profile.png'),
   notification: require('@/assets/images/Notification.png'),
   news: require('@/assets/images/News.png'),

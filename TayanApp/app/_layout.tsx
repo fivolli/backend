@@ -8,6 +8,7 @@ import { AuthProvider } from '@/providers/auth-provider';
 import { initNotifications } from '@/lib/push-notifications';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { ThemedText } from '@/components/themed-text';
+import { AppIcon } from '@/components/app-icon';
 import { t } from '@/lib/i18n';
 import { useAuth } from '@/providers/auth-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
@@ -47,7 +48,7 @@ function PersistentBottomNav() {
         onPress={goHome}
         style={({ pressed }) => [styles.bottomNavItem, pressed ? { opacity: 0.85 } : null]}
       >
-        <ThemedText style={[styles.bottomNavIcon, { color: isHome ? primary : text }]}>🏠</ThemedText>
+        <AppIcon name="home" size={24} color={isHome ? primary : text} style={styles.bottomNavIcon} />
         <ThemedText style={[styles.bottomNavText, { color: isHome ? primary : text }]}>{t(lang, 'home.tab_home')}</ThemedText>
       </Pressable>
 
@@ -56,7 +57,7 @@ function PersistentBottomNav() {
         onPress={goSettings}
         style={({ pressed }) => [styles.bottomNavItem, pressed ? { opacity: 0.85 } : null]}
       >
-        <ThemedText style={[styles.bottomNavIcon, { color: isSettings ? primary : text }]}>⚙️</ThemedText>
+        <AppIcon name="settings" size={24} color={isSettings ? primary : text} style={styles.bottomNavIcon} />
         <ThemedText style={[styles.bottomNavText, { color: isSettings ? primary : text }]}>{t(lang, 'settings.title')}</ThemedText>
       </Pressable>
     </View>
@@ -194,6 +195,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
   },
   bottomNavItem: { alignItems: 'center', flex: 1, paddingVertical: 4 },
-  bottomNavIcon: { fontSize: 24 },
+  bottomNavIcon: { marginBottom: 2 },
   bottomNavText: { fontSize: 12, fontWeight: '700' },
 });

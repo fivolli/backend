@@ -695,7 +695,7 @@ export default function ProfileScreen() {
 							</Pressable>
 							<ThemedText style={styles.profileHeaderTitle}>{t(lang, 'profile.title')}</ThemedText>
 							<Pressable onPress={() => router.push('/settings')} style={styles.headerIconBtn}>
-								<AppIcon name="lock" size={18} color="#fff" />
+								<AppIcon name="settings" size={18} color="#fff" />
 							</Pressable>
 						</View>
 
