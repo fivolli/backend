@@ -38,7 +38,7 @@ const RU: Dict = {
   'home.hello': 'Привет,',
   'home.user_fallback': 'Пользователь',
   'home.sos_title': 'SOS',
-  'home.sos_button': '🚨 ЭКСТРЕННАЯ ПОМОЩЬ (103)',
+  'home.sos_button': 'ЭКСТРЕННАЯ ПОМОЩЬ (103)',
   'home.need_sign_in': 'Нужно войти',
   'home.sign_in_first': 'Сначала войдите в аккаунт',
   'home.sos_confirm': 'Вы уверены, что хотите отправить экстренный запрос? Ближайшие волонтеры будут уведомлены.',
@@ -362,7 +362,7 @@ const RU: Dict = {
   'symptom.comments_placeholder': 'Любая дополнительная информация…',
   'symptom.tip_label': 'Совет:',
   'symptom.tip_text': 'Будьте максимально точны в описании симптомов. Это поможет волонтёрам оказать вам наилучшую помощь.',
-  'symptom.send_request': '📤 Отправить запрос',
+  'symptom.send_request': 'Отправить запрос',
 };
 
 const EN: Dict = {
@@ -401,7 +401,7 @@ const EN: Dict = {
   'home.hello': 'Hello,',
   'home.user_fallback': 'User',
   'home.sos_title': 'SOS',
-  'home.sos_button': '🚨 EMERGENCY HELP (103)',
+  'home.sos_button': 'EMERGENCY HELP (103)',
   'home.need_sign_in': 'Sign in required',
   'home.sign_in_first': 'Please sign in first',
   'home.sos_confirm': 'Are you sure you want to send an emergency request? Nearby volunteers will be notified.',
@@ -725,7 +725,7 @@ const EN: Dict = {
   'symptom.comments_placeholder': 'Any additional information…',
   'symptom.tip_label': 'Tip:',
   'symptom.tip_text': 'Be as specific as possible in describing symptoms. This helps volunteers provide better assistance.',
-  'symptom.send_request': '📤 Send request',
+  'symptom.send_request': 'Send request',
 };
 
 const KG: Dict = {
@@ -764,7 +764,7 @@ const KG: Dict = {
   'home.hello': 'Саламатсызбы,',
   'home.user_fallback': 'Колдонуучу',
   'home.sos_title': 'SOS',
-  'home.sos_button': '🚨 ШАШЫЛЫШ ЖАРДАМ (103)',
+  'home.sos_button': 'ШАШЫЛЫШ ЖАРДАМ (103)',
   'home.need_sign_in': 'Кирүү керек',
   'home.sign_in_first': 'Адегенде аккаунтка кириңиз',
   'home.sos_confirm': 'Шашылыш сурам жөнөтүүнү каалайсызбы? Жакынкы ыктыярчыларга билдирүү кетет.',
@@ -1088,7 +1088,7 @@ const KG: Dict = {
   'symptom.comments_placeholder': 'Кошумча маалымат…',
   'symptom.tip_label': 'Кеңеш:',
   'symptom.tip_text': 'Белгилерди мүмкүн болушунча так сүрөттөп жазыңыз. Бул ыктыярчыларга жакшыраак жардам берүүгө көмөктөшөт.',
-  'symptom.send_request': '📤 Сурам жөнөтүү',
+  'symptom.send_request': 'Сурам жөнөтүү',
 };
 
 const DICTS: Record<AppLang, Dict> = { ru: RU, en: EN, kg: KG };

@@ -68,7 +68,10 @@ export default function HomeScreen() {
 
 				<Pressable onPress={callEmergency103} style={styles.sosWrap}>
 					<LinearGradient colors={[...Gradients.sos]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.sosBtn}>
-						<ThemedText style={[styles.sosText, { color: '#fff' }]}>{t(lang, 'home.sos_button')}</ThemedText>
+						<View style={styles.sosBtnContent}>
+							<AppIcon name="sos" size={20} color="#fff" />
+							<ThemedText style={[styles.sosText, { color: '#fff' }]}>{t(lang, 'home.sos_button')}</ThemedText>
+						</View>
 					</LinearGradient>
 				</Pressable>
 			</View>
@@ -87,7 +90,7 @@ export default function HomeScreen() {
 							style={styles.categoryCard}
 						>
 							<View style={styles.categoryTitleRow}>
-								<AppIcon name="sos" size={24} color={titleColor} />
+								<AppIcon name="nurse" size={24} color={titleColor} />
 								<ThemedText numberOfLines={2} style={[styles.categoryTitle, { color: titleColor }] }>
 									{t(lang, 'category.call_volunteer')}
 								</ThemedText>
@@ -247,6 +250,7 @@ const styles = StyleSheet.create({
 		elevation: 6,
 	},
 	sosText: { fontSize: 18, fontWeight: '700' },
+	sosBtnContent: { flexDirection: 'row', alignItems: 'center', gap: 8 },
 
 	scroll: { flex: 1 },
 	content: { padding: 24, paddingBottom: 24 },

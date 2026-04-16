@@ -273,7 +273,7 @@ export default function SymptomScreen() {
               ]}
             >
               <View style={styles.btnContentRow}>
-                <AppIcon name="pasteTick" size={18} color="#fff" />
+                <AppIcon name="email" size={18} color="#fff" />
                 <ThemedText style={styles.btnTextLight}>{sending ? t(lang, 'common.sending') : t(lang, 'symptom.send_request')}</ThemedText>
               </View>
             </Pressable>
