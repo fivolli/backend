@@ -11,6 +11,7 @@ import { t } from '@/lib/i18n';
 import { getGeoOrNull } from '@/lib/location';
 import { setLastRequestId } from '@/lib/storage';
 import { useAuth } from '@/providers/auth-provider';
+import { AppIcon } from '@/components/app-icon';
 
 export default function SymptomScreen() {
   const params = useLocalSearchParams<{ severity?: string }>();
@@ -271,7 +272,10 @@ export default function SymptomScreen() {
                 { backgroundColor: danger, marginTop: 12, opacity: sending ? 0.7 : pressed ? 0.9 : 1 },
               ]}
             >
-              <ThemedText style={styles.btnTextLight}>{sending ? t(lang, 'common.sending') : t(lang, 'symptom.send_request')}</ThemedText>
+              <View style={styles.btnContentRow}>
+                <AppIcon name="pasteTick" size={18} color="#fff" />
+                <ThemedText style={styles.btnTextLight}>{sending ? t(lang, 'common.sending') : t(lang, 'symptom.send_request')}</ThemedText>
+              </View>
             </Pressable>
           </>
         )}
@@ -353,6 +357,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  btnContentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   btnTextLight: { color: '#fff', fontWeight: '700', fontSize: 16 },
 });

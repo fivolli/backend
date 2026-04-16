@@ -31,10 +31,8 @@ const COPY = {
     emailPh: 'example@mail.com',
     phone: 'Номер телефона',
     phonePh: '+996 XXX XXX XXX',
-    allergies: 'Аллергии',
-    allergiesPh: 'Например: пенициллин, орехи',
-    chronic: 'Хронические заболевания',
-    chronicPh: 'Например: астма, диабет',
+    medicalNotes: 'Аллергии и хронические заболевания',
+    medicalNotesPh: 'Например: пенициллин, астма, диабет',
     role: 'Кто вы?',
     roleUser: 'Пользователь',
     roleVolunteer: 'Волонтёр',
@@ -65,10 +63,8 @@ const COPY = {
     emailPh: 'example@mail.com',
     phone: 'Phone number',
     phonePh: '+996 XXX XXX XXX',
-    allergies: 'Allergies',
-    allergiesPh: 'For example: penicillin, nuts',
-    chronic: 'Chronic conditions',
-    chronicPh: 'For example: asthma, diabetes',
+    medicalNotes: 'Allergies and chronic conditions',
+    medicalNotesPh: 'For example: penicillin, asthma, diabetes',
     role: 'Who are you?',
     roleUser: 'User',
     roleVolunteer: 'Volunteer',
@@ -99,10 +95,8 @@ const COPY = {
     emailPh: 'example@mail.com',
     phone: 'Телефон номери',
     phonePh: '+996 XXX XXX XXX',
-    allergies: 'Аллергиялар',
-    allergiesPh: 'Мисалы: пенициллин, жаңгак',
-    chronic: 'Өнөкөт оорулар',
-    chronicPh: 'Мисалы: астма, диабет',
+    medicalNotes: 'Аллергиялар жана өнөкөт оорулар',
+    medicalNotesPh: 'Мисалы: пенициллин, астма, диабет',
     role: 'Сиз кимсиз?',
     roleUser: 'Колдонуучу',
     roleVolunteer: 'Ыктыярчы',
@@ -157,13 +151,12 @@ export default function RegisterScreen() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [allergies, setAllergies] = useState('');
-  const [chronicConditions, setChronicConditions] = useState('');
+  const [medicalNotes, setMedicalNotes] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<UserRole>('user');
   const [plan, setPlan] = useState<'individual' | 'family'>('individual');
   const [busy, setBusy] = useState(false);
-  const [focused, setFocused] = useState<'name' | 'email' | 'phone' | 'allergies' | 'chronic' | 'password' | null>(null);
+  const [focused, setFocused] = useState<'name' | 'email' | 'phone' | 'medical' | 'password' | null>(null);
 
   const canSubmit = useMemo(() => {
     if (busy) return false;
@@ -179,6 +172,7 @@ export default function RegisterScreen() {
     const emailTrimmed = email.trim();
     const phoneTrimmed = phone.trim();
     const phoneDigits = phoneTrimmed.replace(/\D/g, '');
+    const notesTrimmed = medicalNotes.trim();
 
     if (!nameTrimmed) {
       showAlert(t(lang, 'common.error'), copy.nameRequired);
@@ -219,8 +213,8 @@ export default function RegisterScreen() {
         phone: phoneTrimmed,
         password,
         role,
-        allergies,
-        chronic_conditions: chronicConditions,
+        allergies: notesTrimmed,
+        chronic_conditions: notesTrimmed,
       });
       router.replace('/home');
       showAlert(t(lang, 'common.done'), t(lang, 'profile.register_success'));
@@ -305,29 +299,15 @@ export default function RegisterScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <ThemedText style={[styles.inputLabel, { color: titleColor }]}>{copy.allergies}</ThemedText>
+            <ThemedText style={[styles.inputLabel, { color: titleColor }]}>{copy.medicalNotes}</ThemedText>
             <TextInput
-              value={allergies}
-              onChangeText={setAllergies}
-              placeholder={copy.allergiesPh}
+              value={medicalNotes}
+              onChangeText={setMedicalNotes}
+              placeholder={copy.medicalNotesPh}
               placeholderTextColor={muted}
               multiline
-              style={[styles.textAreaField, { borderColor: focused === 'allergies' ? primary : border, color: text, backgroundColor: surface }]}
-              onFocus={() => setFocused('allergies')}
-              onBlur={() => setFocused(null)}
-            />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <ThemedText style={[styles.inputLabel, { color: titleColor }]}>{copy.chronic}</ThemedText>
-            <TextInput
-              value={chronicConditions}
-              onChangeText={setChronicConditions}
-              placeholder={copy.chronicPh}
-              placeholderTextColor={muted}
-              multiline
-              style={[styles.textAreaField, { borderColor: focused === 'chronic' ? primary : border, color: text, backgroundColor: surface }]}
-              onFocus={() => setFocused('chronic')}
+              style={[styles.textAreaField, { borderColor: focused === 'medical' ? primary : border, color: text, backgroundColor: surface }]}
+              onFocus={() => setFocused('medical')}
               onBlur={() => setFocused(null)}
             />
           </View>
