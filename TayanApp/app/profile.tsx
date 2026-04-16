@@ -359,9 +359,40 @@ export default function ProfileScreen() {
 
 		setAvatarBusy(true);
 		try {
-			const form = new FormData();
 			const name = String(asset?.fileName || asset?.filename || 'avatar.jpg');
 			const type = String(asset?.mimeType || 'image/jpeg');
+
+			if (Platform.OS === 'web') {
+				let dataUrl = '';
+				if (typeof asset?.base64 === 'string' && asset.base64.length > 0) {
+					dataUrl = `data:${type};base64,${asset.base64}`;
+				} else {
+					const raw = await fetch(uri);
+					const blob = await raw.blob();
+					dataUrl = await new Promise<string>((resolve, reject) => {
+						const reader = new FileReader();
+						reader.onload = () => resolve(String(reader.result || ''));
+						reader.onerror = () => reject(reader.error || new Error('file read failed'));
+						reader.readAsDataURL(blob);
+					});
+				}
+
+				if (!dataUrl.startsWith('data:image/')) {
+					throw new Error('failed to prepare image for upload');
+				}
+
+				await api('/auth/me', {
+					method: 'PATCH',
+					token,
+					lang,
+					body: { avatar_url: dataUrl },
+				});
+				await refreshMe();
+				Alert.alert(t(lang, 'common.done'), t(lang, 'profile.avatar_updated'));
+				return;
+			}
+
+			const form = new FormData();
 			form.append('file', { uri, name, type } as any);
 
 			const acceptLang = lang === 'kg' ? 'ky' : lang;
@@ -402,10 +433,11 @@ export default function ProfileScreen() {
 			return;
 		}
 		const res = await ImagePicker.launchImageLibraryAsync({
-			mediaTypes: ImagePicker.MediaTypeOptions.Images,
+			mediaTypes: ['images'],
 			allowsEditing: true,
 			aspect: [1, 1],
 			quality: 0.8,
+			base64: Platform.OS === 'web',
 		});
 		if (res.canceled) return;
 		const asset = res.assets?.[0];
@@ -420,10 +452,11 @@ export default function ProfileScreen() {
 			return;
 		}
 		const res = await ImagePicker.launchCameraAsync({
-			mediaTypes: ImagePicker.MediaTypeOptions.Images,
+			mediaTypes: ['images'],
 			allowsEditing: true,
 			aspect: [1, 1],
 			quality: 0.8,
+			base64: Platform.OS === 'web',
 		});
 		if (res.canceled) return;
 		const asset = res.assets?.[0];
