@@ -138,7 +138,16 @@ MAX_AVATAR_BYTES = _int_env("MAX_AVATAR_BYTES", 2 * 1024 * 1024, min_value=128 *
 GLOBAL_RATE_LIMIT_RPM = _int_env("GLOBAL_RATE_LIMIT_RPM", 240, min_value=30, max_value=3000)
 AUTH_RATE_LIMIT_RPM = _int_env("AUTH_RATE_LIMIT_RPM", 20, min_value=3, max_value=300)
 AI_RATE_LIMIT_RPM = _int_env("AI_RATE_LIMIT_RPM", 12, min_value=2, max_value=120)
-TRUSTED_HOSTS = _csv_env("TRUSTED_HOSTS", ["127.0.0.1", "localhost"])
+TRUSTED_HOSTS = _csv_env(
+    "TRUSTED_HOSTS",
+    [
+        "127.0.0.1",
+        "localhost",
+        "*.onrender.com",
+        "tayan.help",
+        "www.tayan.help",
+    ],
+)
 CORS_ALLOW_ORIGINS = _csv_env("CORS_ALLOW_ORIGINS", DEFAULT_CORS_ORIGINS)
 # Allow common hosted frontend domains (Render/Vercel) without manual per-domain updates.
 _DEFAULT_CORS_ALLOW_ORIGIN_REGEX = r"^https://([a-z0-9-]+\.)?vercel\.app$|^https://frontend-[a-z0-9-]+\.onrender\.com$|^https://(www\.)?tayan\.help$"
