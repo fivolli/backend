@@ -18,6 +18,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { setOnboardingSeen } from '@/lib/storage';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useAuth } from '@/providers/auth-provider';
 
@@ -337,13 +338,56 @@ export default function OnboardingScreen() {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const { lang } = useAuth();
+  const colorScheme = useColorScheme();
   const palette = COPY[(lang as AppLang) || 'ru'] ?? COPY.ru;
 
   const primary = useThemeColor({}, 'primary');
   const surface = useThemeColor({}, 'surface');
   const text = useThemeColor({}, 'text');
-  const muted = '#6D7B93';
-  const activeDot = '#4AA9E8';
+  const isDark = colorScheme === 'dark';
+  const ui = useMemo(
+    () =>
+      isDark
+        ? {
+            containerBg: '#0F1526',
+            cardBg: '#1A2236',
+            cardBorder: '#2F3F62',
+            cardShadow: '#000000',
+            titleColor: '#D9E5FF',
+            mutedText: '#A3B3D3',
+            activeDot: '#88C8FF',
+            inactiveDot: '#3D4D72',
+            roleCardBg: '#131C2F',
+            roleCardBorder: '#334A77',
+            levelDivider: '#2A3858',
+            timelineIconBg: '#253656',
+            timelineNumberBg: '#5B8EDB',
+            timelineLine: '#4A6EA7',
+            finalGlow: ['#2A3C66', '#1D2D52'] as const,
+            nextBtn: ['#567CCF', '#4D67B2'] as const,
+            finalBtn: ['#5C8BE0', '#4769B7'] as const,
+          }
+        : {
+            containerBg: '#F8FDFF',
+            cardBg: surface,
+            cardBorder: '#B8F0EA',
+            cardShadow: '#77E2D8',
+            titleColor: primary,
+            mutedText: '#6D7B93',
+            activeDot: '#4AA9E8',
+            inactiveDot: '#D1D9E6',
+            roleCardBg: '#F9FDFF',
+            roleCardBorder: '#C9E8F5',
+            levelDivider: '#DCECF5',
+            timelineIconBg: '#E1F6FF',
+            timelineNumberBg: '#4A95D2',
+            timelineLine: '#B7D9F1',
+            finalGlow: ['#CFF6F1', '#D6EAFF'] as const,
+            nextBtn: ['#9AF2DE', '#6DE8C3'] as const,
+            finalBtn: ['#13E0C7', '#12C69F'] as const,
+          },
+    [isDark, primary, surface]
+  );
   const lastIndex = palette.slides.length - 1;
 
   const scrollRef = useRef<ScrollView | null>(null);
@@ -406,13 +450,13 @@ export default function OnboardingScreen() {
 
   return (
     <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
-      <ThemedView style={styles.container}>
+      <ThemedView style={[styles.container, { backgroundColor: ui.containerBg }]}> 
       {index < lastIndex ? (
         <Pressable
           onPress={() => void complete('/login')}
           disabled={completing}
           style={[styles.skipButton, { top: Math.max(insets.top + 6, 16) }]}>
-          <ThemedText style={[styles.skipText, { color: muted }]}>{palette.skip}</ThemedText>
+          <ThemedText style={[styles.skipText, { color: ui.mutedText }]}>{palette.skip}</ThemedText>
         </Pressable>
       ) : null}
 
@@ -428,24 +472,24 @@ export default function OnboardingScreen() {
         scrollEventThrottle={16}
         onMomentumScrollEnd={onScrollEnd}>
         <View style={slideStyle}>
-          <View style={[styles.card, { backgroundColor: surface, minHeight: slideMinHeight }]}>
+          <View style={[styles.card, { backgroundColor: ui.cardBg, borderColor: ui.cardBorder, shadowColor: ui.cardShadow, minHeight: slideMinHeight }]}> 
             <Image source={require('../shield-removebg-preview.png')} style={styles.headerImage} resizeMode="contain" />
             <Image source={require('../hands-removebg-preview.png')} style={styles.heroImage} resizeMode="contain" />
-            <ThemedText style={[styles.title, { color: primary }]}>{palette.slides[0].title}</ThemedText>
+            <ThemedText style={[styles.title, { color: ui.titleColor }]}>{palette.slides[0].title}</ThemedText>
             <ThemedText style={[styles.body, { color: text }]}>{palette.slides[0].body}</ThemedText>
           </View>
         </View>
 
         <View style={slideStyle}>
-          <View style={[styles.card, styles.roleDemoCard, { backgroundColor: surface }]}> 
+          <View style={[styles.card, styles.roleDemoCard, { backgroundColor: ui.cardBg, borderColor: ui.cardBorder, shadowColor: ui.cardShadow }]}> 
             <Image source={require('../shield-removebg-preview.png')} style={styles.headerImage} resizeMode="contain" />
-            <ThemedText style={[styles.title, styles.roleTitle, { color: primary }]}>{palette.roleDemo.title}</ThemedText>
+            <ThemedText style={[styles.title, styles.roleTitle, { color: ui.titleColor }]}>{palette.roleDemo.title}</ThemedText>
             <View style={styles.roleCardsWrap}>
               {palette.roleDemo.cards.map((card) => (
-                <View key={card.title} style={styles.roleCard}>
+                <View key={card.title} style={[styles.roleCard, { backgroundColor: ui.roleCardBg, borderColor: ui.roleCardBorder }]}>
                   <View style={styles.roleCardHead}>
                     <Image source={card.image} style={styles.roleCardImage} resizeMode="contain" />
-                    <ThemedText style={[styles.roleCardTitle, { color: primary }]}>{card.title}</ThemedText>
+                    <ThemedText style={[styles.roleCardTitle, { color: ui.titleColor }]}>{card.title}</ThemedText>
                   </View>
                   <ThemedText style={[styles.roleCardDesc, { color: text }]}>{card.desc}</ThemedText>
                 </View>
@@ -455,23 +499,23 @@ export default function OnboardingScreen() {
         </View>
 
         <View style={slideStyle}>
-          <View style={[styles.card, { backgroundColor: surface, minHeight: slideMinHeight }]}>
+          <View style={[styles.card, { backgroundColor: ui.cardBg, borderColor: ui.cardBorder, shadowColor: ui.cardShadow, minHeight: slideMinHeight }]}> 
             <Image source={require('../shield-removebg-preview.png')} style={styles.headerImage} resizeMode="contain" />
-            <ThemedText style={[styles.title, { color: primary }]}>{palette.slides[2].title}</ThemedText>
+            <ThemedText style={[styles.title, { color: ui.titleColor }]}>{palette.slides[2].title}</ThemedText>
             <View style={styles.levelsWrap}>
               {palette.levels.map((level, levelIndex) => (
                 <View
                   key={level.title}
-                  style={[styles.levelRow, levelIndex < palette.levels.length - 1 ? styles.levelDivider : null]}>
+                  style={[styles.levelRow, levelIndex < palette.levels.length - 1 ? [styles.levelDivider, { borderBottomColor: ui.levelDivider }] : null]}>
                   <View style={[styles.levelIcon, { backgroundColor: `${level.color}22` }]}>
                     <Image source={level.image} style={styles.levelImage} resizeMode="contain" />
                   </View>
                   <View style={styles.levelTextWrap}>
                     <View style={styles.levelHeading}>
                       <View style={[styles.signal, { backgroundColor: level.color }]} />
-                      <ThemedText style={[styles.levelTitle, { color: text }]}>{level.title}</ThemedText>
+                      <ThemedText style={[styles.levelTitle, { color: ui.titleColor }]}>{level.title}</ThemedText>
                     </View>
-                    <ThemedText style={[styles.levelDesc, { color: muted }]}>{level.desc}</ThemedText>
+                    <ThemedText style={[styles.levelDesc, { color: ui.mutedText }]}>{level.desc}</ThemedText>
                   </View>
                 </View>
               ))}
@@ -480,26 +524,26 @@ export default function OnboardingScreen() {
         </View>
 
         <View style={slideStyle}>
-          <View style={[styles.card, { backgroundColor: surface, minHeight: slideMinHeight }]}>
+          <View style={[styles.card, { backgroundColor: ui.cardBg, borderColor: ui.cardBorder, shadowColor: ui.cardShadow, minHeight: slideMinHeight }]}> 
             <Image source={require('../shield-removebg-preview.png')} style={styles.headerImage} resizeMode="contain" />
-            <ThemedText style={[styles.title, { color: primary }]}>{palette.slides[3].title}</ThemedText>
+            <ThemedText style={[styles.title, { color: ui.titleColor }]}>{palette.slides[3].title}</ThemedText>
             <View style={styles.timelineWrap}>
               {palette.timeline.map((step, stepIndex) => (
                 <View key={step.title} style={styles.timelineRow}>
                   <View style={styles.timelineLeft}>
-                    <View style={styles.timelineIconWrap}>
+                    <View style={[styles.timelineIconWrap, { backgroundColor: ui.timelineIconBg }]}> 
                       <Image source={step.image} style={styles.timelineImage} resizeMode="contain" />
                     </View>
                   </View>
                   <View style={styles.timelineMiddle}>
-                    <View style={styles.timelineNumber}>
+                    <View style={[styles.timelineNumber, { backgroundColor: ui.timelineNumberBg }]}> 
                       <ThemedText style={styles.timelineNumberText}>{stepIndex + 1}</ThemedText>
                     </View>
-                    {stepIndex < palette.timeline.length - 1 ? <View style={styles.timelineLine} /> : null}
+                    {stepIndex < palette.timeline.length - 1 ? <View style={[styles.timelineLine, { backgroundColor: ui.timelineLine }]} /> : null}
                   </View>
                   <View style={styles.timelineRight}>
-                    <ThemedText style={[styles.timelineTitle, { color: text }]}>{step.title}</ThemedText>
-                    <ThemedText style={[styles.timelineDesc, { color: muted }]}>{step.desc}</ThemedText>
+                    <ThemedText style={[styles.timelineTitle, { color: ui.titleColor }]}>{step.title}</ThemedText>
+                    <ThemedText style={[styles.timelineDesc, { color: ui.mutedText }]}>{step.desc}</ThemedText>
                   </View>
                 </View>
               ))}
@@ -512,10 +556,10 @@ export default function OnboardingScreen() {
             nestedScrollEnabled
             showsVerticalScrollIndicator={false}
             contentContainerStyle={[styles.finalSlideScrollContent, { paddingBottom: footerReservedSpace }]}>
-            <View style={[styles.card, styles.finalCard, { backgroundColor: surface, minHeight: slideMinHeight }]}>
+            <View style={[styles.card, styles.finalCard, { backgroundColor: ui.cardBg, borderColor: ui.cardBorder, shadowColor: ui.cardShadow, minHeight: slideMinHeight }]}> 
               <Image source={require('../shield-removebg-preview.png')} style={styles.headerImage} resizeMode="contain" />
-              <ThemedText style={[styles.title, styles.finalTitle, { color: primary }]}>{palette.slides[4].title}</ThemedText>
-              <LinearGradient colors={['#CFF6F1', '#D6EAFF']} style={styles.finalShieldGlow}>
+              <ThemedText style={[styles.title, styles.finalTitle, { color: ui.titleColor }]}>{palette.slides[4].title}</ThemedText>
+              <LinearGradient colors={[...ui.finalGlow]} style={styles.finalShieldGlow}>
                 <Image source={require('../shield-removebg-preview.png')} style={styles.finalShieldImage} resizeMode="contain" />
               </LinearGradient>
               <ThemedText style={[styles.body, styles.finalBody, { color: text }]}>{palette.slides[4].body}</ThemedText>
@@ -532,7 +576,7 @@ export default function OnboardingScreen() {
               style={[
                 styles.dot,
                 {
-                  backgroundColor: dotIndex === index ? activeDot : '#D1D9E6',
+                  backgroundColor: dotIndex === index ? ui.activeDot : ui.inactiveDot,
                   width: dotIndex === index ? 14 : 8,
                 },
               ]}
@@ -542,13 +586,13 @@ export default function OnboardingScreen() {
 
         {index < lastIndex ? (
           <Pressable onPress={() => void goNext()} style={styles.actionWrap} disabled={completing}>
-            <LinearGradient colors={['#9AF2DE', '#6DE8C3']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.primaryButton}>
+            <LinearGradient colors={[...ui.nextBtn]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.primaryButton}>
               <ThemedText style={styles.primaryButtonText}>{palette.slides[index].cta}</ThemedText>
             </LinearGradient>
           </Pressable>
         ) : (
           <Pressable onPress={() => void complete()} style={styles.actionWrap} disabled={completing}>
-            <LinearGradient colors={['#13E0C7', '#12C69F']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.primaryButton}>
+            <LinearGradient colors={[...ui.finalBtn]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.primaryButton}>
               <ThemedText style={styles.primaryButtonText}>{palette.continue}</ThemedText>
             </LinearGradient>
           </Pressable>
@@ -562,7 +606,6 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FDFF',
   },
   pager: {
     flex: 1,
