@@ -487,83 +487,107 @@ export default function OnboardingScreen() {
         scrollEventThrottle={16}
         onMomentumScrollEnd={onScrollEnd}>
         <View style={slideStyle}>
-          <View style={[styles.card, { backgroundColor: ui.cardBg, borderColor: ui.cardBorder, shadowColor: ui.cardShadow, minHeight: slideMinHeight }]}> 
-            <Image source={require('../shield-removebg-preview.png')} style={styles.headerImage} resizeMode="contain" />
-            <Image source={require('../hands-removebg-preview.png')} style={styles.heroImage} resizeMode="contain" />
-            <ThemedText style={[styles.title, { color: ui.titleColor }]}>{palette.slides[0].title}</ThemedText>
-            <ThemedText style={[styles.body, { color: text }]}>{palette.slides[0].body}</ThemedText>
-          </View>
+          <ScrollView
+            nestedScrollEnabled
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={[styles.slideScrollContent, { paddingBottom: footerReservedSpace }]}
+          >
+            <View style={[styles.card, { backgroundColor: ui.cardBg, borderColor: ui.cardBorder, shadowColor: ui.cardShadow, minHeight: slideMinHeight }]}> 
+              <Image source={require('../shield-removebg-preview.png')} style={styles.headerImage} resizeMode="contain" />
+              <Image source={require('../hands-removebg-preview.png')} style={styles.heroImage} resizeMode="contain" />
+              <ThemedText style={[styles.title, { color: ui.titleColor }]}>{palette.slides[0].title}</ThemedText>
+              <ThemedText style={[styles.body, { color: text }]}>{palette.slides[0].body}</ThemedText>
+            </View>
+          </ScrollView>
         </View>
 
         <View style={slideStyle}>
-          <View style={[styles.card, styles.roleDemoCard, { backgroundColor: ui.cardBg, borderColor: ui.cardBorder, shadowColor: ui.cardShadow }]}> 
-            <Image source={require('../shield-removebg-preview.png')} style={styles.headerImage} resizeMode="contain" />
-            <ThemedText style={[styles.title, styles.roleTitle, { color: ui.titleColor }]}>{palette.roleDemo.title}</ThemedText>
-            <View style={styles.roleCardsWrap}>
-              {palette.roleDemo.cards.map((card) => (
-                <View key={card.title} style={[styles.roleCard, { backgroundColor: ui.roleCardBg, borderColor: ui.roleCardBorder }]}>
-                  <View style={styles.roleCardHead}>
-                    <Image source={card.image} style={styles.roleCardImage} resizeMode="contain" />
-                    <ThemedText style={[styles.roleCardTitle, { color: ui.titleColor }]}>{card.title}</ThemedText>
+          <ScrollView
+            nestedScrollEnabled
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={[styles.slideScrollContent, { paddingBottom: footerReservedSpace }]}
+          >
+            <View style={[styles.card, styles.roleDemoCard, { backgroundColor: ui.cardBg, borderColor: ui.cardBorder, shadowColor: ui.cardShadow }]}> 
+              <Image source={require('../shield-removebg-preview.png')} style={styles.headerImage} resizeMode="contain" />
+              <ThemedText style={[styles.title, styles.roleTitle, { color: ui.titleColor }]}>{palette.roleDemo.title}</ThemedText>
+              <View style={styles.roleCardsWrap}>
+                {palette.roleDemo.cards.map((card) => (
+                  <View key={card.title} style={[styles.roleCard, { backgroundColor: ui.roleCardBg, borderColor: ui.roleCardBorder }]}>
+                    <View style={styles.roleCardHead}>
+                      <Image source={card.image} style={styles.roleCardImage} resizeMode="contain" />
+                      <ThemedText style={[styles.roleCardTitle, { color: ui.titleColor }]}>{card.title}</ThemedText>
+                    </View>
+                    <ThemedText style={[styles.roleCardDesc, { color: text }]}>{card.desc}</ThemedText>
                   </View>
-                  <ThemedText style={[styles.roleCardDesc, { color: text }]}>{card.desc}</ThemedText>
-                </View>
-              ))}
+                ))}
+              </View>
             </View>
-          </View>
+          </ScrollView>
         </View>
 
         <View style={slideStyle}>
-          <View style={[styles.card, { backgroundColor: ui.cardBg, borderColor: ui.cardBorder, shadowColor: ui.cardShadow, minHeight: slideMinHeight }]}> 
-            <Image source={require('../shield-removebg-preview.png')} style={styles.headerImage} resizeMode="contain" />
-            <ThemedText style={[styles.title, { color: ui.titleColor }]}>{palette.slides[2].title}</ThemedText>
-            <View style={styles.levelsWrap}>
-              {palette.levels.map((level, levelIndex) => (
-                <View
-                  key={level.title}
-                  style={[styles.levelRow, levelIndex < palette.levels.length - 1 ? [styles.levelDivider, { borderBottomColor: ui.levelDivider }] : null]}>
-                  <View style={[styles.levelIcon, { backgroundColor: `${level.color}22` }]}>
-                    <Image source={level.image} style={styles.levelImage} resizeMode="contain" />
-                  </View>
-                  <View style={styles.levelTextWrap}>
-                    <View style={styles.levelHeading}>
-                      <View style={[styles.signal, { backgroundColor: level.color }]} />
-                      <ThemedText style={[styles.levelTitle, { color: ui.titleColor }]}>{level.title}</ThemedText>
+          <ScrollView
+            nestedScrollEnabled
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={[styles.slideScrollContent, { paddingBottom: footerReservedSpace }]}
+          >
+            <View style={[styles.card, { backgroundColor: ui.cardBg, borderColor: ui.cardBorder, shadowColor: ui.cardShadow, minHeight: slideMinHeight }]}> 
+              <Image source={require('../shield-removebg-preview.png')} style={styles.headerImage} resizeMode="contain" />
+              <ThemedText style={[styles.title, { color: ui.titleColor }]}>{palette.slides[2].title}</ThemedText>
+              <View style={styles.levelsWrap}>
+                {palette.levels.map((level, levelIndex) => (
+                  <View
+                    key={level.title}
+                    style={[styles.levelRow, levelIndex < palette.levels.length - 1 ? [styles.levelDivider, { borderBottomColor: ui.levelDivider }] : null]}>
+                    <View style={[styles.levelIcon, { backgroundColor: `${level.color}22` }]}> 
+                      <Image source={level.image} style={styles.levelImage} resizeMode="contain" />
                     </View>
-                    <ThemedText style={[styles.levelDesc, { color: ui.mutedText }]}>{level.desc}</ThemedText>
+                    <View style={styles.levelTextWrap}>
+                      <View style={styles.levelHeading}>
+                        <View style={[styles.signal, { backgroundColor: level.color }]} />
+                        <ThemedText style={[styles.levelTitle, { color: ui.titleColor }]}>{level.title}</ThemedText>
+                      </View>
+                      <ThemedText style={[styles.levelDesc, { color: ui.mutedText }]}>{level.desc}</ThemedText>
+                    </View>
                   </View>
-                </View>
-              ))}
+                ))}
+              </View>
             </View>
-          </View>
+          </ScrollView>
         </View>
 
         <View style={slideStyle}>
-          <View style={[styles.card, { backgroundColor: ui.cardBg, borderColor: ui.cardBorder, shadowColor: ui.cardShadow, minHeight: slideMinHeight }]}> 
-            <Image source={require('../shield-removebg-preview.png')} style={styles.headerImage} resizeMode="contain" />
-            <ThemedText style={[styles.title, { color: ui.titleColor }]}>{palette.slides[3].title}</ThemedText>
-            <View style={styles.timelineWrap}>
-              {palette.timeline.map((step, stepIndex) => (
-                <View key={step.title} style={styles.timelineRow}>
-                  <View style={styles.timelineLeft}>
-                    <View style={[styles.timelineIconWrap, { backgroundColor: ui.timelineIconBg }]}> 
-                      <Image source={step.image} style={styles.timelineImage} resizeMode="contain" />
+          <ScrollView
+            nestedScrollEnabled
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={[styles.slideScrollContent, { paddingBottom: footerReservedSpace }]}
+          >
+            <View style={[styles.card, { backgroundColor: ui.cardBg, borderColor: ui.cardBorder, shadowColor: ui.cardShadow, minHeight: slideMinHeight }]}> 
+              <Image source={require('../shield-removebg-preview.png')} style={styles.headerImage} resizeMode="contain" />
+              <ThemedText style={[styles.title, { color: ui.titleColor }]}>{palette.slides[3].title}</ThemedText>
+              <View style={styles.timelineWrap}>
+                {palette.timeline.map((step, stepIndex) => (
+                  <View key={step.title} style={styles.timelineRow}>
+                    <View style={styles.timelineLeft}>
+                      <View style={[styles.timelineIconWrap, { backgroundColor: ui.timelineIconBg }]}> 
+                        <Image source={step.image} style={styles.timelineImage} resizeMode="contain" />
+                      </View>
+                    </View>
+                    <View style={styles.timelineMiddle}>
+                      <View style={[styles.timelineNumber, { backgroundColor: ui.timelineNumberBg }]}> 
+                        <ThemedText style={styles.timelineNumberText}>{stepIndex + 1}</ThemedText>
+                      </View>
+                      {stepIndex < palette.timeline.length - 1 ? <View style={[styles.timelineLine, { backgroundColor: ui.timelineLine }]} /> : null}
+                    </View>
+                    <View style={styles.timelineRight}>
+                      <ThemedText style={[styles.timelineTitle, { color: ui.titleColor }]}>{step.title}</ThemedText>
+                      <ThemedText style={[styles.timelineDesc, { color: ui.mutedText }]}>{step.desc}</ThemedText>
                     </View>
                   </View>
-                  <View style={styles.timelineMiddle}>
-                    <View style={[styles.timelineNumber, { backgroundColor: ui.timelineNumberBg }]}> 
-                      <ThemedText style={styles.timelineNumberText}>{stepIndex + 1}</ThemedText>
-                    </View>
-                    {stepIndex < palette.timeline.length - 1 ? <View style={[styles.timelineLine, { backgroundColor: ui.timelineLine }]} /> : null}
-                  </View>
-                  <View style={styles.timelineRight}>
-                    <ThemedText style={[styles.timelineTitle, { color: ui.titleColor }]}>{step.title}</ThemedText>
-                    <ThemedText style={[styles.timelineDesc, { color: ui.mutedText }]}>{step.desc}</ThemedText>
-                  </View>
-                </View>
-              ))}
+                ))}
+              </View>
             </View>
-          </View>
+          </ScrollView>
         </View>
 
         <View style={slideStyle}>
@@ -838,6 +862,9 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   finalSlideScrollContent: {
+    flexGrow: 1,
+  },
+  slideScrollContent: {
     flexGrow: 1,
   },
   finalCard: {
