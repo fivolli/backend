@@ -21,6 +21,7 @@ import { setOnboardingSeen } from '@/lib/storage';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useAuth } from '@/providers/auth-provider';
+import { useAppTheme } from '@/providers/theme-provider';
 
 type AppLang = 'ru' | 'en' | 'kg';
 
@@ -339,6 +340,7 @@ export default function OnboardingScreen() {
   const insets = useSafeAreaInsets();
   const { lang } = useAuth();
   const colorScheme = useColorScheme();
+  const { setThemePreference } = useAppTheme();
   const palette = COPY[(lang as AppLang) || 'ru'] ?? COPY.ru;
 
   const primary = useThemeColor({}, 'primary');
@@ -368,26 +370,32 @@ export default function OnboardingScreen() {
             finalBtn: ['#5C8BE0', '#4769B7'] as const,
           }
         : {
-            containerBg: '#F8FDFF',
+            containerBg: '#F3F7FF',
             cardBg: surface,
-            cardBorder: '#B8F0EA',
-            cardShadow: '#77E2D8',
+            cardBorder: '#C7D6EE',
+            cardShadow: '#7E97C9',
             titleColor: primary,
-            mutedText: '#6D7B93',
-            activeDot: '#4AA9E8',
-            inactiveDot: '#D1D9E6',
-            roleCardBg: '#F9FDFF',
-            roleCardBorder: '#C9E8F5',
-            levelDivider: '#DCECF5',
-            timelineIconBg: '#E1F6FF',
-            timelineNumberBg: '#4A95D2',
-            timelineLine: '#B7D9F1',
-            finalGlow: ['#CFF6F1', '#D6EAFF'] as const,
-            nextBtn: ['#9AF2DE', '#6DE8C3'] as const,
-            finalBtn: ['#13E0C7', '#12C69F'] as const,
+            mutedText: '#5E7095',
+            activeDot: '#5D88D9',
+            inactiveDot: '#C7D2E7',
+            roleCardBg: '#F5F9FF',
+            roleCardBorder: '#CBD9F1',
+            levelDivider: '#D4E0F3',
+            timelineIconBg: '#EAF1FF',
+            timelineNumberBg: '#4E7DCC',
+            timelineLine: '#9BB8E8',
+            finalGlow: ['#DDE9FF', '#E8F0FF'] as const,
+            nextBtn: ['#6F96E6', '#5677C8'] as const,
+            finalBtn: ['#4E7DCC', '#3D64B0'] as const,
           },
     [isDark, primary, surface]
   );
+
+  const themeToggleLabel = useMemo(() => {
+    if (lang === 'en') return isDark ? 'Light Theme' : 'Dark Theme';
+    if (lang === 'kg') return isDark ? 'Жарык тема' : 'Караңгы тема';
+    return isDark ? 'Светлая тема' : 'Тёмная тема';
+  }, [lang, isDark]);
   const lastIndex = palette.slides.length - 1;
 
   const scrollRef = useRef<ScrollView | null>(null);
@@ -451,6 +459,13 @@ export default function OnboardingScreen() {
   return (
     <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
       <ThemedView style={[styles.container, { backgroundColor: ui.containerBg }]}> 
+      <Pressable
+        onPress={() => void setThemePreference(isDark ? 'light' : 'dark')}
+        style={[styles.themeSwitchButton, { top: Math.max(insets.top + 6, 16), borderColor: ui.cardBorder, backgroundColor: ui.cardBg }]}
+      >
+        <ThemedText style={[styles.themeSwitchText, { color: ui.titleColor }]}>{themeToggleLabel}</ThemedText>
+      </Pressable>
+
       {index < lastIndex ? (
         <Pressable
           onPress={() => void complete('/login')}
@@ -616,6 +631,19 @@ const styles = StyleSheet.create({
     zIndex: 5,
     paddingHorizontal: 10,
     paddingVertical: 8,
+  },
+  themeSwitchButton: {
+    position: 'absolute',
+    left: 20,
+    zIndex: 6,
+    borderWidth: 1,
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  themeSwitchText: {
+    fontSize: 13,
+    fontWeight: '700',
   },
   skipText: {
     fontSize: 15,
